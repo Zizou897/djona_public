@@ -1,0 +1,194 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#2f6388", "inverse-surface": "#2e3131", "background": "#f8f9f9", "on-background": "#191c1c", "primary-fixed": "#cbe6ff", "primary": "#003b5a", "tertiary": "#26384b", "tertiary-container": "#3d4f63", "surface-bright": "#f8f9f9", "tertiary-fixed": "#d1e4fc", "surface-container-high": "#e7e8e8", "on-secondary-fixed-variant": "#663e00", "on-error": "#ffffff", "secondary-container": "#fea520", "surface": "#f8f9f9", "surface-container": "#edeeee", "on-secondary": "#ffffff", "on-secondary-fixed": "#2b1700", "on-error-container": "#93000a", "error-container": "#ffdad6", "on-tertiary-fixed": "#091d2e", "error": "#ba1a1a", "surface-container-lowest": "#ffffff", "on-surface": "#191c1c", "inverse-primary": "#9bccf6", "inverse-on-surface": "#f0f1f1", "tertiary-fixed-dim": "#b5c8e0", "outline": "#72787f", "secondary-fixed": "#ffddb9", "outline-variant": "#c1c7cf", "on-primary-fixed": "#001e30", "on-primary-container": "#94c5ee", "on-secondary-container": "#694000", "surface-variant": "#e1e3e3", "surface-container-low": "#f3f4f4", "surface-container-highest": "#e1e3e3", "secondary": "#865300", "secondary-fixed-dim": "#ffb961", "primary-container": "#1a5276", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#0e4b6e", "surface-dim": "#d9dada", "primary-fixed-dim": "#9bccf6", "on-tertiary-container": "#aec1d8", "on-primary": "#ffffff", "on-surface-variant": "#41474e", "on-tertiary-fixed-variant": "#36485c" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "section-gap": "48px", "gutter": "16px", "container-margin-desktop": "32px", "base": "8px", "container-margin-mobile": "16px" }, "fontFamily": { "label-md": ["Inter"], "headline-lg-mobile": ["Montserrat"], "headline-lg": ["Montserrat"], "headline-md": ["Montserrat"], "display-lg": ["Montserrat"], "body-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"] }, "fontSize": { "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } } .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }</style></head><body class="bg-background text-on-background min-h-screen flex flex-col font-body-md"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-margin-mobile flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center -ml-2 text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-primary truncate">Modifier Mon Annonce</h1></div></header><main class="flex-grow pt-16 bg-surface"><div class="flex flex-col w-full px-container-margin-mobile pb-8">
+<!-- Empty State (Hidden by default, shown via JS if list is empty) -->
+<div class="hidden flex flex-col items-center justify-center py-20 text-center" id="empty-state">
+<div class="w-24 h-24 mb-6 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-5xl">favorite_border</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Pas encore de favoris</h2>
+<p class="font-body-md text-on-surface-variant mb-8 max-w-[280px]">
+      Sauvegardez les véhicules qui vous font de l'œil pour les retrouver facilement ici.
+    </p>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-label-md flex items-center gap-2 shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">search</span>
+      Rechercher un véhicule
+    </button>
+</div>
+<!-- Favorites List -->
+<div class="flex flex-col gap-6" id="favorites-list">
+<!-- Summary Info -->
+<div class="flex items-center justify-between py-4">
+<p class="font-label-md text-on-surface-variant"><span id="fav-count" class="">3</span> véhicules sauvegardés</p>
+<button class="text-primary font-label-md">Tout comparer</button>
+</div>
+<!-- Vehicle Card 1 -->
+<div class="favorite-card relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(26,82,118,0.08)] group">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A front-three-quarter view of a sleek, white 2022 Toyota Land Cruiser Prado parked in a modern urban Abidjan setting. The lighting is golden hour, highlighting the vehicle's premium metallic finish and robust grille. High-end automotive photography style with shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFqzvjsbsN6Qe5txxlSZtwip2jSP-hz8tLuUW2GUSMBmdNclRcOzqCgKlbmyvrXsy9ybMGStpiYcotrFLFdzDauZKzr6vDMLJa4IWD47Uy-fTr1R5kOJ_Dd1WKIAPNRg2lrFYw0Dhmv8T6VmrkNvobGxw638_zecYNlB9dB7emMwani7s4VWg2UU1GzykGK-FKdxB89RoUPRpZ4PfpTgU74QotGnzFiu7XDGT32aa96ru-ARXE28VL">
+<!-- Badges Overlay -->
+<div class="absolute top-3 left-3 flex flex-col gap-2">
+<div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Vérifié par Djona</span>
+</div>
+</div>
+<!-- Favorite Action -->
+<button class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-error shadow-sm active:scale-90 transition-all" onclick="removeFavorite(this)">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-primary text-lg truncate">Toyota Land Cruiser Prado</h3>
+<span class="bg-surface-container text-on-surface-variant text-[10px] font-bold px-2 py-1 rounded uppercase">Occasion</span>
+</div>
+<div class="flex items-baseline gap-2 mb-4"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="text-outline text-xs line-through">47.000.000 FCFA</span><span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">trending_down</span>-2.000.000</span></div><div class="flex items-baseline gap-2"><span class="font-headline-lg text-secondary text-xl">45.000.000</span><span class="text-secondary font-label-md text-xs">FCFA</span></div></div></div>
+<!-- Specs Grid -->
+<div class="grid grid-cols-3 gap-2 mb-6 border-y border-outline-variant/30 py-3">
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">calendar_today</span>
+<span class="font-label-sm text-on-surface text-[11px]">2022</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">speed</span>
+<span class="font-label-sm text-on-surface text-[11px]">34.500 km</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">settings_input_component</span>
+<span class="font-label-sm text-on-surface text-[11px]">Automatique</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-secondary text-on-secondary font-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:opacity-90 transition-opacity shadow-sm">
+            Acheter via Djona
+          </button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed text-on-primary-fixed-variant">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Vehicle Card 2 -->
+<div class="favorite-card relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(26,82,118,0.08)] group">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A luxurious black 2021 Mercedes-Benz GLE 450 standing in front of a high-end commercial building. Night scene with sophisticated street lighting reflecting off the polished black paint. Professional editorial car shot emphasizing elegance and power." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgyw1aRwr3AyvipXyNiDSbc1j5CWb0xoDGwsgrhjTO7gG9lYEb-cd_5FJzuRJOf2wiuv-2d158HUmEdQI29t93rjwI6YqNg9VmEBpxiO5DGixiMFdx0-LBp1HNj_GdX9k2f4YUnyCNvjoliKFDxMwzZkkshqJ6RGadxuVUAZ6gPPtuXFJDNw_gL0EGKM5docD_Wa0kMVj_c54v5GJvS3n-TvIBGRaK3bltKMkXynVlAqUeGwrT45-6">
+<!-- Badges Overlay -->
+<div class="absolute top-3 left-3 flex flex-col gap-2">
+<div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Vérifié par Djona</span>
+</div>
+</div>
+<!-- Favorite Action -->
+<button class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-error shadow-sm active:scale-90 transition-all" onclick="removeFavorite(this)">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-primary text-lg truncate">Mercedes-Benz GLE 450</h3>
+<span class="bg-surface-container text-on-surface-variant text-[10px] font-bold px-2 py-1 rounded uppercase">Neuf</span>
+</div>
+<div class="flex items-baseline gap-2 mb-4">
+<span class="font-headline-lg text-secondary text-xl">62.000.000</span>
+<span class="text-secondary font-label-md text-xs">FCFA</span>
+</div>
+<!-- Specs Grid -->
+<div class="grid grid-cols-3 gap-2 mb-6 border-y border-outline-variant/30 py-3">
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">calendar_today</span>
+<span class="font-label-sm text-on-surface text-[11px]">2021</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">speed</span>
+<span class="font-label-sm text-on-surface text-[11px]">12.000 km</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">settings_input_component</span>
+<span class="font-label-sm text-on-surface text-[11px]">Automatique</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-secondary text-on-secondary font-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:opacity-90 transition-opacity shadow-sm">
+            Acheter via Djona
+          </button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed text-on-primary-fixed-variant">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Vehicle Card 3 -->
+<div class="favorite-card relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(26,82,118,0.08)] group">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A bright blue 2020 Hyundai Tucson parked on a clean suburban driveway. Bright, clear daylight showing the crisp lines of the compact SUV. High-resolution imagery with natural colors and sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa3JRqG2jA31qEDJuBoNItPvSP2FFvWJV5wVnY5eT8rFZFeD6d8kq6EUFdzOPZ4yDgqQVxxNSDCk-x4xWXaiLtd4E6ty8J5hz0IRFpRKhL9dFh2xaiwmP3tsV9Q0MxAFHjcjiYDXeHjX90g_uEsJNs_B9FizlqpEiF8SqE1rGkZrf89oGVzeKxF1lHrVBfqQM5xLL1SqKgCig7xZNbZnqsmbyqMnlLCpQSNFqSJVVzx8VHlBBjCyZ9">
+<!-- Favorite Action -->
+<button class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-error shadow-sm active:scale-90 transition-all" onclick="removeFavorite(this)">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-primary text-lg truncate">Hyundai Tucson Premium</h3>
+<span class="bg-surface-container text-on-surface-variant text-[10px] font-bold px-2 py-1 rounded uppercase">Occasion</span>
+</div>
+<div class="flex items-baseline gap-2 mb-4">
+<span class="font-headline-lg text-secondary text-xl">18.500.000</span>
+<span class="text-secondary font-label-md text-xs">FCFA</span>
+</div>
+<!-- Specs Grid -->
+<div class="grid grid-cols-3 gap-2 mb-6 border-y border-outline-variant/30 py-3">
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">calendar_today</span>
+<span class="font-label-sm text-on-surface text-[11px]">2020</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">speed</span>
+<span class="font-label-sm text-on-surface text-[11px]">58.000 km</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-outline text-sm">settings_input_component</span>
+<span class="font-label-sm text-on-surface text-[11px]">Manuel</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-secondary text-on-secondary font-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:opacity-90 transition-opacity shadow-sm">
+            Acheter via Djona
+          </button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed text-on-primary-fixed-variant">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative Sparkles JS for micro-interaction -->
+<script>
+    function removeFavorite(btn) {
+      const card = btn.closest('.favorite-card');
+      
+      // Visual feedback
+      card.style.transform = 'scale(0.95)';
+      card.style.opacity = '0';
+      
+      setTimeout(() => {
+        card.style.display = 'none';
+        
+        // Update count
+        const currentCount = document.querySelectorAll('.favorite-card[style*="display: none"]').length;
+        const totalCards = document.querySelectorAll('.favorite-card').length;
+        const remaining = totalCards - currentCount;
+        
+        document.getElementById('fav-count').textContent = remaining;
+        
+        if (remaining === 0) {
+          document.getElementById('favorites-list').classList.add('hidden');
+          document.getElementById('empty-state').classList.remove('hidden');
+          document.getElementById('empty-state').classList.add('animate-in', 'fade-in', 'duration-500');
+        }
+      }, 300);
+    }
+  </script>
+</div></main>
+
+</body></html>

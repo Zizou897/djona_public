@@ -1,0 +1,175 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-secondary-fixed-variant": "#663e00", "on-error-container": "#93000a", "on-background": "#191c1c", "error": "#ba1a1a", "primary-container": "#1a5276", "on-primary-fixed": "#001e30", "on-error": "#ffffff", "secondary-container": "#fea520", "error-container": "#ffdad6", "secondary-fixed": "#ffddb9", "outline-variant": "#c1c7cf", "on-primary-container": "#94c5ee", "tertiary-fixed-dim": "#b5c8e0", "inverse-on-surface": "#f0f1f1", "on-secondary": "#ffffff", "primary-fixed-dim": "#9bccf6", "primary-fixed": "#cbe6ff", "outline": "#72787f", "inverse-primary": "#9bccf6", "on-tertiary": "#ffffff", "surface-tint": "#2f6388", "surface-dim": "#d9dada", "surface-container-highest": "#e1e3e3", "on-tertiary-fixed": "#091d2e", "surface-variant": "#e1e3e3", "background": "#f8f9f9", "on-surface-variant": "#41474e", "tertiary-fixed": "#d1e4fc", "on-secondary-container": "#694000", "surface-bright": "#f8f9f9", "on-tertiary-fixed-variant": "#36485c", "tertiary": "#26384b", "surface-container-high": "#e7e8e8", "secondary-fixed-dim": "#ffb961", "inverse-surface": "#2e3131", "on-primary": "#ffffff", "surface-container": "#edeeee", "on-primary-fixed-variant": "#0e4b6e", "primary": "#003b5a", "on-tertiary-container": "#aec1d8", "tertiary-container": "#3d4f63", "surface": "#f8f9f9", "surface-container-lowest": "#ffffff", "surface-container-low": "#f3f4f4", "on-surface": "#191c1c", "secondary": "#865300", "on-secondary-fixed": "#2b1700" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "section-gap": "48px", "container-margin-mobile": "16px", "gutter": "16px", "base": "8px", "container-margin-desktop": "32px" }, "fontFamily": { "display-lg": ["Montserrat"], "label-sm": ["Inter"], "headline-md": ["Montserrat"], "body-md": ["Inter"], "headline-lg-mobile": ["Montserrat"], "headline-lg": ["Montserrat"], "body-lg": ["Inter"], "label-md": ["Inter"] }, "fontSize": { "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }] } } } }</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } } .soft-shadow { shadow-[0_4px_12px_rgba(26,82,118,0.08)]; } </style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 px-container-margin-mobile flex flex-col justify-center gap-base"><div class="flex items-center justify-between"><div class="flex items-center gap-base"><img alt="djona_logo.jpg" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLti_12mOSuv3JV-1K-PbPaBYaHsKPOi9yh_Rwq6ATH6jNekpqzGUG047baaE7zuYtw1wBSAXdkiLiPSjEzx3prlfWyKpUs9-OxCPTpcjMse2r6VZqo_GRPyKilg4BCIGeRFDGfi_pyur7fW20z4NGvt82Rn6gObDwbLGhKJjsWTKF3TEt2Igj2gyXo-4ZtUyacXliMztHAl4VFhMsg1duwi8lnwIlubqww69_wepUqyJzJOTrXNPDsZV9poUtw_WryG7kdpiuqUjw"/><span class="font-headline-md text-primary text-headline-md tracking-tight">Djona</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLv_30qcgyKHYuZJlUY7_bWJGVgcYIzkd29lDMsCArn2pZ4srJj7JZ_4G5M949o3ggnxXZA8rRgbkjcsRlX6OZl_hq0Wwaew5_qFOS1vvWLKMFofpI3PmILOL-uODWKPSxn9mZ8JDBPGTagl7Bk1auEfoTP4humgQOwyOQc_yM4_x9wzUUf-bnjtyI_GoUSxbjDs5Zmkbp7gAJ79ep0CgHeIu4YqO66t16RrP1iXkvNU8CAgbPl0eFynFw"/></div><div class="relative flex items-center h-10 bg-surface-container rounded-lg px-3 gap-2"><span class="material-symbols-outlined text-outline text-[20px]">search</span><input class="bg-transparent border-none outline-none w-full text-label-md font-label-md text-on-surface" placeholder="Rechercher une voiture..." type="text"/></div></div></header><main class="relative w-full pt-20 bg-background min-h-screen"><div class="flex flex-col w-full pb-24">
+<!-- Search Header & Filters -->
+<div class="sticky top-0 z-30 bg-surface/95 backdrop-blur-md px-container-margin-mobile py-4 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-12 bg-surface-container rounded-xl flex items-center px-4 gap-3 shadow-sm transition-all focus-within:shadow-md">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none outline-none w-full text-label-md font-label-md text-on-surface" type="text" value="Toyota Land Cruiser"/>
+</div>
+<button class="h-12 px-4 bg-primary text-on-primary rounded-xl flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+<span class="font-label-md text-label-md">Filtres</span>
+</button>
+</div>
+<!-- Quick Filter Chips -->
+<div class="flex overflow-x-auto gap-2 no-scrollbar -mx-container-margin-mobile px-container-margin-mobile">
+<button class="flex-none px-4 py-2 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm shadow-sm">SUV</button>
+<button class="flex-none px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-label-sm">Berline</button>
+<button class="flex-none px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-label-sm">Moins de 10M FCFA</button>
+<button class="flex-none px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-label-sm">Automatique</button>
+<button class="flex-none px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-label-sm">Hybride</button>
+</div>
+</div>
+<!-- Results Count & Sorting -->
+<div class="px-container-margin-mobile py-2 flex justify-between items-center">
+<span class="text-on-surface-variant font-label-sm text-label-sm">124 voitures trouvées</span>
+<button class="flex items-center gap-1 text-primary font-label-sm text-label-sm">
+<span>Trier par: Prix</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<!-- Vehicle Listings Grid -->
+<div class="flex flex-col gap-6 px-container-margin-mobile mt-2">
+<!-- Vehicle Card 1 -->
+<div class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden soft-shadow transition-all active:scale-[0.98]">
+<div class="relative aspect-[16/9] w-full">
+<img class="w-full h-full object-cover" data-alt="A professional studio photograph of a clean, white 2022 Toyota Land Cruiser Prado parked in a minimalist luxury garage. Soft cinematic lighting highlights the sleek curves of the car. High-end automotive photography style with deep shadows and vibrant white tones, matching the premium navy and orange Djona brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZALqIQvtHZiTLxoUMkL-9vg33aAXYpnCjhQ7aL2jqxbYcOBZF8dFst9c7SILL92VMyIZkZ3oyVrehoDzhsIMyonGoSb8CYHZdaAPL3NzfmK_RRaM_efxNPetIukAxX5Z8Iaa4o3LKuGcSFRjaZERnGzxDVNh6iDOREPXlqW0qPDECYmOZzxy_87AO6KVm404PUEeYGAdGmGkFErO3BRvzo4I8gC0UPMqbM_7TJzGrGt9wUj1oUV4t"/>
+<div class="absolute top-3 left-3 flex flex-col gap-2">
+<span class="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+            Vérifié par Djona
+          </span>
+<span class="px-3 py-1 bg-primary/90 backdrop-blur-md text-on-primary rounded-full font-label-sm text-label-sm w-fit">Nouveau</span>
+</div>
+<button class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white" onclick="event.preventDefault(); this.querySelector('span').style.fontVariationSettings = '\'FILL\' 1'; this.style.color = '#fea520';">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<h3 class="font-headline-md text-headline-md text-primary leading-tight">Toyota Land Cruiser</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Prado V6 • 2022</p>
+</div>
+<p class="text-secondary font-headline-md text-headline-md">45M FCFA</p>
+</div>
+<div class="flex items-center gap-4 py-2 border-t border-outline-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">speed</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">24,500 km</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">settings_accessibility</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Automatique</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">local_gas_station</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Essence</span>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 active:brightness-90 transition-all">
+          Acheter via Djona
+        </button>
+</div>
+</div>
+<!-- Vehicle Card 2 -->
+<div class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden soft-shadow transition-all active:scale-[0.98]">
+<div class="relative aspect-[16/9] w-full">
+<img class="w-full h-full object-cover" data-alt="A modern dark grey Mercedes-Benz C-Class driving through the streets of Abidjan at sunset. The warm golden hour light reflects off the car's metallic surface. Blurred urban background with tropical greenery. Premium aesthetic, sharp focus on the front grille and LED headlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCArLH4dQk0hCndmc2XN9C7RBbUmuq8SKiZtnfVYHgug0iYxQCQkTgts7dO_JnCcn-gzKgWf3VBDnNcbltwu9BaxNYhEYVMOwl4c1u2u-ciYtrEt490CHYIcjauEgzXrqhu5QEIO03wBZLYWR5kMsUFP_UGUbF_VJBAS79B-TjZsEUerqEV6VpdEdK06twT3NkMJ_eYMgLanoxhlf0L0ebA6IE425IT6TDkQp5vwcmUfmYIHgd7B0BU"/>
+<div class="absolute top-3 left-3">
+<span class="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+            Vérifié par Djona
+          </span>
+</div>
+<button class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<h3 class="font-headline-md text-headline-md text-primary leading-tight">Mercedes-Benz</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Classe C 200 • 2020</p>
+</div>
+<p class="text-secondary font-headline-md text-headline-md">28M FCFA</p>
+</div>
+<div class="flex items-center gap-4 py-2 border-t border-outline-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">speed</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">42,000 km</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">settings_accessibility</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Automatique</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[18px]">local_gas_station</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Essence</span>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary h-12 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 active:brightness-90 transition-all">
+          Acheter via Djona
+        </button>
+</div>
+</div>
+<!-- Vehicle Card 3 (Compact/Two Column for variety) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden soft-shadow flex flex-col">
+<div class="relative aspect-square w-full">
+<img class="w-full h-full object-cover" data-alt="A bright red Kia Sportage 2021 model shown from a low angle. High contrast against a clean architectural wall. Vibrant colors, sleek finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5z4IkkCQHzJkXpbk8bbeGKGzkoEQyoL97_c19s6NPHf2Wuhmb_disuyIXJtZE6OKw1ZQH_qvn2dCjJkhDszJqrBDUePYeu6H4BhmyCmZfwA9e_f7HgU7qdmtU8eRLDfKEuzzBu5Jcc3BWJhDT9lgvTzvS_fLXIkUgxWrEK0Yi4k5Zhj-jG8TGXhbFFDWOH6d-mRtNROY_x3d4Swf3C7oeoz7LN2VbrjkYuu8QCocZwknEJFZpFwHO"/>
+<span class="absolute top-2 left-2 px-2 py-0.5 bg-primary/80 backdrop-blur text-white text-[10px] rounded-full">Neuf</span>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h4 class="font-label-md text-label-md text-primary truncate">Kia Sportage</h4>
+<p class="text-secondary font-label-md text-label-md">18.5M FCFA</p>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] text-on-surface-variant font-label-sm">2021 • 15k km</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden soft-shadow flex flex-col">
+<div class="relative aspect-square w-full">
+<img class="w-full h-full object-cover" data-alt="A midnight blue Hyundai Tucson 2019 in a suburban setting. Elegant and family-friendly vibe. Afternoon sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcFsrhkQth5fG7mM0tAgnknEVbhYbixdMpwYlOvtF9Ls3MEy6K445XPC9XVQa8pIY4El0_rP5A06qhmcrjgS7eiXGczbioCGhxr67pkk0vK4IB_gxX0tkLnhSV0Gn_S0p_LlcsQe9lryPkWOZd1xavTMI8qB2tkA7EdD1X6TZz-KOdWI8vIMahrJFFROW2fOYFZzcsCnfiba0U486fvnd-sJXsw0m0W8VoR2xCUFN7O96lX7TUDFqS"/>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h4 class="font-label-md text-label-md text-primary truncate">Hyundai Tucson</h4>
+<p class="text-secondary font-label-md text-label-md">14.2M FCFA</p>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] text-on-surface-variant font-label-sm">2019 • 68k km</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative Sparkles JS for "Delight" -->
+<script>
+    document.querySelectorAll('.group').forEach(card => {
+      card.addEventListener('click', () => {
+        const rect = card.getBoundingClientRect();
+        for (let i = 0; i < 5; i++) {
+          const sparkle = document.createElement('div');
+          sparkle.className = 'fixed pointer-events-none z-50';
+          sparkle.innerHTML = '✨';
+          sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+          sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+          sparkle.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          document.body.appendChild(sparkle);
+          
+          setTimeout(() => {
+            sparkle.style.transform = `translate(${(Math.random() - 0.5) * 100}px, -100px) scale(0)`;
+            sparkle.style.opacity = '0';
+          }, 10);
+          
+          setTimeout(() => sparkle.remove(), 600);
+        }
+      });
+    });
+  </script>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-secondary"><div class="flex justify-around items-center h-16"><a aria-current="page" class="flex flex-col items-center gap-0.5 transition-colors text-secondary" data-path="acheter" href="#"><span class="material-symbols-outlined">directions_car</span><span class="font-label-sm text-label-sm">Acheter</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant transition-colors" data-path="vendre" href="#"><span class="material-symbols-outlined">sell</span><span class="font-label-sm text-label-sm">Vendre</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant transition-colors" data-path="favoris" href="#"><span class="material-symbols-outlined">favorite</span><span class="font-label-sm text-label-sm">Favoris</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant transition-colors" data-path="profil" href="#"><span class="material-symbols-outlined">person</span><span class="font-label-sm text-label-sm">Profil</span></a></div></nav></body></html>
