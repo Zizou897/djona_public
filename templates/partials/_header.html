@@ -1,0 +1,36 @@
+{% load static %}
+{# Header public — porté depuis _mockups/01_public/desktop/djona_accueil/code.html #}
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-signature">
+  <div class="h-20 max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop flex items-center justify-between">
+
+    <a href="{% url 'core:home' %}" class="flex items-center gap-base">
+      <img src="{% static 'img/djona-logo.png' %}" alt="Djona" class="h-8 w-auto object-contain">
+      <span class="font-headline-md text-headline-md text-primary">Djona</span>
+    </a>
+
+    <nav class="hidden lg:flex items-center gap-gutter" aria-label="Navigation principale">
+      <a href="{% url 'core:home' %}"
+         class="font-label-md text-label-md transition-colors py-2 text-secondary border-b-2 border-secondary font-bold"
+         aria-current="page">Acheter</a>
+      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Vendre</a>
+      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Nos Services</a>
+      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-base">
+      <a href="#"
+         class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded-lg hover:bg-primary-fixed transition-colors">
+        Publier mon véhicule
+      </a>
+      <button type="button"
+              class="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-2.5 rounded-lg font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>
+        Rechercher
+      </button>
+      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-2" aria-hidden="true">
+        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+      </div>
+    </div>
+
+  </div>
+</header>

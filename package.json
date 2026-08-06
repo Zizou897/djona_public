@@ -1,0 +1,12 @@
+{
+  "name": "djona-public",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.13"
+  }
+}
