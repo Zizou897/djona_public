@@ -1,11 +1,195 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Accueil — Djona{% endblock %}
 
 {% block content %}
-  {# Le reste de la page d'accueil (hero, recherche, listings...) sera porté #}
-  {# depuis _mockups/01_public/desktop/djona_accueil/code.html dans une prochaine étape. #}
-  <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
-    <p class="font-body-md text-on-surface-variant">Header intégré. Le reste de la page d'accueil arrive prochainement.</p>
-  </div>
+<div class="flex flex-col w-full overflow-x-hidden">
+
+  {# Hero #}
+  <section class="relative w-full overflow-hidden bg-primary py-24 md:py-32 flex flex-col items-center justify-center -mt-20">
+    <div class="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-secondary-container rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-primary-fixed-dim rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4"></div>
+    </div>
+    <div class="relative z-10 max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop w-full text-center">
+      <span class="inline-block px-4 py-1.5 mb-8 rounded-full bg-white/10 backdrop-blur-sm font-label-md text-label-md text-primary-fixed uppercase tracking-[0.2em]">
+        L'Automobile en Côte d'Ivoire
+      </span>
+      <h1 class="font-display-lg text-display-lg text-on-primary mb-gutter max-w-4xl mx-auto leading-tight">
+        Achetez, vendez et gérez votre véhicule <span class="text-secondary-container">simplement</span> avec Djona
+      </h1>
+      <p class="font-body-lg text-body-lg text-primary-fixed-dim/80 mb-12 max-w-2xl mx-auto">
+        La première plateforme sécurisée qui vous accompagne de l'inspection à l'immatriculation pour une sérénité totale.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-gutter">
+        <a href="#" class="w-full sm:w-auto px-10 py-5 bg-secondary text-on-secondary font-label-md text-[18px] rounded-xl shadow-xl hover:brightness-110 hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
+          Trouver un véhicule
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+        </a>
+        <a href="#" class="w-full sm:w-auto px-10 py-5 bg-transparent border border-primary-fixed text-primary-fixed font-label-md text-[18px] rounded-xl hover:bg-white/5 transition-all text-center">
+          Mettre mon véhicule en vente
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {# Barre de recherche #}
+  <section class="relative z-20 -mt-16 max-w-[1100px] mx-auto px-container-margin-mobile w-full">
+    <div class="bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="flex flex-col gap-2">
+          <label for="search-marque" class="font-label-md text-on-surface-variant ml-1">Marque</label>
+          <div class="relative">
+            <select id="search-marque" name="marque" class="w-full h-14 pl-4 pr-10 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary font-body-md text-on-surface appearance-none outline-none">
+              <option>Toutes les marques</option>
+              <option>Toyota</option>
+              <option>Hyundai</option>
+              <option>Mercedes-Benz</option>
+              <option>Range Rover</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" aria-hidden="true">keyboard_arrow_down</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="search-modele" class="font-label-md text-on-surface-variant ml-1">Modèle</label>
+          <div class="relative">
+            <select id="search-modele" name="modele" class="w-full h-14 pl-4 pr-10 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary font-body-md text-on-surface appearance-none outline-none">
+              <option>Tous les modèles</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" aria-hidden="true">keyboard_arrow_down</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="search-prix-max" class="font-label-md text-on-surface-variant ml-1">Prix max (FCFA)</label>
+          <input id="search-prix-max" name="prix_max" type="number" placeholder="Ex: 15 000 000" class="w-full h-14 px-4 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary font-body-md text-on-surface outline-none">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="search-localisation" class="font-label-md text-on-surface-variant ml-1">Localisation</label>
+          <div class="relative">
+            <input id="search-localisation" name="localisation" type="text" placeholder="Abidjan, Yamoussoukro..." class="w-full h-14 pl-4 pr-10 bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary font-body-md text-on-surface outline-none">
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 opacity-50" aria-hidden="true">location_on</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="button" class="bg-primary text-on-primary px-12 py-4 rounded-xl font-headline-md text-headline-md shadow-md hover:brightness-125 transition-all flex items-center gap-3">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          Lancer la recherche
+        </button>
+      </div>
+    </div>
+  </section>
+
+  {# Trust bar #}
+  <section class="w-full py-section-gap bg-background">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="flex items-start gap-4 group">
+          <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
+            <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">verified_user</span>
+          </div>
+          <div>
+            <h3 class="font-headline-md text-headline-md text-primary mb-2">Sécurité Garantie</h3>
+            <p class="font-body-md text-on-surface-variant">Chaque véhicule est inspecté par nos experts avant la mise en vente. Fini les mauvaises surprises.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 group">
+          <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
+            <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">support_agent</span>
+          </div>
+          <div>
+            <h3 class="font-headline-md text-headline-md text-primary mb-2">Accompagnement</h3>
+            <p class="font-body-md text-on-surface-variant">De la visite à l'acte de vente final, nos conseillers Djona gèrent tout pour vous.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 group">
+          <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
+            <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">bolt</span>
+          </div>
+          <div>
+            <h3 class="font-headline-md text-headline-md text-primary mb-2">Simplicité Extrême</h3>
+            <p class="font-body-md text-on-surface-variant">Une interface fluide pensée pour le marché local. Vendez ou achetez en quelques clics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Véhicules en avant #}
+  <section class="w-full py-section-gap bg-surface-container-low">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-gutter">
+        <div class="max-w-2xl">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-12 h-[2px] bg-secondary" aria-hidden="true"></div>
+            <span class="font-label-md text-secondary uppercase tracking-widest">Le meilleur du marché</span>
+          </div>
+          <h2 class="font-headline-lg text-headline-lg text-primary">Véhicules en avant</h2>
+        </div>
+        <a href="#" class="group flex items-center gap-2 font-label-md text-primary hover:text-secondary transition-colors">
+          Voir tout l'inventaire
+          <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">trending_flat</span>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for vehicle in featured_vehicles %}
+          {% include 'partials/_vehicle_card.html' %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# Bannière CTA vente #}
+  <section class="w-full py-20 px-container-margin-mobile">
+    <div class="max-w-page mx-auto bg-primary rounded-3xl overflow-hidden relative">
+      <div class="absolute inset-0 opacity-10 pointer-events-none overflow-hidden" aria-hidden="true">
+        <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern height="40" id="grid" patternUnits="userSpaceOnUse" width="40">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"></path>
+            </pattern>
+          </defs>
+          <rect fill="url(#grid)" height="100%" width="100%"></rect>
+        </svg>
+      </div>
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-8 md:p-16">
+        <div class="flex flex-col gap-6">
+          <h2 class="font-display-lg text-[40px] leading-tight text-on-primary">Vous souhaitez vendre <br>votre véhicule ?</h2>
+          <p class="font-body-lg text-primary-fixed-dim/80">Rejoignez des milliers de vendeurs satisfaits. Nous nous occupons de l'inspection, des photos et de la mise en avant pour vous trouver l'acheteur idéal en un temps record.</p>
+          <div class="flex flex-wrap gap-4 mt-4">
+            <a href="#" class="bg-secondary text-on-secondary px-8 py-4 rounded-xl font-label-md text-label-md shadow-lg hover:brightness-110 transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined" aria-hidden="true">add_circle</span>
+              Vendre maintenant
+            </a>
+            <a href="#" class="bg-transparent border border-white/20 text-on-primary px-8 py-4 rounded-xl font-label-md text-label-md hover:bg-white/10 transition-all">
+              En savoir plus sur Djona Vendre
+            </a>
+          </div>
+        </div>
+        <div class="hidden lg:block relative">
+          <div class="absolute inset-0 bg-secondary-container/20 blur-3xl rounded-full scale-75" aria-hidden="true"></div>
+          <img src="{% static 'img/sell-cta-placeholder.svg' %}" alt="Illustration Djona Vendre" class="relative z-10 w-full h-auto rounded-2xl shadow-2xl">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Stats du marché local #}
+  <section class="w-full pb-section-gap">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop grid grid-cols-2 md:grid-cols-4 gap-gutter">
+      {% for stat in stats %}
+      <div class="text-center p-8 rounded-2xl bg-surface-container-low flex flex-col gap-2">
+        <span class="font-display-lg text-[32px] text-primary js-stat-counter" data-target="{{ stat.end }}" data-suffix="{{ stat.suffix }}">0</span>
+        <span class="font-label-md text-on-surface-variant uppercase tracking-tighter">{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/home.js' %}" defer></script>
 {% endblock %}

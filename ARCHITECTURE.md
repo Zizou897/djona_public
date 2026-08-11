@@ -50,8 +50,8 @@ djona_public/
 - [x] Scaffold Django (`config/`, `apps/core`, `apps/catalog`)
 - [x] Build Tailwind (tokens du design system, pas de CDN)
 - [x] `base.html` + header public (`partials/_header.html`) — **première vue livrée**
-- [ ] Footer
-- [ ] Accueil complet (hero, recherche, listings, trust bar, CTA vente, stats)
+- [x] Footer (`partials/_footer.html`, inclus dans `base.html`)
+- [x] Accueil complet (hero, recherche, listings, trust bar, CTA vente, stats animées)
 - [ ] Catalogue : modèles `Vehicle`/`VehicleImage`/`Favorite` + listing/détail/comparaison/favoris
 
 ## Démarrage local
