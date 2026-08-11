@@ -10,11 +10,14 @@
 
     <nav class="hidden lg:flex items-center gap-gutter" aria-label="Navigation principale">
       <a href="{% url 'core:home' %}"
-         class="font-label-md text-label-md transition-colors py-2 text-secondary border-b-2 border-secondary font-bold"
-         aria-current="page">Acheter</a>
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
+      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Acheter</a>
       <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Vendre</a>
       <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Nos Services</a>
-      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Contact</a>
+      <a href="{% url 'core:contact' %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
     </nav>
 
     <div class="flex items-center gap-base">

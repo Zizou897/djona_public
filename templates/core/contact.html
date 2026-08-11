@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact — Djona{% endblock %}
+
+{% block content %}
+<div class="relative flex flex-col w-full">
+
+  {# Hero #}
+  <section class="relative px-container-margin-mobile lg:px-container-margin-desktop py-section-gap overflow-hidden">
+    {# Élément décoratif de fond — confiné au hero (pas fixed : ne doit pas déborder sur les sections suivantes) #}
+    <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-20" aria-hidden="true">
+      <svg class="absolute top-[-10%] right-[-5%] w-[60%] h-auto text-primary/10" fill="none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-dasharray="4 4" stroke-width="0.5"></circle>
+        <path d="M100 20V180M20 100H180" stroke="currentColor" stroke-width="0.2"></path>
+      </svg>
+    </div>
+    <div class="max-w-page mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+      <div class="lg:col-span-7 z-10">
+        <span class="inline-block font-label-md text-label-md text-secondary mb-4 uppercase tracking-widest bg-secondary-fixed/30 px-3 py-1 rounded-full">Assistance Client</span>
+        <h1 class="font-display-lg text-display-lg text-primary mb-6 leading-tight">
+          Comment pouvons-nous <br class="hidden lg:block"><span class="text-secondary">vous aider ?</span>
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-8">
+          Que vous soyez acheteur ou vendeur, notre équipe d'experts automobile est à votre disposition pour sécuriser chaque étape de votre transaction à Abidjan.
+        </p>
+      </div>
+      <div class="lg:col-span-5 relative">
+        <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl group">
+          <img src="{% static 'img/contact-support-office.svg' %}" alt="Équipe support Djona" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" aria-hidden="true"></div>
+          <div class="absolute bottom-6 left-6 right-6 p-4 bg-surface-container-lowest/90 backdrop-blur-md rounded-xl flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary shrink-0">
+              <span class="material-symbols-outlined" aria-hidden="true">support_agent</span>
+            </div>
+            <div>
+              <p class="font-label-md text-label-md text-primary">Réponse moyenne</p>
+              <p class="font-headline-md text-headline-md text-primary">Moins de 15 min</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Canaux de contact #}
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-low">
+    <div class="max-w-page mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded-lg bg-[#25D366]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[#25D366] text-[32px]" aria-hidden="true">chat</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-2">WhatsApp</h3>
+          <p class="font-body-md text-label-md text-on-surface-variant mb-6">Idéal pour l'envoi rapide de documents ou de photos de véhicules.</p>
+          <a href="#" class="inline-flex items-center gap-2 font-label-md text-label-md text-[#25D366] hover:underline">
+            Démarrer la discussion <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-primary text-[32px]" aria-hidden="true">call</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-2">Téléphone</h3>
+          <p class="font-body-md text-label-md text-on-surface-variant mb-6">Parlez directement à un conseiller Djona du Lundi au Samedi.</p>
+          <a href="tel:+2250102030405" class="inline-flex items-center gap-2 font-label-md text-label-md text-primary hover:underline">
+            +225 01 02 03 04 05 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded-lg bg-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">mail</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-2">Email</h3>
+          <p class="font-body-md text-label-md text-on-surface-variant mb-6">Pour vos demandes officielles ou partenariats professionnels.</p>
+          <a href="mailto:contact@djona.ci" class="inline-flex items-center gap-2 font-label-md text-label-md text-secondary hover:underline">
+            contact@djona.ci <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {# Formulaire de contact + localisation #}
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="max-w-page mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+      <div class="lg:col-span-7">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-8">Envoyez-nous un message</h2>
+        <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex flex-col gap-2">
+            <label for="contact-nom" class="font-label-md text-label-md text-on-surface">Nom Complet</label>
+            <input id="contact-nom" name="nom" type="text" placeholder="Ex: Jean Kouadio" class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="contact-email" class="font-label-md text-label-md text-on-surface">Adresse Email</label>
+            <input id="contact-email" name="email" type="email" placeholder="jean@email.ci" class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <div class="md:col-span-2 flex flex-col gap-2">
+            <label for="contact-objet" class="font-label-md text-label-md text-on-surface">Objet</label>
+            <div class="relative">
+              <select id="contact-objet" name="objet" class="w-full px-4 py-3 pr-10 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all appearance-none">
+                <option>Acheter un véhicule</option>
+                <option>Estimer mon véhicule</option>
+                <option>Service de conciergerie</option>
+                <option>Problème technique</option>
+                <option>Autre</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" aria-hidden="true">keyboard_arrow_down</span>
+            </div>
+          </div>
+          <div class="md:col-span-2 flex flex-col gap-2">
+            <label for="contact-message" class="font-label-md text-label-md text-on-surface">Message</label>
+            <textarea id="contact-message" name="message" rows="5" placeholder="Dites-nous comment nous pouvons vous aider..." class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all resize-none"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <button type="button" class="w-full md:w-auto px-10 py-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md shadow-lg hover:brightness-110 transition-all">
+              Envoyer le message
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="lg:col-span-5 flex flex-col gap-8">
+        <div class="bg-surface-container-high rounded-2xl p-8 relative overflow-hidden group">
+          <div class="relative z-10">
+            <h3 class="font-headline-md text-headline-md text-primary mb-6">Notre présence à Abidjan</h3>
+            <div class="flex flex-col gap-6">
+              <div class="flex gap-4">
+                <span class="material-symbols-outlined text-secondary" aria-hidden="true">location_on</span>
+                <div>
+                  <p class="font-label-md text-label-md text-primary">Siège Social</p>
+                  <p class="font-body-md text-label-md text-on-surface-variant">Boulevard Lagunaire, Plateau<br>Immeuble Djona, 4ème étage<br>Abidjan, Côte d'Ivoire</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <span class="material-symbols-outlined text-secondary" aria-hidden="true">schedule</span>
+                <div>
+                  <p class="font-label-md text-label-md text-primary">Heures d'ouverture</p>
+                  <p class="font-body-md text-label-md text-on-surface-variant">Lun - Ven: 08:30 - 18:00<br>Sam: 09:00 - 13:00</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" aria-hidden="true"></div>
+        </div>
+
+        <div class="w-full h-[300px] rounded-2xl overflow-hidden shadow-md relative">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-4.0317%2C5.3047%2C-4.0017%2C5.3287&layer=mapnik&marker=5.3167%2C-4.0167"
+            title="Localisation du siège Djona — Plateau, Abidjan"
+            class="w-full h-full border-0"
+            loading="lazy">
+          </iframe>
+          <div class="absolute top-4 right-4 bg-surface-container-lowest px-4 py-2 rounded-full shadow-sm flex items-center gap-2 pointer-events-none">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse" aria-hidden="true"></span>
+            <span class="font-label-md text-label-sm text-primary">Bureaux Ouverts</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  {# FAQ #}
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-lowest">
+    <div class="max-w-[800px] mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Foire Aux Questions</h2>
+        <p class="font-body-md text-label-md text-on-surface-variant">Tout ce que vous devez savoir pour acheter ou vendre en toute sérénité.</p>
+      </div>
+      <div class="space-y-4">
+        {% for item in faq_items %}
+        <div class="faq-item border-b border-outline-variant{% if forloop.last %} border-b-0{% endif %}">
+          <button type="button" class="js-faq-toggle w-full py-6 flex justify-between items-center text-left hover:text-primary transition-colors">
+            <span class="font-label-md text-label-md md:text-body-lg text-on-surface">{{ item.question }}</span>
+            <span class="material-symbols-outlined transition-transform duration-300" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="faq-content h-0 overflow-hidden transition-all duration-300">
+            <p class="pb-6 font-body-md text-label-md text-on-surface-variant">{{ item.answer }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# CTA final #}
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="max-w-page mx-auto bg-primary rounded-3xl p-12 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-container/20 via-transparent to-transparent" aria-hidden="true"></div>
+      <div class="relative z-10 flex flex-col items-center gap-6">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary">Vous préférez un contact direct ?</h2>
+        <p class="font-body-lg text-on-primary/80 max-w-2xl">Nos conseillers sont disponibles pour vous accompagner dans votre projet auto au quotidien.</p>
+        <div class="flex flex-col md:flex-row gap-4 mt-4">
+          <a href="#" class="px-8 py-4 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md shadow-lg hover:scale-105 transition-all">Acheter via Djona</a>
+          <a href="{% url 'core:home' %}" class="px-8 py-4 bg-transparent border-2 border-on-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary/10 transition-all">Consulter le catalogue</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/faq.js' %}" defer></script>
+{% endblock %}

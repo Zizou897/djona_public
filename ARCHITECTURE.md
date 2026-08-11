@@ -52,6 +52,7 @@ djona_public/
 - [x] `base.html` + header public (`partials/_header.html`) — **première vue livrée**
 - [x] Footer (`partials/_footer.html`, inclus dans `base.html`)
 - [x] Accueil complet (hero, recherche, listings, trust bar, CTA vente, stats animées)
+- [x] Contact / support (`/contact/` — hero, canaux de contact, formulaire, localisation, FAQ)
 - [ ] Catalogue : modèles `Vehicle`/`VehicleImage`/`Favorite` + listing/détail/comparaison/favoris
 
 ## Démarrage local

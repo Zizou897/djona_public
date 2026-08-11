@@ -1,0 +1,4 @@
+# Les fichiers destinés au VPS (Linux) doivent garder des fins de ligne LF,
+# même si le dépôt est édité depuis Windows (évite un script cassé après clone/pull).
+*.sh text eol=lf
+deploy/** text eol=lf

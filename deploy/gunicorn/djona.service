@@ -1,0 +1,18 @@
+[Unit]
+Description=Gunicorn — (djona public)
+After=network.target
+
+[Service]
+Type=notify
+
+User=www-data
+Group=www-data
+
+WorkingDirectory=/var/www/project/djona_public
+ExecStart=/var/www/project/djona_public/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8006 config.wsgi:application
+Restart=on-failure
+RestartSec=5
+
+
+[Install]
+WantedBy=multi-user.target

@@ -89,3 +89,30 @@ def home(request):
         'stats': HOME_STATS,
     }
     return render(request, 'core/home.html', context)
+
+
+FAQ_ITEMS = [
+    {
+        'question': 'Comment Djona vérifie-t-elle les véhicules ?',
+        'answer': "Chaque véhicule listé sur Djona subit une inspection rigoureuse sur 150 points de contrôle par nos techniciens certifiés. Nous vérifions l'historique administratif, l'état mécanique et la carrosserie avant toute mise en ligne.",
+    },
+    {
+        'question': 'Le paiement est-il sécurisé ?',
+        'answer': "Absolument. Djona utilise un système de compte séquestre. Les fonds ne sont débloqués au vendeur que lorsque l'acheteur a validé la conformité du véhicule après l'essai final et la vérification des documents.",
+    },
+    {
+        'question': 'Quels sont les frais de service Djona ?',
+        'answer': "Notre commission est transparente et varie selon la valeur du véhicule. Elle couvre l'inspection, la sécurisation du paiement et l'assistance administrative pour le transfert de propriété.",
+    },
+    {
+        'question': 'Puis-je obtenir un financement via Djona ?',
+        'answer': "Oui, nous collaborons avec plusieurs banques partenaires en Côte d'Ivoire pour vous proposer des solutions de crédit automobile adaptées à votre profil directement depuis notre plateforme.",
+    },
+]
+
+
+def contact(request):
+    """Page contact / support, portée depuis
+    _mockups/01_public/desktop/contact_support_djona/code.html.
+    """
+    return render(request, 'core/contact.html', {'faq_items': FAQ_ITEMS})
