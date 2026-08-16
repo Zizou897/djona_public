@@ -1,0 +1,48 @@
+{% comment %}Attend page_obj, total_count. Cible des swaps HTMX (filtres, tri, pagination).{% endcomment %}
+<p id="results-count" class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+  {{ total_count }} véhicule{{ total_count|pluralize }} trouvé{{ total_count|pluralize }} en Côte d'Ivoire
+</p>
+
+{% if page_obj %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+  {% for vehicle in page_obj %}
+    {% include 'partials/_listing_vehicle_card.html' %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="py-16 flex flex-col items-center gap-4 text-center">
+  <span class="material-symbols-outlined text-outline text-[48px]" aria-hidden="true">search_off</span>
+  <p class="font-body-md text-body-md text-on-surface-variant">Aucun véhicule ne correspond à ces critères.</p>
+</div>
+{% endif %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="mt-section-gap flex justify-center items-center gap-2">
+  {% if page_obj.has_previous %}
+  <a href="{% querystring page=page_obj.previous_page_number %}"
+     hx-get="{% querystring page=page_obj.previous_page_number %}"
+     hx-target="#catalog-results" hx-push-url="true"
+     class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
+    <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+  </a>
+  {% endif %}
+
+  {% for page_number in page_obj.paginator.page_range %}
+  <a href="{% querystring page=page_number %}"
+     hx-get="{% querystring page=page_number %}"
+     hx-target="#catalog-results" hx-push-url="true"
+     class="w-10 h-10 rounded flex items-center justify-center font-label-md {% if page_number == page_obj.number %}bg-primary text-on-primary{% else %}text-on-surface hover:bg-surface-container-highest transition-colors{% endif %}">
+    {{ page_number }}
+  </a>
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+  <a href="{% querystring page=page_obj.next_page_number %}"
+     hx-get="{% querystring page=page_obj.next_page_number %}"
+     hx-target="#catalog-results" hx-push-url="true"
+     class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
+    <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+  </a>
+  {% endif %}
+</div>
+{% endif %}

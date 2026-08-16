@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Véhicules neufs et d'occasion à vendre — Djona{% endblock %}
+{% block meta_description %}Parcourez le catalogue de véhicules neufs et d'occasion en Côte d'Ivoire. Filtrez par marque, prix, ville et transmission pour trouver la voiture idéale, inspectée par Djona.{% endblock %}
+
+{% block og_extra %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Djona">
+<meta property="og:locale" content="fr_CI">
+<meta property="og:title" content="Véhicules neufs et d'occasion à vendre — Djona">
+<meta property="og:description" content="Parcourez le catalogue de véhicules neufs et d'occasion en Côte d'Ivoire, inspectés et vérifiés par Djona.">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Véhicules neufs et d'occasion à vendre — Djona">
+<meta name="twitter:description" content="Parcourez le catalogue de véhicules neufs et d'occasion en Côte d'Ivoire, inspectés et vérifiés par Djona.">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {% for vehicle in page_obj %}
+    {
+      "@type": "ListItem",
+      "position": {{ forloop.counter }},
+      "url": "{{ request.scheme }}://{{ request.get_host }}{{ vehicle.get_absolute_url }}",
+      "name": "{{ vehicle.brand|escapejs }} {{ vehicle.model_name|escapejs }} {{ vehicle.year|stringformat:"d" }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# En-tête résultats #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter border-b border-surface-container-highest pb-gutter">
+      <div class="flex flex-col">
+        <span class="font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2">Marketplace</span>
+        <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-on-surface">Véhicules Disponibles</h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded shadow-sm">
+          <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">sort</span>
+          <select name="sort" hx-get="{% url 'catalog:list' %}" hx-include="#filters-form" hx-target="#catalog-results" hx-push-url="true"
+                  class="bg-transparent border-none focus:ring-0 font-label-md text-label-md text-on-surface cursor-pointer">
+            <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Plus récents</option>
+            <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Prix croissant</option>
+            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Prix décroissant</option>
+            <option value="mileage" {% if sort == 'mileage' %}selected{% endif %}>Kilométrage</option>
+          </select>
+        </div>
+        <button type="button" id="filters-toggle" class="lg:hidden flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded shadow-md">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">filter_list</span>
+          <span class="font-label-md text-label-md">Filtres</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  {# Contenu principal #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter flex flex-col lg:flex-row gap-section-gap">
+
+    <div id="filters-backdrop" class="hidden fixed inset-0 z-[99] bg-black/50 backdrop-blur-sm lg:hidden"></div>
+
+    <aside id="filters-panel"
+           class="fixed inset-y-0 right-0 z-[100] w-[85%] max-w-sm bg-white shadow-2xl translate-x-full transition-transform duration-300 overflow-y-auto p-6
+                  lg:static lg:z-auto lg:w-72 lg:max-w-none lg:bg-transparent lg:shadow-none lg:translate-x-0 lg:transition-none lg:overflow-visible lg:p-0 lg:shrink-0">
+      <div class="flex items-center justify-between mb-8 lg:hidden">
+        <h2 class="font-headline-md text-headline-md">Filtres</h2>
+        <button type="button" id="filters-close" class="p-2">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+      <div class="lg:sticky lg:top-24">
+        {% include 'partials/_filters.html' %}
+      </div>
+    </aside>
+
+    <div class="flex-1">
+      <div id="catalog-results">
+        {% include 'catalog/_results.html' %}
+      </div>
+    </div>
+
+  </section>
+
+  {# CTA Djona Verified #}
+  <section class="mt-section-gap bg-primary text-on-primary py-16 overflow-hidden relative">
+    <div class="absolute right-0 top-0 h-full w-1/3 opacity-10 flex items-center justify-center pointer-events-none" aria-hidden="true">
+      <span class="material-symbols-outlined text-[320px]" style="font-variation-settings: 'wght' 200;">verified_user</span>
+    </div>
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop relative z-10">
+      <div class="max-w-2xl flex flex-col gap-6">
+        <div class="inline-flex items-center gap-2 bg-secondary text-on-secondary px-4 py-1.5 rounded-full w-fit">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">verified</span>
+          <span class="font-label-md text-label-md uppercase tracking-wide">Exclusivité Djona</span>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg-mobile lg:text-display-lg leading-tight">Achetez en toute sérénité avec l'inspection certifiée Djona.</h2>
+        <p class="font-body-md text-body-lg opacity-80">Nos experts inspectent plus de 150 points de contrôle pour vous garantir un achat sécurisé et transparent, sans mauvaises surprises.</p>
+        <div class="flex flex-col sm:flex-row gap-gutter mt-4">
+          <a href="{% url 'core:contact' %}" class="group bg-secondary text-on-secondary px-8 py-4 rounded-md font-label-md text-label-md shadow-xl hover:brightness-110 transition-all flex items-center justify-center gap-3">
+            Découvrir le service
+            <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">trending_flat</span>
+          </a>
+          <a href="{% url 'core:contact' %}" class="border-2 border-on-primary/30 text-on-primary px-8 py-4 rounded-md font-label-md text-label-md hover:bg-white/10 transition-all">
+            Comment ça marche ?
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/filters-drawer.js' %}" defer></script>
+{% endblock %}

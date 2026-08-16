@@ -1,0 +1,49 @@
+{% comment %}
+Carte compacte pour la grille /vehicules/ — attend `vehicle` (instance catalog.Vehicle,
+avec un attribut `.is_favorite` déjà calculé par la vue) dans le contexte.
+{% endcomment %}
+<div class="group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+  <div class="relative h-48 overflow-hidden bg-surface-container">
+    {% with image=vehicle.images.first %}
+    {% if image %}
+      <img src="{{ image.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.model_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    {% endif %}
+    {% endwith %}
+
+    {% if vehicle.is_verified %}
+    <div class="absolute top-3 left-3 bg-secondary text-on-secondary px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+      <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+      <span class="font-label-sm text-[11px] uppercase tracking-wider font-bold">Service Djona</span>
+    </div>
+    {% endif %}
+
+    {% include 'partials/_favorite_button.html' with is_favorite=vehicle.is_favorite %}
+  </div>
+
+  <a href="{{ vehicle.get_absolute_url }}" class="p-5 flex flex-col flex-1">
+    <div class="flex justify-between items-start mb-2">
+      <h3 class="font-headline-md text-[18px] text-on-surface group-hover:text-primary transition-colors">{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}</h3>
+      <span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-[10px] uppercase shrink-0 ml-2">{{ vehicle.get_condition_display }}</span>
+    </div>
+    <div class="flex items-center gap-4 text-outline mb-4">
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">speed</span>
+        <span class="font-body-md text-label-sm">{{ vehicle.mileage }} km</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">local_gas_station</span>
+        <span class="font-body-md text-label-sm">{{ vehicle.get_fuel_type_display }}</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">settings_accessibility</span>
+        <span class="font-body-md text-label-sm">{{ vehicle.get_transmission_display }}</span>
+      </div>
+    </div>
+    <div class="mt-auto flex items-center justify-between pt-4 border-t border-surface-container">
+      <span class="font-display-lg text-[22px] text-primary">{{ vehicle.price }} <span class="text-[12px] font-label-md">FCFA</span></span>
+      <span class="text-primary group-hover:bg-primary-fixed p-2 rounded-full transition-colors">
+        <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+      </span>
+    </div>
+  </a>
+</div>

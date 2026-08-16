@@ -1,0 +1,78 @@
+{% comment %}
+Formulaire de filtres pour /vehicules/ — attend brands, cities, selected_brands,
+selected_transmissions, selected_conditions, selected_city, price_min, price_max.
+{% endcomment %}
+<form id="filters-form"
+      hx-get="{% url 'catalog:list' %}"
+      hx-target="#catalog-results"
+      hx-push-url="true"
+      hx-trigger="change"
+      class="flex flex-col gap-8">
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Marque</h3>
+    <div class="flex flex-wrap gap-2">
+      {% for brand in brands %}
+      <label class="cursor-pointer">
+        <input type="checkbox" name="brand" value="{{ brand }}" class="peer hidden" {% if brand in selected_brands %}checked{% endif %}>
+        <span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors block">{{ brand }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Budget (FCFA)</h3>
+    <div class="flex items-center gap-2">
+      <input type="number" name="price_min" value="{{ price_min }}" placeholder="Min" class="w-1/2 bg-white border border-outline-variant rounded px-3 py-2 font-body-md text-label-md outline-none">
+      <div class="w-4 h-[1px] bg-outline-variant" aria-hidden="true"></div>
+      <input type="number" name="price_max" value="{{ price_max }}" placeholder="Max" class="w-1/2 bg-white border border-outline-variant rounded px-3 py-2 font-body-md text-label-md outline-none">
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Transmission</h3>
+    <div class="flex flex-col gap-2">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" name="transmission" value="automatique" class="w-5 h-5 accent-primary" {% if 'automatique' in selected_transmissions %}checked{% endif %}>
+        <span class="font-body-md text-label-md text-on-surface-variant">Automatique</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" name="transmission" value="manuelle" class="w-5 h-5 accent-primary" {% if 'manuelle' in selected_transmissions %}checked{% endif %}>
+        <span class="font-body-md text-label-md text-on-surface-variant">Manuelle</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">État</h3>
+    <div class="flex gap-2">
+      <label class="cursor-pointer flex-1">
+        <input type="checkbox" name="condition" value="neuf" class="peer hidden" {% if 'neuf' in selected_conditions %}checked{% endif %}>
+        <span class="block text-center px-3 py-2 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors">Neuf</span>
+      </label>
+      <label class="cursor-pointer flex-1">
+        <input type="checkbox" name="condition" value="occasion" class="peer hidden" {% if 'occasion' in selected_conditions %}checked{% endif %}>
+        <span class="block text-center px-3 py-2 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors">Occasion</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Localisation</h3>
+    <select name="city" class="w-full bg-white border border-outline-variant rounded px-4 py-2.5 font-body-md text-label-md outline-none">
+      <option value="">Toutes les villes</option>
+      {% for city in cities %}
+      <option value="{{ city }}" {% if city == selected_city %}selected{% endif %}>{{ city }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <a href="{% url 'catalog:list' %}"
+     hx-get="{% url 'catalog:list' %}"
+     hx-target="#catalog-results"
+     hx-push-url="true"
+     class="w-full text-center bg-surface-container text-on-surface-variant font-label-md text-label-md py-3 rounded hover:bg-surface-container-highest transition-colors">
+    Réinitialiser les filtres
+  </a>
+</form>

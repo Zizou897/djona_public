@@ -1,0 +1,9 @@
+{% comment %}Attend `vehicle` et `is_favorite` (booléen) dans le contexte.{% endcomment %}
+<button type="button"
+        hx-post="{% url 'catalog:toggle_favorite' vehicle.id %}"
+        hx-swap="outerHTML"
+        class="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center transition-colors {% if is_favorite %}text-error{% else %}text-on-surface-variant hover:text-error{% endif %}"
+        aria-pressed="{{ is_favorite|yesno:'true,false' }}"
+        aria-label="{% if is_favorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+  <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' {% if is_favorite %}1{% else %}0{% endif %};" aria-hidden="true">favorite</span>
+</button>

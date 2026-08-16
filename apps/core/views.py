@@ -1,73 +1,7 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 
-FEATURED_VEHICLES = [
-    {
-        'name': 'Toyota Land Cruiser 300',
-        'price': '85M FCFA',
-        'location': 'Cocody, Abidjan',
-        'year': 2023,
-        'mileage': '12 500 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/toyota-land-cruiser-300.svg',
-        'is_verified': True,
-        'condition': 'Occasion',
-    },
-    {
-        'name': 'Hyundai Tucson 1.6 T-GDi',
-        'price': '22M FCFA',
-        'location': 'Marcory, Abidjan',
-        'year': 2022,
-        'mileage': '34 000 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/hyundai-tucson.svg',
-        'is_verified': True,
-        'condition': '',
-    },
-    {
-        'name': 'Mercedes-Benz C300',
-        'price': '28.5M FCFA',
-        'location': 'Plateau, Abidjan',
-        'year': 2021,
-        'mileage': '48 200 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/mercedes-c300.svg',
-        'is_verified': False,
-        'condition': '',
-    },
-    {
-        'name': 'Kia Sportage New Edition',
-        'price': '21M FCFA',
-        'location': 'Bingerville, Abidjan',
-        'year': 2024,
-        'mileage': '0 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/kia-sportage.svg',
-        'is_verified': False,
-        'condition': '',
-    },
-    {
-        'name': 'Ford Explorer XLT',
-        'price': '18.5M FCFA',
-        'location': 'Yamoussoukro',
-        'year': 2019,
-        'mileage': '72 000 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/ford-explorer-xlt.svg',
-        'is_verified': True,
-        'condition': '',
-    },
-    {
-        'name': 'Range Rover Sport HSE',
-        'price': '42M FCFA',
-        'location': 'Assinie-Mafia',
-        'year': 2020,
-        'mileage': '55 000 km',
-        'transmission': 'Auto',
-        'image': 'img/vehicles/range-rover-sport-hse.svg',
-        'is_verified': False,
-        'condition': '',
-    },
-]
+from apps.catalog.models import Vehicle
 
 HOME_STATS = [
     {'end': 1450, 'suffix': '+', 'label': 'Véhicules vendus'},
@@ -80,12 +14,9 @@ HOME_STATS = [
 def home(request):
     """Page d'accueil du parcours public, portée depuis
     _mockups/01_public/desktop/djona_accueil/code.html.
-
-    Les véhicules en avant sont des données statiques en attendant le
-    modèle `catalog.Vehicle` (AGENTS.md §10, étape 5).
     """
     context = {
-        'featured_vehicles': FEATURED_VEHICLES,
+        'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:6],
         'stats': HOME_STATS,
     }
     return render(request, 'core/home.html', context)
@@ -116,3 +47,35 @@ def contact(request):
     _mockups/01_public/desktop/contact_support_djona/code.html.
     """
     return render(request, 'core/contact.html', {'faq_items': FAQ_ITEMS})
+
+
+def privacy(request):
+    """Politique de confidentialité, portée depuis
+    _mockups/01_public/desktop/conditions/screen.png (pas de code.html source).
+    """
+    return render(request, 'core/privacy.html')
+
+
+def terms(request):
+    """Conditions Générales d'Utilisation, portée depuis
+    _mockups/01_public/desktop/conditions/code.html (source fournie par l'utilisateur).
+    """
+    return render(request, 'core/terms.html')
+
+
+def seller_terms(request):
+    """Conditions Particulières Vendeurs, portée depuis une maquette fournie
+    directement par l'utilisateur (source non stockée dans _mockups/).
+    """
+    return render(request, 'core/seller_terms.html')
+
+
+def robots_txt(request):
+    lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin/',
+        '',
+        f'Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml',
+    ]
+    return HttpResponse('\n'.join(lines), content_type='text/plain')
