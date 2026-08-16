@@ -25,6 +25,9 @@ npm run build:css
 echo "==> migrations Django"
 python manage.py migrate --noinput --settings=config.settings.prod
 
+echo "==> véhicules de démonstration (idempotent, ne duplique rien)"
+python manage.py seed_vehicles --settings=config.settings.prod
+
 echo "==> collecte des fichiers statiques"
 python manage.py collectstatic --noinput --settings=config.settings.prod
 
