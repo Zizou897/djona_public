@@ -8,32 +8,61 @@
       <span class="font-headline-md text-headline-md text-primary">Djona</span>
     </a>
 
+    {% with underline="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-full after:bg-primary after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100" %}
     <nav class="hidden lg:flex items-center gap-gutter" aria-label="Navigation principale">
       <a href="{% url 'core:home' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}text-on-surface-variant hover:text-primary{% endif %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
-      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Acheter</a>
-      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Vendre</a>
-      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2">Nos Services</a>
+      <a href="{% url 'catalog:list' %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.app_name == 'catalog' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.app_name == 'catalog' %}aria-current="page"{% endif %}>Catalogue</a>
+      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
       <a href="{% url 'core:contact' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}text-on-surface-variant hover:text-primary{% endif %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
     </nav>
+    {% endwith %}
 
     <div class="flex items-center gap-base">
       <a href="#"
-         class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded-lg hover:bg-primary-fixed transition-colors">
+         class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded hover:bg-primary-fixed transition-colors">
         Publier mon véhicule
       </a>
-      <button type="button"
-              class="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-2.5 rounded-lg font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
+      <a href="{% url 'catalog:list' %}"
+         class="print:hidden flex items-center gap-2 bg-secondary text-on-secondary px-6 py-2.5 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
         <span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>
         Rechercher
+      </a>
+      <button type="button" id="mobile-nav-toggle" data-open="false"
+              class="group lg:hidden relative flex items-center justify-center w-11 h-11 rounded-full border border-primary/15 bg-surface hover:border-secondary/50 hover:bg-surface-container transition-colors"
+              aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+        <span class="sr-only">Menu</span>
+        <span class="relative w-5 h-[14px]" aria-hidden="true">
+          <span class="absolute left-0 top-0 w-5 h-[2px] rounded-full bg-primary transition-all duration-300 ease-out group-data-[open=true]:translate-y-[6px] group-data-[open=true]:rotate-45"></span>
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-[2px] rounded-full bg-secondary transition-all duration-200 ease-out group-data-[open=true]:opacity-0 group-data-[open=true]:scale-x-0"></span>
+          <span class="absolute left-0 bottom-0 w-5 h-[2px] rounded-full bg-primary transition-all duration-300 ease-out group-data-[open=true]:-translate-y-[6px] group-data-[open=true]:-rotate-45"></span>
+        </span>
       </button>
-      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-2" aria-hidden="true">
-        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-      </div>
     </div>
 
+  </div>
+
+  {# Panneau de navigation mobile #}
+  <div id="mobile-nav-panel" class="hidden lg:hidden absolute top-full left-0 w-full bg-surface border-t border-surface-container-highest shadow-signature">
+    <nav class="flex flex-col p-4 gap-1" aria-label="Navigation principale mobile">
+      <a href="{% url 'core:home' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
+      <a href="{% url 'catalog:list' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.app_name == 'catalog' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.app_name == 'catalog' %}aria-current="page"{% endif %}>Catalogue</a>
+      <a href="#" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
+      <a href="{% url 'core:contact' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
+      <a href="#" class="mt-2 text-center px-4 py-3 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
+        Publier mon véhicule
+      </a>
+    </nav>
   </div>
 </header>

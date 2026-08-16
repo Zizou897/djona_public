@@ -1,6 +1,6 @@
 {% load static %}
 {# Footer public — porté depuis _mockups/01_public/desktop/djona_accueil/code.html #}
-<footer class="w-full bg-primary text-on-primary py-section-gap mt-section-gap">
+<footer class="print:hidden w-full bg-primary text-on-primary py-section-gap mt-section-gap">
   <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-section-gap">
 
@@ -11,10 +11,10 @@
         </div>
         <p class="font-body-md text-label-md opacity-80 max-w-xs">La marketplace automobile de confiance en Côte d'Ivoire. Achetez et vendez en toute sécurité.</p>
         <div class="flex gap-4">
-          <a href="#" class="hover:text-secondary-container transition-colors" aria-label="Code QR">
+          <a href="{% url 'core:contact' %}#canaux" class="hover:text-secondary-container transition-colors" aria-label="Code QR">
             <span class="material-symbols-outlined" aria-hidden="true">qr_code_2</span>
           </a>
-          <a href="#" class="hover:text-secondary-container transition-colors" aria-label="Discuter">
+          <a href="{% url 'core:contact' %}#canaux" class="hover:text-secondary-container transition-colors" aria-label="Discuter">
             <span class="material-symbols-outlined" aria-hidden="true">chat</span>
           </a>
         </div>
@@ -23,9 +23,9 @@
       <div class="flex flex-col gap-4">
         <h4 class="font-headline-md text-[18px] uppercase tracking-wider">Marketplace</h4>
         <ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
-          <li><a href="{% url 'core:home' %}" class="hover:text-secondary-fixed transition-colors">Acheter</a></li>
+          <li><a href="{% url 'catalog:list' %}" class="hover:text-secondary-fixed transition-colors">Acheter</a></li>
           <li><a href="#" class="hover:text-secondary-fixed transition-colors">Vendre</a></li>
-          <li><a href="#" class="hover:text-secondary-fixed transition-colors">F.A.Q</a></li>
+          <li><a href="{% url 'core:contact' %}#faq" class="hover:text-secondary-fixed transition-colors">F.A.Q</a></li>
         </ul>
       </div>
 
@@ -33,7 +33,7 @@
         <h4 class="font-headline-md text-[18px] uppercase tracking-wider">Entreprise</h4>
         <ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
           <li><a href="#" class="hover:text-secondary-fixed transition-colors">À propos</a></li>
-          <li><a href="#" class="hover:text-secondary-fixed transition-colors">Contact</a></li>
+          <li><a href="{% url 'core:contact' %}" class="hover:text-secondary-fixed transition-colors">Contact</a></li>
           <li><a href="#" class="hover:text-secondary-fixed transition-colors">Partenaires</a></li>
         </ul>
       </div>
@@ -41,8 +41,9 @@
       <div class="flex flex-col gap-4">
         <h4 class="font-headline-md text-[18px] uppercase tracking-wider">Légal</h4>
         <ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
-          <li><a href="#" class="hover:text-secondary-fixed transition-colors">CGU</a></li>
-          <li><a href="#" class="hover:text-secondary-fixed transition-colors">Confidentialité</a></li>
+          <li><a href="{% url 'core:terms' %}" class="hover:text-secondary-fixed transition-colors">CGU</a></li>
+          <li><a href="{% url 'core:privacy' %}" class="hover:text-secondary-fixed transition-colors">Confidentialité</a></li>
+          <li><a href="{% url 'core:seller_terms' %}" class="hover:text-secondary-fixed transition-colors">Conditions Vendeurs</a></li>
         </ul>
       </div>
 

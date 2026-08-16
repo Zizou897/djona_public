@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Contact — Djona{% endblock %}
+{% block title %}Contact & Support — Djona Automobile Côte d'Ivoire{% endblock %}
+{% block meta_description %}Contactez l'équipe Djona par WhatsApp, téléphone ou email. Notre support répond en moins de 15 minutes pour toutes vos questions sur l'achat ou la vente de véhicules.{% endblock %}
+
+{% block og_extra %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Djona">
+<meta property="og:locale" content="fr_CI">
+<meta property="og:title" content="Contact & Support — Djona Automobile Côte d'Ivoire">
+<meta property="og:description" content="Contactez l'équipe Djona par WhatsApp, téléphone ou email. Notre support répond en moins de 15 minutes.">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contact & Support — Djona Automobile Côte d'Ivoire">
+<meta name="twitter:description" content="Contactez l'équipe Djona par WhatsApp, téléphone ou email. Notre support répond en moins de 15 minutes.">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+{% endblock %}
 
 {% block content %}
 <div class="relative flex flex-col w-full">
@@ -29,7 +43,7 @@
         <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl group">
           <img src="{% static 'img/contact-support-office.svg' %}" alt="Équipe support Djona" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" aria-hidden="true"></div>
-          <div class="absolute bottom-6 left-6 right-6 p-4 bg-surface-container-lowest/90 backdrop-blur-md rounded-xl flex items-center gap-4">
+          <div class="absolute bottom-6 left-6 right-6 p-4 bg-surface-container-lowest/90 backdrop-blur-md rounded-md flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary shrink-0">
               <span class="material-symbols-outlined" aria-hidden="true">support_agent</span>
             </div>
@@ -44,40 +58,40 @@
   </section>
 
   {# Canaux de contact #}
-  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-low">
+  <section id="canaux" class="scroll-mt-24 px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-low">
     <div class="max-w-page mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
 
-        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
-          <div class="w-14 h-14 rounded-lg bg-[#25D366]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <div class="bg-surface-container-lowest p-8 rounded-md shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded bg-[#25D366]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <span class="material-symbols-outlined text-[#25D366] text-[32px]" aria-hidden="true">chat</span>
           </div>
           <h3 class="font-headline-md text-headline-md text-primary mb-2">WhatsApp</h3>
           <p class="font-body-md text-label-md text-on-surface-variant mb-6">Idéal pour l'envoi rapide de documents ou de photos de véhicules.</p>
           <a href="#" class="inline-flex items-center gap-2 font-label-md text-label-md text-[#25D366] hover:underline">
-            Démarrer la discussion <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+            Démarrer la discussion <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
           </a>
         </div>
 
-        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
-          <div class="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <div class="bg-surface-container-lowest p-8 rounded-md shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <span class="material-symbols-outlined text-primary text-[32px]" aria-hidden="true">call</span>
           </div>
           <h3 class="font-headline-md text-headline-md text-primary mb-2">Téléphone</h3>
           <p class="font-body-md text-label-md text-on-surface-variant mb-6">Parlez directement à un conseiller Djona du Lundi au Samedi.</p>
           <a href="tel:+2250102030405" class="inline-flex items-center gap-2 font-label-md text-label-md text-primary hover:underline">
-            +225 01 02 03 04 05 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+            +225 01 02 03 04 05 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
           </a>
         </div>
 
-        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group">
-          <div class="w-14 h-14 rounded-lg bg-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <div class="bg-surface-container-lowest p-8 rounded-md shadow-md hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 rounded bg-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">mail</span>
           </div>
           <h3 class="font-headline-md text-headline-md text-primary mb-2">Email</h3>
           <p class="font-body-md text-label-md text-on-surface-variant mb-6">Pour vos demandes officielles ou partenariats professionnels.</p>
           <a href="mailto:contact@djona.ci" class="inline-flex items-center gap-2 font-label-md text-label-md text-secondary hover:underline">
-            contact@djona.ci <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+            contact@djona.ci <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
           </a>
         </div>
 
@@ -94,16 +108,16 @@
         <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex flex-col gap-2">
             <label for="contact-nom" class="font-label-md text-label-md text-on-surface">Nom Complet</label>
-            <input id="contact-nom" name="nom" type="text" placeholder="Ex: Jean Kouadio" class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
+            <input id="contact-nom" name="nom" type="text" placeholder="Ex: Jean Kouadio" class="px-4 py-3 rounded bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
           </div>
           <div class="flex flex-col gap-2">
             <label for="contact-email" class="font-label-md text-label-md text-on-surface">Adresse Email</label>
-            <input id="contact-email" name="email" type="email" placeholder="jean@email.ci" class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
+            <input id="contact-email" name="email" type="email" placeholder="jean@email.ci" class="px-4 py-3 rounded bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all">
           </div>
           <div class="md:col-span-2 flex flex-col gap-2">
             <label for="contact-objet" class="font-label-md text-label-md text-on-surface">Objet</label>
             <div class="relative">
-              <select id="contact-objet" name="objet" class="w-full px-4 py-3 pr-10 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all appearance-none">
+              <select id="contact-objet" name="objet" class="w-full px-4 py-3 pr-10 rounded bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all appearance-none">
                 <option>Acheter un véhicule</option>
                 <option>Estimer mon véhicule</option>
                 <option>Service de conciergerie</option>
@@ -115,10 +129,10 @@
           </div>
           <div class="md:col-span-2 flex flex-col gap-2">
             <label for="contact-message" class="font-label-md text-label-md text-on-surface">Message</label>
-            <textarea id="contact-message" name="message" rows="5" placeholder="Dites-nous comment nous pouvons vous aider..." class="px-4 py-3 rounded-lg bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all resize-none"></textarea>
+            <textarea id="contact-message" name="message" rows="5" placeholder="Dites-nous comment nous pouvons vous aider..." class="px-4 py-3 rounded bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all resize-none"></textarea>
           </div>
           <div class="md:col-span-2">
-            <button type="button" class="w-full md:w-auto px-10 py-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md shadow-lg hover:brightness-110 transition-all">
+            <button type="button" class="w-full md:w-auto px-10 py-4 bg-primary text-on-primary rounded font-label-md text-label-md shadow-lg hover:brightness-110 transition-all">
               Envoyer le message
             </button>
           </div>
@@ -167,7 +181,7 @@
   </section>
 
   {# FAQ #}
-  <section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-lowest">
+  <section id="faq" class="scroll-mt-24 px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-surface-container-lowest">
     <div class="max-w-[800px] mx-auto">
       <div class="text-center mb-12">
         <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Foire Aux Questions</h2>
@@ -197,8 +211,8 @@
         <h2 class="font-headline-lg text-headline-lg text-on-primary">Vous préférez un contact direct ?</h2>
         <p class="font-body-lg text-on-primary/80 max-w-2xl">Nos conseillers sont disponibles pour vous accompagner dans votre projet auto au quotidien.</p>
         <div class="flex flex-col md:flex-row gap-4 mt-4">
-          <a href="#" class="px-8 py-4 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md shadow-lg hover:scale-105 transition-all">Acheter via Djona</a>
-          <a href="{% url 'core:home' %}" class="px-8 py-4 bg-transparent border-2 border-on-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary/10 transition-all">Consulter le catalogue</a>
+          <a href="#" class="px-8 py-4 bg-secondary text-on-secondary rounded font-label-md text-label-md shadow-lg hover:scale-105 transition-all">Acheter via Djona</a>
+          <a href="{% url 'catalog:list' %}" class="px-8 py-4 bg-transparent border-2 border-on-primary text-on-primary rounded font-label-md text-label-md hover:bg-on-primary/10 transition-all">Consulter le catalogue</a>
         </div>
       </div>
     </div>

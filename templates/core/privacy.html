@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Politique de Confidentialité — Djona{% endblock %}
+{% block meta_description %}Découvrez comment Djona collecte, utilise et protège vos données personnelles sur sa plateforme automobile en Côte d'Ivoire.{% endblock %}
+
+{% block og_extra %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Djona">
+<meta property="og:locale" content="fr_CI">
+<meta property="og:title" content="Politique de Confidentialité — Djona">
+<meta property="og:description" content="Découvrez comment Djona collecte, utilise et protège vos données personnelles.">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Politique de Confidentialité — Djona">
+<meta name="twitter:description" content="Découvrez comment Djona collecte, utilise et protège vos données personnelles.">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# Bannière + fil d'ariane #}
+  <div class="relative w-full overflow-hidden bg-surface pb-12 pt-8">
+    <div class="absolute inset-0 z-0" aria-hidden="true">
+      <svg class="absolute w-full h-full text-primary-container/5" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M120,-20 L40,120 L-40,40 Z" fill="currentColor" opacity="0.3"></path>
+        <path d="M140,20 L60,140 L-20,60 Z" fill="currentColor" opacity="0.1"></path>
+        <circle cx="20" cy="20" fill="currentColor" opacity="0.2" r="15"></circle>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-surface/50 to-surface"></div>
+    </div>
+    <div class="relative z-10 max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <nav class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-6" aria-label="Fil d'ariane">
+        <a href="{% url 'core:home' %}" class="hover:text-primary transition-colors">Accueil</a>
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+        <span class="text-on-surface">Politique de Confidentialité</span>
+      </nav>
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="max-w-2xl">
+          <span class="block mb-2 font-label-md text-label-md text-primary uppercase tracking-widest">Informations Légales</span>
+          <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-primary mb-4">Politique de Confidentialité</h1>
+          <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">Djona Automotive System accorde une importance primordiale à la protection de vos données personnelles.</p>
+        </div>
+        <div class="flex items-center gap-3 bg-surface-container-high px-4 py-2 rounded-full shadow-sm shrink-0">
+          <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">calendar_today</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Dernière mise à jour : Août 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Contenu #}
+  <div class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start relative">
+
+      {# Sommaire desktop #}
+      <aside class="hidden lg:block w-72 shrink-0 sticky top-28 bg-surface-container-lowest rounded-md shadow-md p-6">
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">toc</span>
+          Sommaire
+        </h3>
+        <nav class="flex flex-col gap-1 font-body-md text-body-md text-on-surface-variant relative" id="toc-nav">
+          <div class="absolute left-0 top-2 bottom-2 w-0.5 bg-surface-container" aria-hidden="true">
+            <div class="w-full bg-primary transition-all duration-300 rounded-full" id="toc-progress" style="height: 0%;"></div>
+          </div>
+          <a href="#collecte" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="collecte">1. Collecte des données</a>
+          <a href="#utilisation" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="utilisation">2. Utilisation des données</a>
+          <a href="#partage" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="partage">3. Partage des données</a>
+          <a href="#securite" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="securite">4. Sécurité</a>
+          <a href="#droits" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="droits">5. Vos droits</a>
+          <a href="#cookies" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="cookies">6. Cookies</a>
+        </nav>
+      </aside>
+
+      {# Sommaire mobile #}
+      <div class="w-full lg:hidden mb-8 sticky top-20 z-40 bg-surface/90 backdrop-blur-md pt-4 pb-2 shadow-sm">
+        <details class="group bg-surface-container-lowest rounded-md shadow-sm">
+          <summary class="flex items-center justify-between p-4 cursor-pointer list-none">
+            <span class="font-label-md text-label-md text-primary font-bold">Voir le Sommaire</span>
+            <span class="material-symbols-outlined transition duration-300 group-open:-rotate-180 text-primary" aria-hidden="true">expand_more</span>
+          </summary>
+          <div class="p-4 pt-0 font-body-md text-body-md text-on-surface-variant flex flex-col gap-2">
+            <a href="#collecte" class="hover:text-primary">1. Collecte des données</a>
+            <a href="#utilisation" class="hover:text-primary">2. Utilisation des données</a>
+            <a href="#partage" class="hover:text-primary">3. Partage des données</a>
+            <a href="#securite" class="hover:text-primary">4. Sécurité</a>
+            <a href="#droits" class="hover:text-primary">5. Vos droits</a>
+            <a href="#cookies" class="hover:text-primary">6. Cookies</a>
+          </div>
+        </details>
+      </div>
+
+      {# Sections #}
+      <div class="flex-1 max-w-4xl bg-surface-container-lowest rounded-2xl shadow-sm p-6 lg:p-10 text-on-surface flex flex-col gap-12">
+
+        <section id="collecte" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">01</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Collecte des données</h2>
+          </div>
+          <div class="bg-surface p-6 rounded-md flex flex-col gap-4">
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Nous collectons les données suivantes lors de votre utilisation de la plateforme Djona Automotive System :</p>
+            <div class="flex flex-col gap-4">
+              <div class="flex gap-3">
+                <span class="material-symbols-outlined text-primary shrink-0" aria-hidden="true">badge</span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Données d'identification :</strong> Nom, prénom, adresse e-mail, numéro de téléphone, copie de pièce d'identité (pour les vendeurs vérifiés).</p>
+              </div>
+              <div class="flex gap-3">
+                <span class="material-symbols-outlined text-primary shrink-0" aria-hidden="true">directions_car</span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Données relatives aux véhicules :</strong> Informations sur les véhicules mis en vente, immatriculation, historique d'entretien.</p>
+              </div>
+              <div class="flex gap-3">
+                <span class="material-symbols-outlined text-primary shrink-0" aria-hidden="true">devices</span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Données techniques :</strong> Adresse IP, type de navigateur, historique de navigation sur notre site, données de localisation (si autorisées).</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="utilisation" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">02</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Utilisation des données</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Vos données personnelles sont utilisées pour :</p>
+          <ul class="flex flex-col gap-3">
+            <li class="flex gap-3"><span class="material-symbols-outlined text-secondary shrink-0" aria-hidden="true">check_circle</span><p class="font-body-md text-body-md text-on-surface-variant">Créer et gérer votre compte utilisateur.</p></li>
+            <li class="flex gap-3"><span class="material-symbols-outlined text-secondary shrink-0" aria-hidden="true">check_circle</span><p class="font-body-md text-body-md text-on-surface-variant">Faciliter la mise en relation entre acheteurs et vendeurs en Côte d'Ivoire.</p></li>
+            <li class="flex gap-3"><span class="material-symbols-outlined text-secondary shrink-0" aria-hidden="true">check_circle</span><p class="font-body-md text-body-md text-on-surface-variant">Vérifier l'identité des vendeurs pour garantir un environnement de confiance.</p></li>
+            <li class="flex gap-3"><span class="material-symbols-outlined text-secondary shrink-0" aria-hidden="true">check_circle</span><p class="font-body-md text-body-md text-on-surface-variant">Améliorer nos services et personnaliser votre expérience de recherche automobile.</p></li>
+            <li class="flex gap-3"><span class="material-symbols-outlined text-secondary shrink-0" aria-hidden="true">check_circle</span><p class="font-body-md text-body-md text-on-surface-variant">Communiquer avec vous concernant vos annonces ou vos recherches.</p></li>
+          </ul>
+        </section>
+
+        <section id="partage" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">03</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Partage des données</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Nous ne vendons pas vos données personnelles. Elles peuvent être partagées avec :</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+            <div class="bg-surface-container-low p-5 rounded-md flex flex-col gap-2">
+              <h3 class="flex items-center gap-2 font-label-md text-on-surface">
+                <span class="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">group</span>
+                Autres Utilisateurs
+              </h3>
+              <p class="font-body-md text-label-sm text-on-surface-variant">Les acheteurs potentiels (uniquement les informations nécessaires au contact, comme votre numéro de téléphone si vous l'avez rendu public dans votre annonce).</p>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-md flex flex-col gap-2">
+              <h3 class="flex items-center gap-2 font-label-md text-on-surface">
+                <span class="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">settings</span>
+                Prestataires
+              </h3>
+              <p class="font-body-md text-label-sm text-on-surface-variant">Nos prestataires de services techniques (hébergement, maintenance, analyse de données), soumis à des obligations strictes de confidentialité.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="securite" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">04</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Sécurité</h2>
+          </div>
+          <div class="bg-primary-fixed/20 border border-primary/20 rounded-md p-6 flex gap-4">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-on-primary" aria-hidden="true">security</span>
+            </div>
+            <div class="flex flex-col gap-3">
+              <p class="font-body-md text-body-md text-on-surface-variant">Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles conformes aux standards de l'industrie pour protéger vos données contre l'accès non autorisé, l'altération, la divulgation ou la destruction.</p>
+              <p class="font-body-md text-body-md text-on-surface-variant">Ces mesures incluent le chiffrement des données de communication (SSL/TLS), le stockage sécurisé des mots de passe, et des audits de sécurité réguliers.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="droits" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">05</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Vos droits</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Conformément à la législation en vigueur, vous disposez des droits suivants concernant vos données personnelles :</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-4 py-2 bg-surface-container-highest rounded-full font-label-sm text-label-sm text-on-surface-variant">Droit d'accès</span>
+            <span class="px-4 py-2 bg-surface-container-highest rounded-full font-label-sm text-label-sm text-on-surface-variant">Droit de rectification</span>
+            <span class="px-4 py-2 bg-surface-container-highest rounded-full font-label-sm text-label-sm text-on-surface-variant">Droit à l'effacement</span>
+            <span class="px-4 py-2 bg-surface-container-highest rounded-full font-label-sm text-label-sm text-on-surface-variant">Droit d'opposition</span>
+            <span class="px-4 py-2 bg-surface-container-highest rounded-full font-label-sm text-label-sm text-on-surface-variant">Droit à la portabilité</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Pour exercer ces droits, veuillez nous contacter aux coordonnées indiquées ci-dessous.</p>
+        </section>
+
+        <section id="cookies" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">06</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Cookies</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Notre plateforme utilise des cookies pour améliorer votre navigation, mémoriser vos préférences de recherche de véhicules et analyser le trafic de notre site. Vous pouvez paramétrer votre navigateur pour refuser les cookies, mais cela peut limiter certaines fonctionnalités du site.</p>
+        </section>
+
+        <div class="pt-8 border-t border-surface-container">
+          <div class="bg-surface-container-low rounded-md p-8 flex flex-col items-center text-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-secondary" aria-hidden="true">mail</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md text-on-surface">Nous contacter</h3>
+            <p class="font-body-md text-on-surface-variant max-w-md">Pour toute question relative à cette politique de confidentialité ou pour exercer vos droits, n'hésitez pas à nous contacter.</p>
+            <div class="flex flex-col gap-1 mt-2">
+              <a href="mailto:privacy@djona-auto.ci" class="flex items-center gap-2 justify-center text-primary font-label-md hover:underline">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">mail</span>
+                privacy@djona-auto.ci
+              </a>
+              <span class="flex items-center gap-2 justify-center font-body-md text-label-sm text-on-surface-variant">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>
+                Cocody Riviera Palmeraie, Abidjan, Côte d'Ivoire
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/legal-toc.js' %}" defer></script>
+{% endblock %}

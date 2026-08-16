@@ -1,11 +1,13 @@
-{% load static %}
 {% comment %}
-Carte véhicule réutilisable — attend une variable `vehicle` (dict ou modèle) avec :
-name, price, location, year, mileage, transmission, image, is_verified, condition (optionnel)
+Carte véhicule "vitrine" (accueil) — attend une variable `vehicle` (instance catalog.Vehicle).
 {% endcomment %}
-<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col">
-  <div class="relative aspect-[16/10] overflow-hidden">
-    <img src="{% static vehicle.image %}" alt="{{ vehicle.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+<a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col">
+  <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
+    {% with image=vehicle.images.first %}
+    {% if image %}
+      <img src="{{ image.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.model_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+    {% endif %}
+    {% endwith %}
 
     {% if vehicle.is_verified %}
     <div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
@@ -14,35 +16,33 @@ name, price, location, year, mileage, transmission, image, is_verified, conditio
     </div>
     {% endif %}
 
-    {% if vehicle.condition %}
-    <div class="absolute bottom-4 right-4 bg-primary/80 backdrop-blur-md text-on-primary px-3 py-1 rounded-lg font-label-md text-label-md">
-      {{ vehicle.condition }}
+    <div class="absolute bottom-4 right-4 bg-primary/80 backdrop-blur-md text-on-primary px-3 py-1 rounded font-label-md text-label-md">
+      {{ vehicle.get_condition_display }}
     </div>
-    {% endif %}
   </div>
 
   <div class="p-6 flex flex-col flex-grow">
     <div class="flex justify-between items-start mb-2">
-      <h4 class="font-headline-md text-headline-md text-on-surface truncate">{{ vehicle.name }}</h4>
-      <span class="font-headline-md text-headline-md text-secondary whitespace-nowrap">{{ vehicle.price }}</span>
+      <h4 class="font-headline-md text-headline-md text-on-surface truncate">{{ vehicle.brand }} {{ vehicle.model_name }}</h4>
+      <span class="font-headline-md text-headline-md text-secondary whitespace-nowrap">{{ vehicle.price }} FCFA</span>
     </div>
     <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm mb-6">
       <span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>
-      {{ vehicle.location }}
+      {{ vehicle.city }}
     </div>
     <div class="grid grid-cols-3 gap-2 border-t border-surface-variant pt-6">
       <div class="flex flex-col items-center gap-1">
         <span class="material-symbols-outlined text-primary/60" aria-hidden="true">calendar_today</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.year }}</span>
+        <span class="font-label-sm text-on-surface-variant">{{ vehicle.year|stringformat:"d" }}</span>
       </div>
       <div class="flex flex-col items-center gap-1">
         <span class="material-symbols-outlined text-primary/60" aria-hidden="true">speed</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.mileage }}</span>
+        <span class="font-label-sm text-on-surface-variant">{{ vehicle.mileage }} km</span>
       </div>
       <div class="flex flex-col items-center gap-1">
         <span class="material-symbols-outlined text-primary/60" aria-hidden="true">settings</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.transmission }}</span>
+        <span class="font-label-sm text-on-surface-variant">{{ vehicle.get_transmission_display }}</span>
       </div>
     </div>
   </div>
-</article>
+</a>

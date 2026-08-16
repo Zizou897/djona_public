@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Conditions Générales d'Utilisation — Djona{% endblock %}
+{% block meta_description %}Consultez les conditions générales d'utilisation de la plateforme Djona : définitions, accès au site, responsabilités et propriété intellectuelle.{% endblock %}
+
+{% block og_extra %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Djona">
+<meta property="og:locale" content="fr_CI">
+<meta property="og:title" content="Conditions Générales d'Utilisation — Djona">
+<meta property="og:description" content="Consultez les conditions générales d'utilisation de la plateforme Djona.">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Conditions Générales d'Utilisation — Djona">
+<meta name="twitter:description" content="Consultez les conditions générales d'utilisation de la plateforme Djona.">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# Bannière + fil d'ariane #}
+  <div class="relative w-full overflow-hidden bg-surface pb-12 pt-8">
+    <div class="absolute inset-0 z-0" aria-hidden="true">
+      <svg class="absolute w-full h-full text-primary-container/5" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M120,-20 L40,120 L-40,40 Z" fill="currentColor" opacity="0.3"></path>
+        <path d="M140,20 L60,140 L-20,60 Z" fill="currentColor" opacity="0.1"></path>
+        <circle cx="20" cy="20" fill="currentColor" opacity="0.2" r="15"></circle>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-surface/50 to-surface"></div>
+    </div>
+    <div class="relative z-10 max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <nav class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-6" aria-label="Fil d'ariane">
+        <a href="{% url 'core:home' %}" class="hover:text-primary transition-colors">Accueil</a>
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+        <span class="text-on-surface">Conditions Générales d'Utilisation</span>
+      </nav>
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="max-w-2xl">
+          <span class="block mb-2 font-label-md text-label-md text-primary uppercase tracking-widest">Informations Légales</span>
+          <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-primary mb-4">Conditions Générales d'Utilisation</h1>
+          <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+            Veuillez lire attentivement ces conditions avant d'utiliser la plateforme Djona. Ces règles définissent l'utilisation de nos services et vos droits en tant qu'utilisateur.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 bg-surface-container-high px-4 py-2 rounded-full shadow-sm shrink-0">
+          <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">update</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Dernière mise à jour : 12 Octobre 2024</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Contenu #}
+  <div class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start relative">
+
+      {# Sommaire desktop #}
+      <aside class="hidden lg:block w-72 shrink-0 sticky top-28 bg-surface-container-lowest rounded-md shadow-md p-6">
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">toc</span>
+          Sommaire
+        </h3>
+        <nav class="flex flex-col gap-1 font-body-md text-body-md text-on-surface-variant relative" id="toc-nav">
+          <div class="absolute left-0 top-2 bottom-2 w-0.5 bg-surface-container" aria-hidden="true">
+            <div class="w-full bg-primary transition-all duration-300 rounded-full" id="toc-progress" style="height: 0%;"></div>
+          </div>
+          <a href="#article-1" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-1">Article 1 - Définitions</a>
+          <a href="#article-2" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-2">Article 2 - Objet</a>
+          <a href="#article-3" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-3">Article 3 - Accès au site</a>
+          <a href="#article-4" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-4">Article 4 - Responsabilités</a>
+          <a href="#article-5" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-5">Article 5 - Propriété intellectuelle</a>
+          <a href="#article-6" class="js-toc-link py-2 pl-4 border-l-2 border-transparent hover:text-primary hover:bg-surface-container-low transition-all rounded-r" data-target="article-6">Article 6 - Données personnelles</a>
+        </nav>
+      </aside>
+
+      {# Sommaire mobile #}
+      <div class="w-full lg:hidden mb-8 sticky top-20 z-40 bg-surface/90 backdrop-blur-md pt-4 pb-2 shadow-sm">
+        <details class="group bg-surface-container-lowest rounded-md shadow-sm">
+          <summary class="flex items-center justify-between p-4 cursor-pointer list-none">
+            <span class="font-label-md text-label-md text-primary font-bold">Voir le Sommaire</span>
+            <span class="material-symbols-outlined transition duration-300 group-open:-rotate-180 text-primary" aria-hidden="true">expand_more</span>
+          </summary>
+          <div class="p-4 pt-0 font-body-md text-body-md text-on-surface-variant flex flex-col gap-2">
+            <a href="#article-1" class="hover:text-primary">Article 1 - Définitions</a>
+            <a href="#article-2" class="hover:text-primary">Article 2 - Objet</a>
+            <a href="#article-3" class="hover:text-primary">Article 3 - Accès au site</a>
+            <a href="#article-4" class="hover:text-primary">Article 4 - Responsabilités</a>
+            <a href="#article-5" class="hover:text-primary">Article 5 - Propriété intellectuelle</a>
+            <a href="#article-6" class="hover:text-primary">Article 6 - Données personnelles</a>
+          </div>
+        </details>
+      </div>
+
+      {# Articles #}
+      <div class="flex-1 max-w-4xl bg-surface-container-lowest rounded-2xl shadow-sm p-6 lg:p-10 text-on-surface flex flex-col gap-12">
+
+        <div class="bg-primary-container/10 p-6 rounded-md flex gap-4 items-start shadow-inner">
+          <span class="material-symbols-outlined text-primary-container shrink-0" aria-hidden="true">info</span>
+          <div>
+            <h4 class="font-label-md text-label-md text-on-surface font-bold mb-1">Information Importante</h4>
+            <p class="font-body-md text-body-md text-on-surface-variant">L'utilisation du site Djona implique l'acceptation pleine et entière des conditions générales d'utilisation décrites ci-après. Celles-ci peuvent être modifiées à tout moment, nous vous invitons à les consulter régulièrement.</p>
+          </div>
+        </div>
+
+        <section id="article-1" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">01</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Définitions</h2>
+          </div>
+          <div class="bg-surface p-6 rounded-md flex flex-col gap-4">
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Dans les présentes conditions générales d'utilisation, les termes suivants ont le sens qui leur est attribué ci-après :</p>
+            <ul class="flex flex-col gap-3">
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" aria-hidden="true"></span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Utilisateur :</strong> toute personne qui accède au site et utilise ses services.</p>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" aria-hidden="true"></span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Vendeur :</strong> utilisateur ayant déposé une annonce de véhicule sur la plateforme.</p>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" aria-hidden="true"></span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Acheteur :</strong> utilisateur souhaitant acquérir un véhicule via la plateforme.</p>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" aria-hidden="true"></span>
+                <p class="font-body-md text-body-md text-on-surface-variant"><strong class="text-on-surface">Service :</strong> l'ensemble des fonctionnalités proposées par Djona Automotive, incluant la mise en relation, la sécurisation des transactions et les services associés.</p>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="article-2" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">02</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Objet</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Les présentes CGU ont pour objet de définir les modalités de mise à disposition du site Djona, ainsi que les conditions d'utilisation des services par l'Utilisateur.</p>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">En accédant à ce site et en utilisant ses services, vous acceptez d'être lié par ces conditions. Si vous n'acceptez pas l'intégralité de ces termes, vous devez cesser d'utiliser nos services.</p>
+        </section>
+
+        <section id="article-3" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">03</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Accès au site</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">L'accès au site est gratuit pour tout Utilisateur disposant d'un accès à internet. Tous les coûts afférents à l'accès (matériel informatique, logiciels, connexion internet) sont à la charge de l'Utilisateur.</p>
+          <div class="bg-surface-container-low p-4 rounded border-l-4 border-primary">
+            <p class="font-label-md text-label-md text-on-surface">Djona s'efforce de permettre un accès continu au site 24 heures sur 24, 7 jours sur 7, sauf en cas de force majeure ou d'un événement hors de son contrôle, et sous réserve des éventuelles pannes et interventions de maintenance nécessaires au bon fonctionnement du service.</p>
+          </div>
+        </section>
+
+        <section id="article-4" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">04</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Responsabilités</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Djona agit en qualité d'intermédiaire technique. Les informations fournies sur la plateforme, notamment les caractéristiques des véhicules, sont de la responsabilité des Vendeurs.</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-6 bg-surface rounded-md shadow-sm hover:shadow-md transition-shadow">
+              <span class="material-symbols-outlined text-primary mb-3 text-3xl" aria-hidden="true">verified_user</span>
+              <h3 class="font-label-md text-label-md text-on-surface font-bold mb-2">Obligations de l'Utilisateur</h3>
+              <p class="font-label-sm text-label-sm text-on-surface-variant">Fournir des informations exactes, ne pas utiliser la plateforme à des fins frauduleuses, et respecter les règles de bienséance lors des échanges.</p>
+            </div>
+            <div class="p-6 bg-surface rounded-md shadow-sm hover:shadow-md transition-shadow">
+              <span class="material-symbols-outlined text-primary mb-3 text-3xl" aria-hidden="true">gavel</span>
+              <h3 class="font-label-md text-label-md text-on-surface font-bold mb-2">Limitation de garantie</h3>
+              <p class="font-label-sm text-label-sm text-on-surface-variant">Djona ne peut être tenu responsable des dommages directs ou indirects résultant de l'utilisation du site ou de l'impossibilité de l'utiliser.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="article-5" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">05</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Propriété intellectuelle</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">L'ensemble des éléments constituant la plateforme Djona (textes, images, logos, interfaces, bases de données) est la propriété exclusive de Djona Automotive ou de ses partenaires. Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation préalable.</p>
+        </section>
+
+        <section id="article-6" class="scroll-mt-32">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-headline-lg text-headline-lg text-surface-container-high opacity-50 select-none hidden sm:block" aria-hidden="true">06</span>
+            <h2 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary">Données personnelles</h2>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">Le traitement des données personnelles collectées dans le cadre de l'utilisation de la plateforme Djona est décrit en détail dans notre Politique de Confidentialité, qui fait partie intégrante des présentes conditions générales d'utilisation.</p>
+          <a href="{% url 'core:privacy' %}" class="group inline-flex items-center gap-2 font-label-md text-label-md text-secondary hover:underline">
+            Consulter la Politique de Confidentialité
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </a>
+        </section>
+
+        <div class="pt-8 border-t border-surface-container flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Avez-vous des questions concernant ces conditions ?</p>
+          <a href="{% url 'core:contact' %}" class="bg-primary text-on-primary px-6 py-3 rounded font-label-md text-label-md hover:bg-primary-container transition-colors flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">mail</span>
+            Contacter le support légal
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/legal-toc.js' %}" defer></script>
+{% endblock %}

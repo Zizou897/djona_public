@@ -4,15 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Djona — L'automobile en Côte d'Ivoire{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Djona est la marketplace automobile de confiance en Côte d'Ivoire : achetez et vendez des véhicules neufs et d'occasion, inspectés et vérifiés par nos experts.{% endblock %}">
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <link rel="icon" type="image/png" href="{% static 'img/djona-logo.png' %}">
+
+  {% block og_extra %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Djona">
+  <meta property="og:locale" content="fr_CI">
+  <meta property="og:title" content="Djona — L'automobile en Côte d'Ivoire">
+  <meta property="og:description" content="Djona est la marketplace automobile de confiance en Côte d'Ivoire : achetez et vendez des véhicules neufs et d'occasion, inspectés et vérifiés par nos experts.">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Djona — L'automobile en Côte d'Ivoire">
+  <meta name="twitter:description" content="Djona est la marketplace automobile de confiance en Côte d'Ivoire : achetez et vendez des véhicules neufs et d'occasion, inspectés et vérifiés par nos experts.">
+  <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
+  {% endblock %}
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <script src="{% static 'js/mobile-nav.js' %}" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutomotiveBusiness",
+    "name": "Djona",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/djona-logo.png' %}",
+    "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}",
+    "description": "Marketplace automobile de confiance en Côte d'Ivoire : achat et vente de véhicules neufs et d'occasion, inspectés et vérifiés.",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Côte d'Ivoire"
+    }
+  }
+  </script>
+  {% block extra_schema %}{% endblock %}
   {% block styles %}{% endblock %}
 </head>
-<body class="bg-background font-body-md text-on-background">
+<body class="bg-background font-body-md text-on-background" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% include 'partials/_header.html' %}
 
   <main class="w-full pt-20 bg-background">
