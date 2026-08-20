@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Véhicules Favoris — Djona{% endblock %}
+{% block meta_description %}Retrouvez et gérez la liste de vos véhicules favoris enregistrés sur Djona.{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full min-h-[70vh]">
+
+  {# En-tête de la page favoris #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter border-b border-surface-container-highest pb-gutter">
+      <div class="flex flex-col">
+        <span class="font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2">Sélection Personnelle</span>
+        <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-on-surface">Mes Véhicules Favoris</h1>
+        <p class="font-body-md text-on-surface-variant mt-1">Consultez et gérez vos coups de cœur enregistrés.</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="{% url 'catalog:list' %}" class="inline-flex items-center gap-2 border border-primary text-primary px-4 py-2 rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">search</span>
+          <span>Explorer le catalogue</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {# Contenu principal #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter pb-16">
+
+    {# État vide (affiché si aucun favori) #}
+    <div id="empty-state" class="{% if fav_count > 0 %}hidden{% endif %} bg-white rounded-md shadow-signature p-8 md:p-12 text-center flex flex-col items-center justify-center my-6">
+      <div class="w-20 h-20 mb-6 rounded-full bg-surface-container flex items-center justify-center text-outline">
+        <span class="material-symbols-outlined text-4xl" aria-hidden="true">favorite_border</span>
+      </div>
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-2">Vous n'avez pas encore de favoris</h2>
+      <p class="font-body-md text-on-surface-variant mb-8 max-w-md">
+        Sauvegardez les véhicules qui vous intéressent lors de votre recherche pour les retrouver facilement ici.
+      </p>
+      <a href="{% url 'catalog:list' %}" class="bg-secondary text-on-secondary px-8 py-3.5 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all inline-flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">directions_car</span>
+        <span>Explorer les véhicules disponibles</span>
+      </a>
+    </div>
+
+    {# Grille des favoris #}
+    {% if fav_count > 0 %}
+    <div id="favorites-container">
+      <div class="flex items-center justify-between py-2 mb-6">
+        <p class="font-label-md text-on-surface-variant">
+          <span id="fav-count-display" class="font-bold text-primary">{{ fav_count }}</span> véhicule(s) sauvegardé(s)
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="favorites-grid">
+        {% for vehicle in vehicles %}
+        <div id="favorite-card-{{ vehicle.id }}" class="favorite-card group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col relative">
+          
+          {# Photo & Badges #}
+          <div class="relative h-48 overflow-hidden bg-surface-container">
+            {% with image=vehicle.images.first %}
+            {% if image %}
+              <img src="{{ image.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.model_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-outline">
+                <span class="material-symbols-outlined text-5xl">directions_car</span>
+              </div>
+            {% endif %}
+            {% endwith %}
+
+            {% if vehicle.is_verified %}
+            <div class="absolute top-3 left-3 bg-secondary text-on-secondary px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+              <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+              <span class="font-label-sm text-[11px] uppercase tracking-wider font-bold">Service Djona</span>
+            </div>
+            {% endif %}
+
+            {# Bouton de suppression HTMX des favoris #}
+            <button type="button"
+                    hx-post="{% url 'catalog:toggle_favorite' vehicle.id %}?from=favorites"
+                    hx-target="#favorite-card-{{ vehicle.id }}"
+                    hx-swap="outerHTML swap:300ms"
+                    class="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-error hover:bg-white active:scale-90 transition-colors shadow-sm cursor-pointer z-10"
+                    aria-label="Retirer des favoris">
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">favorite</span>
+            </button>
+          </div>
+
+          {# Informations du véhicule #}
+          <a href="{{ vehicle.get_absolute_url }}" class="p-5 flex flex-col flex-1">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-headline-md text-[18px] text-on-surface group-hover:text-primary transition-colors truncate">
+                {{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}
+              </h3>
+              <span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-[10px] uppercase shrink-0 ml-2">
+                {{ vehicle.get_condition_display }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4 text-outline mb-4">
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">speed</span>
+                <span class="font-body-md text-label-sm">{{ vehicle.mileage }} km</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">local_gas_station</span>
+                <span class="font-body-md text-label-sm">{{ vehicle.get_fuel_type_display }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">settings_accessibility</span>
+                <span class="font-body-md text-label-sm">{{ vehicle.get_transmission_display }}</span>
+              </div>
+            </div>
+
+            <div class="mt-auto flex items-center justify-between pt-4 border-t border-surface-container">
+              <span class="font-display-lg text-[22px] text-primary">
+                {{ vehicle.price }} <span class="text-[12px] font-label-md">FCFA</span>
+              </span>
+              <span class="text-primary group-hover:bg-primary-fixed p-2 rounded-full transition-colors">
+                <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+              </span>
+            </div>
+          </a>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </section>
+
+</div>
+
+{# Écouteur HTMX pour la suppression en direct et l'affichage de l'état vide #}
+<script>
+  document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+    if (evt.detail.xhr && evt.detail.requestConfig.parameters['from'] === 'favorites') {
+      const grid = document.getElementById('favorites-grid');
+      if (grid) {
+        const remainingCards = grid.querySelectorAll('.favorite-card').length;
+        const countDisplay = document.getElementById('fav-count-display');
+        if (countDisplay) {
+          countDisplay.textContent = remainingCards;
+        }
+        if (remainingCards === 0) {
+          const container = document.getElementById('favorites-container');
+          if (container) container.remove();
+          const emptyState = document.getElementById('empty-state');
+          if (emptyState) emptyState.classList.remove('hidden');
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

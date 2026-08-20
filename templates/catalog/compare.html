@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Comparateur de Véhicules — Djona{% endblock %}
+{% block meta_description %}Comparez côte à côte jusqu'à 3 véhicules sur Djona : prix, kilométrage, carburant, transmission et avis expert certifié.{% endblock %}
+
+{% block styles %}
+<style>
+  /* Tooltip accessible */
+  [data-tooltip]:hover::after,
+  [data-tooltip]:focus-within::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #191c1c;
+    color: #f0f1f1;
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    max-width: 220px;
+    white-space: normal;
+    text-align: center;
+    z-index: 50;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+  [data-tooltip] { position: relative; }
+
+  /* Highlight ligne au hover */
+  .compare-row:hover { background-color: rgba(0, 59, 90, 0.03); }
+
+  /* Scroll snap mobile */
+  .compare-scroll { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .compare-scroll > * { scroll-snap-align: start; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full min-h-[70vh]">
+
+  {# En-tête de la page #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base pb-gutter">
+    <a href="{% url 'catalog:list' %}" class="inline-flex items-center gap-2 group font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors mb-gutter">
+      <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform" aria-hidden="true">arrow_back</span>
+      Retour au catalogue
+    </a>
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Analyse comparative</span>
+        <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-primary">
+          Comparer mes <span class="text-secondary">sélections</span>
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+          Analysez les caractéristiques techniques pour faire le meilleur choix.
+        </p>
+      </div>
+      {% if vehicles %}
+      <a href="{% url 'catalog:list' %}"
+         class="inline-flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors shrink-0">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
+        Ajouter un véhicule
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if not vehicles %}
+  {# État vide #}
+  <section class="flex-1 flex flex-col items-center justify-center py-16 px-4 text-center">
+    <div class="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center mb-6">
+      <span class="material-symbols-outlined text-primary text-[40px]" aria-hidden="true">balance</span>
+    </div>
+    <h2 class="font-headline-lg text-headline-lg-mobile text-primary mb-3">Aucun véhicule à comparer</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-sm mb-8">
+      Parcourez le catalogue et ajoutez jusqu'à {{ max_compare }} véhicules pour les comparer côte à côte.
+    </p>
+    <a href="{% url 'catalog:list' %}"
+       class="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-3.5 rounded font-label-md text-label-md shadow-md hover:brightness-125 active:scale-98 transition-all">
+      <span class="material-symbols-outlined" aria-hidden="true">search</span>
+      Parcourir le catalogue
+    </a>
+  </section>
+
+  {% else %}
+
+  {# Tableau de comparaison #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
+
+    {# Badge "Choix de l'Expert" — légende #}
+    {% if expert_pick_id and vehicles|length >= 2 %}
+    <div class="flex items-center gap-2 mb-4 px-1">
+      <div class="inline-flex items-center gap-1.5 bg-secondary text-on-secondary px-3 py-1 rounded-full shadow-md">
+        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;" aria-hidden="true">star</span>
+        <span class="font-label-sm text-label-sm font-bold tracking-wide">Le Choix de l'Expert</span>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Véhicule recommandé selon le score composite Djona (inspection, kilométrage, état, prix).</span>
+    </div>
+    {% endif %}
+
+    {# Conteneur scroll horizontal sur mobile #}
+    <div class="relative overflow-x-auto compare-scroll rounded-xl shadow-signature">
+      <div class="min-w-[600px] lg:min-w-0 bg-surface-container-lowest overflow-hidden">
+
+        {# ── Ligne 1 : Photos + En-têtes véhicules ── #}
+        <div class="grid border-b border-surface-variant/50" style="grid-template-columns: 180px repeat({{ vehicles|length }}, 1fr);">
+
+          {# Colonne étiquette #}
+          <div class="p-gutter flex items-center justify-center bg-surface-container-low/40 border-r border-surface-variant/30">
+            <div class="text-center">
+              <span class="material-symbols-outlined text-primary-container text-[40px] mb-1 block" aria-hidden="true">balance</span>
+              <p class="font-label-md text-label-md text-primary/60">{{ vehicles|length }} sélectionné{{ vehicles|length|pluralize }}</p>
+            </div>
+          </div>
+
+          {# Colonnes véhicules #}
+          {% for vehicle in vehicles %}
+          <div class="p-gutter relative group border-r border-surface-variant/20 last:border-r-0
+                      {% if vehicle.id == expert_pick_id %}ring-2 ring-secondary/30 bg-secondary/[0.02]{% endif %}">
+
+            {# Badge Expert #}
+            {% if vehicle.id == expert_pick_id %}
+            <div class="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-secondary text-on-secondary px-2.5 py-1 rounded-full shadow-xl text-[11px] font-bold tracking-wide">
+              <span class="material-symbols-outlined text-[13px]" style="font-variation-settings:'FILL' 1;" aria-hidden="true">star</span>
+              Expert
+            </div>
+            {% endif %}
+
+            {# Bouton retrait #}
+            <button
+              hx-post="{% url 'catalog:toggle_compare' vehicle.id %}"
+              hx-target="closest .compare-wrapper"
+              hx-swap="none"
+              hx-on::after-request="window.location.reload()"
+              class="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-error hover:text-on-error transition-colors opacity-0 group-hover:opacity-100"
+              aria-label="Retirer {{ vehicle.brand }} {{ vehicle.model_name }} de la comparaison"
+              title="Retirer">
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>
+            </button>
+
+            {# Photo #}
+            <div class="aspect-[16/10] overflow-hidden rounded mb-3 shadow-sm {% if vehicle.id == expert_pick_id %}ring-2 ring-secondary/40{% endif %}">
+              {% with vehicle.images.first as img %}
+                {% if img %}
+                  <img src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year }}"
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                {% else %}
+                  <div class="w-full h-full bg-surface-container flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-surface-variant text-[40px]" aria-hidden="true">directions_car</span>
+                  </div>
+                {% endif %}
+              {% endwith %}
+            </div>
+
+            {# Badge Vérifié #}
+            {% if vehicle.is_verified %}
+            <div class="absolute bottom-[calc(100%-130px)] right-4 bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md text-[11px] font-medium">
+              <span class="material-symbols-outlined text-[13px]" aria-hidden="true">verified</span>
+              Vérifié Djona
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {# ── Ligne 2 : Nom + Prix ── #}
+        <div class="grid bg-surface-container-low/10 items-start border-b border-surface-variant/30" style="grid-template-columns: 180px repeat({{ vehicles|length }}, 1fr);">
+          <div class="p-gutter font-headline-md text-[15px] text-primary border-r border-surface-variant/30 flex items-center">
+            <span>Modèle &amp; Prix</span>
+          </div>
+          {% for vehicle in vehicles %}
+          <div class="p-gutter border-r border-surface-variant/20 last:border-r-0 {% if vehicle.id == expert_pick_id %}bg-secondary/[0.03]{% endif %}">
+            <a href="{{ vehicle.get_absolute_url }}" class="hover:text-primary transition-colors">
+              <h3 class="font-headline-md text-[15px] sm:text-[17px] text-on-surface leading-snug">{{ vehicle.brand }} {{ vehicle.model_name }}</h3>
+            </a>
+            <p class="font-headline-lg text-[18px] sm:text-headline-lg text-primary mt-1">{{ vehicle.price|intcomma }} FCFA</p>
+            <a href="{{ vehicle.get_absolute_url }}"
+               class="mt-3 inline-flex items-center gap-1.5 text-[11px] font-label-md text-secondary hover:underline">
+              Voir l'annonce
+              <span class="material-symbols-outlined text-[14px]" aria-hidden="true">open_in_new</span>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+
+        {# ── Lignes de critères ── #}
+        {% for criterion in criteria %}
+        <div class="compare-row grid items-center border-b border-surface-variant/20 last:border-b-0 transition-colors"
+             style="grid-template-columns: 180px repeat({{ vehicles|length }}, 1fr);">
+
+          {# Étiquette critère avec tooltip #}
+          <div class="p-3 sm:p-gutter flex items-center gap-2 border-r border-surface-variant/30 bg-surface-container-low/5"
+               data-tooltip="{{ criterion.tooltip }}"
+               tabindex="0" role="button" aria-label="{{ criterion.label }} — {{ criterion.tooltip }}">
+            <span class="material-symbols-outlined text-primary text-[18px] shrink-0" aria-hidden="true">{{ criterion.icon }}</span>
+            <span class="font-label-md text-[12px] sm:text-label-md text-on-surface-variant">{{ criterion.label }}</span>
+            <span class="material-symbols-outlined text-outline text-[14px] ml-auto hidden sm:block" aria-hidden="true">info</span>
+          </div>
+
+          {# Valeur pour chaque véhicule #}
+          {% for vehicle in vehicles %}
+          <div class="p-3 sm:p-gutter border-r border-surface-variant/20 last:border-r-0 {% if vehicle.id == expert_pick_id %}bg-secondary/[0.02]{% endif %}">
+            {% if criterion.format == 'price' %}
+              <span class="font-headline-md text-[15px] sm:text-headline-md text-primary">
+                {{ vehicle.price|intcomma }} FCFA
+              </span>
+
+            {% elif criterion.format == 'number' %}
+              <span class="font-label-md text-label-md text-on-surface">
+                {{ vehicle.mileage|intcomma }} {{ criterion.unit }}
+              </span>
+
+            {% elif criterion.format == 'bool' %}
+              {% if vehicle.is_verified %}
+                <span class="inline-flex items-center gap-1 text-secondary font-label-md text-label-md">
+                  <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;" aria-hidden="true">check_circle</span>
+                  Oui
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 text-outline font-label-md text-label-md">
+                  <span class="material-symbols-outlined text-[16px]" aria-hidden="true">cancel</span>
+                  Non
+                </span>
+              {% endif %}
+
+            {% elif criterion.format == 'choice' %}
+              <span class="font-label-md text-label-md text-on-surface capitalize">
+                {% if criterion.key == 'fuel_type' %}{{ vehicle.get_fuel_type_display }}
+                {% elif criterion.key == 'transmission' %}{{ vehicle.get_transmission_display }}
+                {% elif criterion.key == 'condition' %}{{ vehicle.get_condition_display }}
+                {% else %}—{% endif %}
+              </span>
+
+            {% else %}
+              <span class="font-label-md text-label-md text-on-surface">
+                {% if criterion.key == 'year' %}{{ vehicle.year }}
+                {% elif criterion.key == 'city' %}{{ vehicle.city }}
+                {% else %}—{% endif %}
+              </span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        {# ── CTA Acheter via Djona ── #}
+        <div class="grid border-t border-surface-variant/30 bg-surface-container-low/20" style="grid-template-columns: 180px repeat({{ vehicles|length }}, 1fr);">
+          <div class="p-gutter border-r border-surface-variant/30 flex items-center">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Action</span>
+          </div>
+          {% for vehicle in vehicles %}
+          <div class="p-gutter border-r border-surface-variant/20 last:border-r-0 {% if vehicle.id == expert_pick_id %}bg-secondary/[0.03]{% endif %}">
+            <a href="{{ vehicle.get_absolute_url }}"
+               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded font-label-md text-label-md transition-all active:scale-98
+                      {% if vehicle.id == expert_pick_id %}bg-secondary text-on-secondary shadow-md hover:brightness-110{% else %}bg-primary text-on-primary hover:brightness-125{% endif %}">
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">shopping_bag</span>
+              Acheter via Djona
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>{# end min-w #}
+    </div>{# end overflow-x-auto #}
+
+    {# Vider la sélection #}
+    <div class="mt-6 flex justify-end">
+      <form method="post" action="{% url 'catalog:compare' %}">
+        {% csrf_token %}
+        <input type="hidden" name="clear" value="1">
+        <button type="submit"
+                class="inline-flex items-center gap-2 px-4 py-2 border border-error/40 text-error rounded font-label-md text-label-md hover:bg-error hover:text-on-error active:scale-98 transition-all">
+          <span class="material-symbols-outlined text-[16px]" aria-hidden="true">delete_sweep</span>
+          Vider la sélection
+        </button>
+      </form>
+    </div>
+
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

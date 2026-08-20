@@ -18,8 +18,18 @@ def home(request):
     context = {
         'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:6],
         'stats': HOME_STATS,
+        'search_brands': Vehicle.objects.filter(publish=True).values_list('brand', flat=True).distinct().order_by('brand'),
+        'search_cities': Vehicle.objects.filter(publish=True).values_list('city', flat=True).distinct().order_by('city'),
     }
     return render(request, 'core/home.html', context)
+
+
+def about(request):
+    """Page À propos de Djona, portée depuis
+    _mockups/01_public/desktop/about/code.html.
+    """
+    return render(request, 'core/about.html')
+
 
 
 FAQ_ITEMS = [

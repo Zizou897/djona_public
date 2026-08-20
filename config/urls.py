@@ -11,10 +11,13 @@ sitemaps = {
     'vehicles': VehicleSitemap,
 }
 
+from apps.catalog import views as catalog_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('', include('apps.core.urls')),
+    path('favoris/', catalog_views.vehicle_favorites, name='favorites_direct'),
     path('vehicules/', include('apps.catalog.urls')),
 ]
 

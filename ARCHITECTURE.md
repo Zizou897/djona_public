@@ -45,15 +45,13 @@ djona_public/
     └── _assets/djona_automotive_system/DESIGN.md   # design system source de vérité
 ```
 
-## État d'avancement
+## Suivi du Projet & État d'avancement
 
-- [x] Scaffold Django (`config/`, `apps/core`, `apps/catalog`)
-- [x] Build Tailwind (tokens du design system, pas de CDN)
-- [x] `base.html` + header public (`partials/_header.html`) — **première vue livrée**
-- [x] Footer (`partials/_footer.html`, inclus dans `base.html`)
-- [x] Accueil complet (hero, recherche, listings, trust bar, CTA vente, stats animées)
-- [x] Contact / support (`/contact/` — hero, canaux de contact, formulaire, localisation, FAQ)
-- [ ] Catalogue : modèles `Vehicle`/`VehicleImage`/`Favorite` + listing/détail/comparaison/favoris
+Pour un suivi détaillé et constamment mis à jour du projet, se référer aux 3 fichiers dédiés :
+- [TACHES_REALISEES.md](file:///c:/Users/HP/Documents/Github/djona_public/TACHES_REALISEES.md) : Détail complet de tout ce qui a été développé et livré.
+- [TACHES_EN_COURS.md](file:///c:/Users/HP/Documents/Github/djona_public/TACHES_EN_COURS.md) : Modules et fonctionnalités actuellement en cours d'intégration (Page favoris dédiée, Comparateur).
+- [TACHES_A_FAIRE.md](file:///c:/Users/HP/Documents/Github/djona_public/TACHES_A_FAIRE.md) : Backlog du parcours public immédiat et roadmap globale (Authentification, Vendeur, Transactions séquestres, Administration).
+
 
 ## Démarrage local
 

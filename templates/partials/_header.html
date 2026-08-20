@@ -14,8 +14,15 @@
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
       <a href="{% url 'catalog:list' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.app_name == 'catalog' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.app_name == 'catalog' %}aria-current="page"{% endif %}>Catalogue</a>
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
+      <a href="{% url 'catalog:favorites' %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:favorites' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:favorites' %}aria-current="page"{% endif %}>Favoris</a>
+      <a href="{% url 'catalog:compare' %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
+
       <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
@@ -23,18 +30,18 @@
     </nav>
     {% endwith %}
 
-    <div class="flex items-center gap-base">
+    <div class="flex items-center gap-2 sm:gap-base">
       <a href="#"
          class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded hover:bg-primary-fixed transition-colors">
         Publier mon véhicule
       </a>
       <a href="{% url 'catalog:list' %}"
-         class="print:hidden flex items-center gap-2 bg-secondary text-on-secondary px-6 py-2.5 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
-        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>
-        Rechercher
+         class="print:hidden flex items-center gap-1.5 sm:gap-2 bg-secondary text-on-secondary px-3 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-xs sm:text-label-md shadow-md hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[18px] sm:text-[20px]" aria-hidden="true">search</span>
+        <span>Rechercher</span>
       </a>
       <button type="button" id="mobile-nav-toggle" data-open="false"
-              class="group lg:hidden relative flex items-center justify-center w-11 h-11 rounded-full border border-primary/15 bg-surface hover:border-secondary/50 hover:bg-surface-container transition-colors"
+              class="group lg:hidden relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-primary/15 bg-surface hover:border-secondary/50 hover:bg-surface-container transition-colors shrink-0"
               aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-nav-panel">
         <span class="sr-only">Menu</span>
         <span class="relative w-5 h-[14px]" aria-hidden="true">
@@ -54,8 +61,15 @@
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
       <a href="{% url 'catalog:list' %}"
-         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.app_name == 'catalog' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.app_name == 'catalog' %}aria-current="page"{% endif %}>Catalogue</a>
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
+      <a href="{% url 'catalog:favorites' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:favorites' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:favorites' %}aria-current="page"{% endif %}>Mes Favoris</a>
+      <a href="{% url 'catalog:compare' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
+
       <a href="#" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"

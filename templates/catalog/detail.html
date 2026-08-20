@@ -133,10 +133,7 @@
                 <span>Démarrer l'achat sécurisé</span>
                 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
               </a>
-              <a href="#" class="w-full text-center border border-primary/30 text-primary py-2.5 rounded font-label-md text-label-sm hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">compare_arrows</span>
-                Ajouter au comparateur
-              </a>
+              {% include 'partials/_compare_button.html' with vehicle=vehicle in_compare=vehicle.in_compare compare_count=compare_count max_compare=max_compare %}
             </div>
 
             <div class="p-5 rounded-md bg-surface-container-highest/50 flex flex-col gap-3">

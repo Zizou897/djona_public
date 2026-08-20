@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À Propos de Djona — La marketplace automobile de confiance en Côte d'Ivoire{% endblock %}
+{% block meta_description %}Découvrez l'histoire, la mission et les valeurs de Djona, la première marketplace automobile sécurisée de Côte d'Ivoire, avec inspection certifiée et paiement séquestre.{% endblock %}
+
+{% block styles %}
+<style>
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-slide-up-1 { animation: slideUp 0.7s ease-out 0s forwards; opacity: 0; }
+  .animate-slide-up-2 { animation: slideUp 0.7s ease-out 0.2s forwards; opacity: 0; }
+  .animate-slide-up-3 { animation: slideUp 0.7s ease-out 0.4s forwards; opacity: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# ── Hero ── #}
+  <section class="relative w-full min-h-[55vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden bg-primary text-on-primary rounded-b-[32px] sm:rounded-b-[40px] shadow-lg -mt-20 pt-20">
+    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
+        <path d="M0 0 L50 100 L0 100 Z" fill="currentColor" opacity="0.5"/>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+    </div>
+
+    <div class="relative z-10 max-w-page w-full px-4 sm:px-container-margin-mobile lg:px-container-margin-desktop text-center flex flex-col items-center py-12 sm:py-16">
+      <span class="font-label-md text-secondary-container tracking-widest uppercase mb-4 animate-slide-up-1">
+        Notre Histoire
+      </span>
+      <h1 class="font-display-lg text-2xl sm:text-4xl lg:text-display-lg max-w-4xl mb-6 animate-slide-up-2 leading-tight">
+        Redéfinir la confiance automobile en Côte d'Ivoire
+      </h1>
+      <p class="font-body-lg text-sm sm:text-body-lg animate-slide-up-3 max-w-2xl text-primary-fixed-dim/80 px-2">
+        Nous bâtissons le premier écosystème automobile entièrement sécurisé, transparent et certifié pour les particuliers et professionnels en Afrique de l'Ouest.
+      </p>
+    </div>
+  </section>
+
+  {# ── Mission ── #}
+  <section class="py-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="flex flex-col lg:flex-row gap-section-gap items-center">
+      <div class="flex-1 space-y-6">
+        <div class="flex items-center gap-2 text-secondary mb-2">
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+          <span class="font-label-md text-label-md uppercase tracking-wider">Notre Mission</span>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg text-on-background">Sécuriser chaque transaction.</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">
+          Chez Djona, nous savons que l'achat ou la vente d'un véhicule est une étape majeure. Notre mission est d'éliminer le stress, l'incertitude et la fraude du marché de l'occasion en Côte d'Ivoire.
+        </p>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          Grâce à notre service de <strong>séquestre financier</strong> et à nos <strong>inspections certifiées sur 150 points de contrôle</strong>, nous garantissons que l'acheteur obtient exactement le véhicule décrit, et que le vendeur est payé de manière sécurisée. Nous ne sommes pas juste une plateforme d'annonces, nous sommes votre tiers de confiance.
+        </p>
+      </div>
+      <div class="flex-1 relative w-full aspect-video md:aspect-[4/3] rounded-3xl overflow-hidden shadow-xl group">
+        <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+        <div class="w-full h-full bg-primary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary-container text-[80px] opacity-30" aria-hidden="true">directions_car</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ── Chiffres Clés ── #}
+  <section class="py-section-gap bg-surface-container-low w-full relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none opacity-[0.04] flex items-center justify-center overflow-hidden" aria-hidden="true">
+      <span class="font-display-lg text-[20vw] whitespace-nowrap text-primary font-bold -rotate-6">DJONA</span>
+    </div>
+    <div class="max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop relative z-10">
+      <div class="text-center mb-12">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+          <span class="font-label-md text-secondary uppercase tracking-widest">En chiffres</span>
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg text-primary">L'impact Djona</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+          <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">directions_car</span>
+          <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2 js-about-counter" data-target="2500">0</span>
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Véhicules Inspectés</span>
+        </div>
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+          <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+          <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2 js-about-counter" data-target="150">0</span>
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Points de Contrôle</span>
+        </div>
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+          <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">shield</span>
+          <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2"><span class="js-about-counter" data-target="100">0</span>%</span>
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Transactions Sécurisées</span>
+        </div>
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+          <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">group</span>
+          <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2"><span class="js-about-counter" data-target="15">0</span>K+</span>
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Utilisateurs</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ── Nos Valeurs ── #}
+  <section class="py-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+        <span class="font-label-md text-secondary uppercase tracking-widest">L'ADN de Djona</span>
+        <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+      </div>
+      <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">Nos Valeurs Fondamentales</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        Nos principes stricts pour vous offrir la meilleure expérience sur le marché automobile.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+      {# Transparence #}
+      <div class="bg-surface p-6 sm:p-8 rounded-3xl shadow-signature hover:-translate-y-2 transition-all duration-300 group">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-2xl flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
+          <span class="material-symbols-outlined text-primary text-[28px] sm:text-[32px] group-hover:text-on-primary transition-colors">visibility</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-background mb-3">Transparence</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          Aucun vice caché. Chaque rapport d'inspection est disponible publiquement. Nous disons la vérité sur l'état de chaque véhicule, qu'elle soit bonne ou mauvaise.
+        </p>
+      </div>
+      {# Sécurité — Card mise en avant (primary background) #}
+      <div class="bg-primary text-on-primary p-6 sm:p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+        <div class="absolute -right-8 -top-8 w-32 h-32 bg-secondary rounded-full opacity-10 group-hover:scale-150 transition-transform duration-500" aria-hidden="true"></div>
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-5 sm:mb-6 backdrop-blur-sm">
+          <span class="material-symbols-outlined text-on-primary text-[28px] sm:text-[32px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">security</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-primary mb-3">Sécurité</h3>
+        <p class="font-body-md text-body-md text-primary-fixed-dim/80">
+          Votre argent est protégé jusqu'à la remise des clés. Notre système de séquestre garantit qu'aucune transaction frauduleuse ne puisse aboutir sur notre plateforme.
+        </p>
+      </div>
+      {# Innovation #}
+      <div class="bg-surface p-6 sm:p-8 rounded-3xl shadow-signature hover:-translate-y-2 transition-all duration-300 group">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-2xl flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
+          <span class="material-symbols-outlined text-primary text-[28px] sm:text-[32px] group-hover:text-on-primary transition-colors">lightbulb</span>
+        </div>
+        <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-background mb-3">Innovation</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          Nous repensons continuellement le parcours utilisateur en intégrant les dernières technologies pour rendre l'achat et la vente plus rapides et plus fluides.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {# ── Direction / Citation du Fondateur ── #}
+  <section class="py-section-gap my-4 mx-4 lg:mx-auto max-w-page bg-surface-container rounded-[32px] sm:rounded-[40px] shadow-inner overflow-hidden relative">
+    <div class="absolute -left-[10%] -top-[20%] w-[40%] aspect-square bg-primary/5 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 sm:gap-12 px-container-margin-mobile lg:px-container-margin-desktop">
+      {# Portrait #}
+      <div class="w-full md:w-1/3 flex justify-center">
+        <div class="relative w-52 h-52 sm:w-64 sm:h-64 md:w-80 md:h-80 -mt-10 md:mt-0">
+          <div class="absolute inset-0 bg-secondary rounded-full -translate-x-4 translate-y-4 opacity-50" aria-hidden="true"></div>
+          <div class="w-full h-full rounded-full shadow-xl relative z-10 border-4 border-surface bg-primary-container flex items-center justify-center overflow-hidden">
+            <span class="material-symbols-outlined text-on-primary-container text-[80px] opacity-40">person</span>
+          </div>
+        </div>
+      </div>
+      {# Texte #}
+      <div class="w-full md:w-2/3 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary font-label-sm text-label-sm uppercase tracking-widest mb-2">
+          <span>Direction</span>
+        </div>
+        <blockquote class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-on-background leading-snug">
+          « Nous redonnons le pouvoir aux acheteurs et aux vendeurs honnêtes. »
+        </blockquote>
+        <div class="pt-4">
+          <p class="font-headline-md text-[18px] sm:text-[20px] text-on-background">Jean-Marc Konan</p>
+          <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Fondateur &amp; CEO, Djona</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ── CTA Final ── #}
+  <section class="py-section-gap w-full flex justify-center px-4">
+    <div class="max-w-[800px] w-full bg-primary text-on-primary rounded-[24px] sm:rounded-[32px] p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary-fixed opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <h2 class="font-display-lg text-2xl sm:text-[40px] mb-4 leading-tight">Prêt à changer d'air&nbsp;?</h2>
+        <p class="font-body-lg text-sm sm:text-body-lg text-primary-fixed-dim/80 mb-8 max-w-lg">
+          Rejoignez des milliers d'Ivoiriens qui ont choisi la sécurité et la tranquillité d'esprit avec Djona.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+          <a href="{% url 'catalog:list' %}"
+             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-secondary text-on-secondary rounded-xl font-label-md text-label-md uppercase tracking-wider shadow-md hover:-translate-y-1 hover:shadow-lg active:scale-98 transition-all">
+            Découvrir nos annonces
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+          </a>
+          <a href="#"
+             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border-2 border-on-primary/40 text-on-primary rounded-xl font-label-md text-label-md uppercase tracking-wider hover:bg-white/10 active:scale-98 transition-all">
+            Publier mon véhicule
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Compteurs animés au défilement (IntersectionObserver)
+  document.addEventListener('DOMContentLoaded', () => {
+    const counters = document.querySelectorAll('.js-about-counter');
+    if (!counters.length) return;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = +el.dataset.target;
+        const duration = 1200;
+        const step = target / (duration / 16);
+        let current = 0;
+        const tick = () => {
+          current = Math.min(current + step, target);
+          el.textContent = Math.ceil(current);
+          if (current < target) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        obs.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+
+    counters.forEach(c => observer.observe(c));
+  });
+</script>
+{% endblock %}

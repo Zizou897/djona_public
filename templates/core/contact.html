@@ -17,6 +17,18 @@
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
 {% endblock %}
 
+{% block styles %}
+<style>
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-slide-up-1 { animation: slideUp 0.7s ease-out 0s   forwards; opacity: 0; }
+  .animate-slide-up-2 { animation: slideUp 0.7s ease-out 0.2s forwards; opacity: 0; }
+  .animate-slide-up-3 { animation: slideUp 0.7s ease-out 0.4s forwards; opacity: 0; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="relative flex flex-col w-full">
 
@@ -31,11 +43,11 @@
     </div>
     <div class="max-w-page mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
       <div class="lg:col-span-7 z-10">
-        <span class="inline-block font-label-md text-label-md text-secondary mb-4 uppercase tracking-widest bg-secondary-fixed/30 px-3 py-1 rounded-full">Assistance Client</span>
-        <h1 class="font-display-lg text-display-lg text-primary mb-6 leading-tight">
+        <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary mb-4 uppercase tracking-widest bg-secondary-fixed/30 px-3 py-1 rounded-full">Assistance Client</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-display-lg text-primary mb-6 leading-tight">
           Comment pouvons-nous <br class="hidden lg:block"><span class="text-secondary">vous aider ?</span>
         </h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-8">
+        <p class="animate-slide-up-3 font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-8">
           Que vous soyez acheteur ou vendeur, notre équipe d'experts automobile est à votre disposition pour sécuriser chaque étape de votre transaction à Abidjan.
         </p>
       </div>
