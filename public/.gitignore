@@ -1,6 +1,3 @@
-.superpowers/
-.claude/worktrees/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -219,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Djona (Django + Tailwind) ---
+# Django
+/media_cdn/
+/static_cdn/
+*.sqlite3
+
+# Node / Tailwind
+node_modules/
+/static/css/output.css
