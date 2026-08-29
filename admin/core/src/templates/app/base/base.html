@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    {% load static %}
+    <title>{% block title %}core{% endblock %}</title>
+    <style>
+        @layer base {
+            html, body { margin: 0; padding: 0; }
+            body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+        }
+        ::-webkit-scrollbar { display: none; }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    {% if messages %}
+    <div class="fixed top-4 inset-x-4 z-[100] flex flex-col gap-2 pointer-events-none">
+        {% for message in messages %}
+        <div class="pointer-events-auto mx-auto max-w-md w-full px-4 py-3 rounded-lg shadow-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-600 text-white{% elif message.tags == 'success' %}bg-green-600 text-white{% else %}bg-gray-800 text-white{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

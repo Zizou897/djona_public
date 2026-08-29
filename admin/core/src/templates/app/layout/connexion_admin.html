@@ -1,0 +1,131 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Connexion — Portail Admin{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-error-container":"#93000a","tertiary":"#26384b","surface-container":"#edeeee","secondary-fixed":"#ffddb9","surface-tint":"#2f6388","primary-fixed":"#cbe6ff","secondary":"#865300","on-primary-fixed-variant":"#0e4b6e","on-error":"#ffffff","outline-variant":"#c1c7cf","background":"#f8f9f9","inverse-surface":"#2e3131","on-surface-variant":"#41474e","secondary-container":"#fea520","on-secondary-container":"#694000","tertiary-container":"#3d4f63","on-primary":"#ffffff","on-tertiary-container":"#aec1d8","primary-fixed-dim":"#9bccf6","on-surface":"#191c1c","inverse-on-surface":"#f0f1f1","tertiary-fixed":"#d1e4fc","error-container":"#ffdad6","surface-container-lowest":"#ffffff","outline":"#72787f","surface-container-high":"#e7e8e8","surface-container-highest":"#e1e3e3","inverse-primary":"#9bccf6","surface-container-low":"#f3f4f4","on-tertiary-fixed":"#091d2e","surface-bright":"#f8f9f9","error":"#ba1a1a","on-tertiary":"#ffffff","secondary-fixed-dim":"#ffb961","on-secondary-fixed":"#2b1700","tertiary-fixed-dim":"#b5c8e0","surface-variant":"#e1e3e3","on-background":"#191c1c","surface":"#f8f9f9","surface-dim":"#d9dada","on-primary-container":"#94c5ee","on-secondary":"#ffffff","on-secondary-fixed-variant":"#663e00","on-tertiary-fixed-variant":"#36485c","on-primary-fixed":"#001e30","primary-container":"#1a5276","primary":"#003b5a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"section-gap":"48px","gutter":"16px","base":"8px","container-margin-mobile":"16px","container-margin-desktop":"32px"},"fontFamily":{"body-md":["Inter"],"headline-lg-mobile":["Montserrat"],"label-md":["Inter"],"body-lg":["Inter"],"headline-lg":["Montserrat"],"display-lg":["Montserrat"],"headline-md":["Montserrat"],"label-sm":["Inter"]},"fontSize":{"body-md":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-lg-mobile":["18px",{"lineHeight":"24px","fontWeight":"700"}],"label-md":["11px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"600"}],"body-lg":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["21px",{"lineHeight":"27px","fontWeight":"700"}],"display-lg":["30px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"label-sm":["10px",{"lineHeight":"14px","fontWeight":"500"}]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<main class="w-full bg-background">
+<div class="flex flex-col w-full h-[100dvh] relative overflow-hidden bg-background">
+<!-- Fond mobile : dégradé de marque plein écran (repris de la maquette connexion_admin_djona_mobile) -->
+<div class="md:hidden absolute inset-0 bg-primary-container">
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+<svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="40" id="pattern-diagonal-stripes" patternTransform="rotate(45)" patternUnits="userSpaceOnUse" width="40">
+<rect fill="currentColor" height="40" width="2"></rect>
+</pattern>
+<pattern height="20" id="pattern-dots" patternUnits="userSpaceOnUse" width="20">
+<circle cx="2" cy="2" fill="currentColor" r="1.5"></circle>
+</pattern>
+</defs>
+<rect fill="url(#pattern-dots)" height="100%" width="100%"></rect>
+<rect fill="url(#pattern-diagonal-stripes)" height="100%" opacity="0.3" width="100%"></rect>
+</svg>
+</div>
+<div class="absolute inset-0 bg-gradient-to-b from-primary/50 to-primary-container/90 mix-blend-multiply"></div>
+</div>
+<!-- Fond desktop : motif géométrique discret + halos (repris de la maquette connexion_admin_djona) -->
+<div class="hidden md:block absolute inset-0 pointer-events-none opacity-[0.03]">
+<svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="100" id="admin-pattern" patternUnits="userSpaceOnUse" width="100" x="0" y="0">
+<path class="text-on-background" d="M0 100L100 0M50 150L150 50M-50 50L50 -50" fill="none" stroke="currentColor" stroke-width="0.5"></path>
+<circle class="text-on-background" cx="50" cy="50" fill="currentColor" r="1.5"></circle>
+<circle class="text-on-background" cx="0" cy="100" fill="currentColor" r="1.5"></circle>
+<circle class="text-on-background" cx="100" cy="0" fill="currentColor" r="1.5"></circle>
+</pattern>
+<linearGradient id="fade" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="transparent"></stop>
+<stop class="text-background" offset="50%" stop-color="currentColor"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</linearGradient>
+</defs>
+<rect fill="url(#admin-pattern)" height="100%" width="100%"></rect>
+<rect class="opacity-80" fill="url(#fade)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<div class="hidden md:block absolute top-1/4 left-1/4 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-primary-fixed/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-multiply"></div>
+<div class="hidden md:block absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] bg-secondary-fixed/20 rounded-full blur-[80px] translate-x-1/2 translate-y-1/2 pointer-events-none mix-blend-multiply"></div>
+<div class="relative z-10 flex flex-col items-center justify-center flex-1 p-gutter md:p-container-margin-desktop pt-safe pb-safe overflow-y-auto">
+<div class="w-full max-w-sm md:max-w-[440px] bg-surface-container-lowest rounded-2xl shadow-xl md:shadow-[0_8px_32px_rgba(26,82,118,0.12)] relative overflow-hidden group">
+<div class="hidden md:block absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary-container to-secondary"></div>
+<div class="p-6 md:p-10 flex flex-col gap-6 md:gap-8">
+<div class="flex flex-col items-center gap-4 text-center">
+<img alt="Djona" class="h-16 w-16 object-contain rounded-xl shadow-sm" src="{% static 'app/assets/img/djona-logo.png' %}">
+<div class="flex flex-col gap-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Portail Admin</h1>
+<div class="flex items-center justify-center gap-1.5 text-secondary">
+<span class="material-symbols-outlined text-[16px] font-bold" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Connexion Sécurisée</span>
+</div>
+</div>
+</div>
+<form class="flex flex-col gap-5" id="admin-login-form" method="post" novalidate>
+{% csrf_token %}
+{% if form.non_field_errors %}
+<div class="px-4 py-3 rounded-lg bg-error-container text-on-error-container font-label-sm text-label-sm">
+{{ form.non_field_errors.0 }}
+</div>
+{% endif %}
+<div class="flex flex-col gap-4">
+<div class="relative flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant sr-only" for="admin-email">Adresse Email</label>
+<div class="relative flex items-center bg-surface-container-low rounded-lg transition-colors focus-within:bg-surface-container-lowest focus-within:shadow-[0_0_0_2px_#003b5a]">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant/70 text-[20px] pointer-events-none">mail</span>
+<input autofocus class="w-full pl-11 pr-4 py-3.5 bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none rounded-lg" id="admin-email" name="username" placeholder="Email administrateur" required type="text" value="{{ form.username.value|default:'' }}">
+</div>
+</div>
+<div class="relative flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant sr-only" for="admin-password">Mot de passe</label>
+<div class="relative flex items-center bg-surface-container-low rounded-lg transition-colors focus-within:bg-surface-container-lowest focus-within:shadow-[0_0_0_2px_#003b5a]">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant/70 text-[20px] pointer-events-none">key</span>
+<input class="w-full pl-11 pr-12 py-3.5 bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none rounded-lg" id="admin-password" name="password" placeholder="Mot de passe" required type="password">
+<button class="absolute right-3.5 text-on-surface-variant/70 hover:text-primary transition-colors flex items-center justify-center w-6 h-6" id="toggle-password" type="button">
+<span class="material-symbols-outlined text-[20px]" id="visibility-icon">visibility_off</span>
+</button>
+</div>
+</div>
+</div>
+<input name="next" type="hidden" value="{{ next }}">
+<div class="flex flex-col gap-3 mt-2">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-[14px] py-3.5 rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-container-lowest flex items-center justify-center gap-2 group/btn" type="submit">
+<span>Se connecter</span>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-2 pt-6 border-t border-outline-variant/30 text-center">
+<p class="font-label-sm text-label-sm leading-relaxed text-on-surface-variant/60 uppercase tracking-wide">
+Accès restreint au personnel autorisé de Djona Automotive. Toute tentative de connexion non autorisée est surveillée.
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordInput = document.getElementById('admin-password');
+        const icon = document.getElementById('visibility-icon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.textContent = 'visibility';
+        } else {
+            passwordInput.type = 'password';
+            icon.textContent = 'visibility_off';
+        }
+    });
+</script>
+{% endblock %}

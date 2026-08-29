@@ -1,0 +1,20 @@
+{% load static %}
+<header class="lg:hidden fixed top-0 inset-x-0 z-50 h-16 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] flex items-center justify-between px-container-margin-mobile">
+<div class="flex items-center gap-3">
+<img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+<h1 class="font-headline-md text-headline-md text-primary">{{ page_title }}</h1>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden ml-1">
+{% if request.user.profil.avatar %}
+<img alt="Photo de profil" class="w-full h-full object-cover" src="{{ request.user.profil.avatar.url }}">
+{% else %}
+<span class="material-symbols-outlined text-on-primary text-[16px]">person</span>
+{% endif %}
+</div>
+</div>
+</header>

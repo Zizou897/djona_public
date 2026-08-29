@@ -1,0 +1,19 @@
+<nav class="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)] pb-safe">
+<div class="flex justify-around items-center h-16 px-container-margin-mobile">
+<a {% if active_nav == 'dashboard' %}aria-current="page" class="flex flex-col items-center justify-center gap-1 text-secondary"{% else %}class="flex flex-col items-center justify-center gap-1 text-on-surface-variant"{% endif %} href="{% url 'dashboard_admin' %}">
+<span class="material-symbols-outlined">dashboard</span><span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a {% if active_nav == 'annonces' %}aria-current="page" class="flex flex-col items-center justify-center gap-1 text-secondary"{% else %}class="flex flex-col items-center justify-center gap-1 text-on-surface-variant"{% endif %} href="{% url 'annonce_moderation_liste' %}">
+<span class="material-symbols-outlined">fact_check</span><span class="font-label-sm text-label-sm">Validation</span>
+</a>
+<a {% if active_nav == 'vendeurs' %}aria-current="page" class="flex flex-col items-center justify-center gap-1 text-secondary"{% else %}class="flex flex-col items-center justify-center gap-1 text-on-surface-variant"{% endif %} href="{% url 'vendeur_liste' %}">
+<span class="material-symbols-outlined">group</span><span class="font-label-sm text-label-sm">Vendeurs</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">receipt_long</span><span class="font-label-sm text-label-sm">Transactions</span>
+</a>
+<a {% if active_nav == 'profil' %}aria-current="page" class="flex flex-col items-center justify-center gap-1 text-secondary"{% else %}class="flex flex-col items-center justify-center gap-1 text-on-surface-variant"{% endif %} href="{% url 'profil_admin' %}">
+<span class="material-symbols-outlined">settings</span><span class="font-label-sm text-label-sm">Réglages</span>
+</a>
+</div>
+</nav>

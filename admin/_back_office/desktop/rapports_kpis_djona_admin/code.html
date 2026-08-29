@@ -1,0 +1,301 @@
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"on-tertiary-container":"#aec1d8","inverse-surface":"#2e3131","surface-container-lowest":"#ffffff","error":"#ba1a1a","inverse-primary":"#9bccf6","surface-bright":"#f8f9f9","on-tertiary":"#ffffff","on-secondary-fixed":"#2b1700","tertiary":"#26384b","inverse-on-surface":"#f0f1f1","tertiary-container":"#3d4f63","tertiary-fixed":"#d1e4fc","on-secondary-container":"#694000","error-container":"#ffdad6","secondary-container":"#fea520","surface-container-high":"#e7e8e8","surface":"#f8f9f9","on-secondary-fixed-variant":"#663e00","on-primary-container":"#94c5ee","on-tertiary-fixed":"#091d2e","on-tertiary-fixed-variant":"#36485c","surface-container-highest":"#e1e3e3","surface-container":"#edeeee","on-secondary":"#ffffff","on-primary":"#ffffff","secondary":"#865300","primary-fixed":"#cbe6ff","secondary-fixed":"#ffddb9","primary":"#003b5a","background":"#f8f9f9","secondary-fixed-dim":"#ffb961","on-error-container":"#93000a","on-background":"#191c1c","surface-dim":"#d9dada","surface-container-low":"#f3f4f4","outline-variant":"#c1c7cf","tertiary-fixed-dim":"#b5c8e0","primary-container":"#1a5276","surface-variant":"#e1e3e3","on-primary-fixed":"#001e30","on-error":"#ffffff","surface-tint":"#2f6388","primary-fixed-dim":"#9bccf6","outline":"#72787f","on-primary-fixed-variant":"#0e4b6e","on-surface-variant":"#41474e"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"base":"8px","section-gap":"48px","gutter":"16px","container-margin-mobile":"16px","container-margin-desktop":"32px"},"fontFamily":{"headline-lg-mobile":["Montserrat"],"body-md":["Inter"],"label-md":["Inter"],"headline-md":["Montserrat"],"label-sm":["Inter"],"headline-lg":["Montserrat"],"body-lg":["Inter"],"display-lg":["Montserrat"]},"fontSize":{"headline-lg-mobile":["24px",{"lineHeight":"32px","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","fontWeight":"700"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"display-lg":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background font-body-md text-on-surface"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low shadow-[4px_0_12px_rgba(26,82,118,0.04)] z-50 flex flex-col pt-base pb-section-gap"><div class="px-container-margin-desktop mb-10 flex items-center gap-3"><img alt="djona_logo.jpg" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLti_12mOSuv3JV-1K-PbPaBYaHsKPOi9yh_Rwq6ATH6jNekpqzGUG047baaE7zuYtw1wBSAXdkiLiPSjEzx3prlfWyKpUs9-OxCPTpcjMse2r6VZqo_GRPyKilg4BCIGeRFDGfi_pyur7fW20z4NGvt82Rn6gObDwbLGhKJjsWTKF3TEt2Igj2gyXo-4ZtUyacXliMztHAl4VFhMsg1duwi8lnwIlubqww69_wepUqyJzJOTrXNPDsZV9poUtw_WryG7kdpiuqUjw"/><span class="font-headline-md text-headline-md text-primary">Djona Admin</span></div><nav class="flex-1 px-4 space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold"><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-3">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span></a><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="validation" href="#"><span class="material-symbols-outlined mr-3">verified_user</span><span class="font-label-md text-label-md">Validation</span></a><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="transactions" href="#"><span class="material-symbols-outlined mr-3">receipt_long</span><span class="font-label-md text-label-md">Transactions</span></a><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="utilisateurs" href="#"><span class="material-symbols-outlined mr-3">group</span><span class="font-label-md text-label-md">Utilisateurs</span></a><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="rapports-kpis" href="#"><span class="material-symbols-outlined mr-3">analytics</span><span class="font-label-md text-label-md">Rapports &amp; KPIs</span></a><a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all group" data-path="notifications" href="#"><span class="material-symbols-outlined mr-3">notifications</span><span class="font-label-md text-label-md">Notifications</span></a></nav></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-container-margin-desktop"><div class="flex items-center bg-surface-container px-4 py-2 rounded-full w-96 border border-outline-variant/30"><span class="material-symbols-outlined text-on-surface-variant text-sm">search</span><input class="bg-transparent border-none focus:ring-0 ml-2 text-sm w-full text-on-surface" placeholder="Recherche globale..." type="text"/></div><div class="flex items-center gap-gutter"><div class="flex items-center gap-2 bg-surface-container-high px-4 py-1.5 rounded-lg"><span class="material-symbols-outlined text-sm">calendar_month</span><span class="font-label-sm text-label-sm">Derniers 30 jours</span><span class="material-symbols-outlined text-sm">expand_more</span></div><button class="relative p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span><span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span></button><div class="flex items-center gap-3 pl-4 border-l border-outline-variant"><div class="text-right hidden sm:block"><p class="font-label-md text-label-md text-on-surface leading-tight">Admin Djona</p><p class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Super Utilisateur</p></div><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida/AP1WRLsDcDpxar7gV9-UUt0MNL0iRb_mGyRWUOlNz_Fo7VKW5N6Owcvq8B6L8jjJYVG5sftIpQGD3Cw9y5_tuoSS0gQ3VHkWsTQBJBDn506j-AHWQH5IHrzT-jqPZtZLzlyOMUhc0wr7fAWoipRyT8OL53B8jt4Xa4OhlfSx7SCWyWFnpkTU-ERXFiVyVGvo1zDWd6YzGN-dZzd7BPzSPqkboSR-e9P9ob5C1uYYPzdKYNG2kvG5SlldXEZXsQ"/></div></div></header><main class="relative pt-16 min-h-screen bg-background"><div class="flex flex-col w-full p-container-margin-desktop space-y-section-gap">
+<!-- Header Section with Contextual Selection -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest mb-2">Centre d'Analyse</span>
+<h1 class="font-display-lg text-display-lg text-on-surface">Rapports &amp; KPIs</h1>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-high p-1.5 rounded-xl shadow-sm">
+<button class="px-6 py-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-sm transition-all hover:bg-white">Vue d'ensemble</button>
+<button class="px-6 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all">Comparaison</button>
+<div class="h-6 w-[1px] bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                Exporter PDF
+            </button>
+</div>
+</div>
+<!-- Scorecards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Chiffre d'Affaires -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-md flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12.5%</span>
+</div>
+</div>
+<div class="mt-8">
+<p class="font-label-md text-label-md text-on-surface-variant">Chiffre d'Affaires Total</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-1">458.2M <span class="text-label-md font-normal">FCFA</span></p>
+</div>
+</div>
+<!-- Taux de conversion -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-md flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="p-3 rounded-xl bg-secondary/10 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex items-center gap-1 text-error font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_down</span>
+<span>-2.1%</span>
+</div>
+</div>
+<div class="mt-8">
+<p class="font-label-md text-label-md text-on-surface-variant">Taux de conversion global</p>
+<div class="flex items-baseline gap-2 mt-1">
+<p class="font-headline-lg text-headline-lg text-on-surface">18.4%</p>
+<div class="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[18.4%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Ventes Sécurisées -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-md flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="p-3 rounded-xl bg-tertiary/10 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+45</span>
+</div>
+</div>
+<div class="mt-8">
+<p class="font-label-md text-label-md text-on-surface-variant">Ventes sécurisées</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-1">1,284</p>
+</div>
+</div>
+<!-- Temps Moyen de Vente -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-md flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="p-3 rounded-xl bg-primary-container/20 text-primary-container group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-label-sm">
+<span class="material-symbols-outlined text-[16px]">speed</span>
+<span>Rapide</span>
+</div>
+</div>
+<div class="mt-8">
+<p class="font-label-md text-label-md text-on-surface-variant">Temps moyen de vente</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-1">14 <span class="text-label-md font-normal">jours</span></p>
+</div>
+</div>
+</div>
+<!-- Main Data Visualizations -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Sales Evolution Line Chart -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-8 rounded-3xl shadow-md overflow-hidden relative">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Évolution des ventes</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Volume quotidien des transactions sécurisées</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm">Mois actuel</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-outline-variant"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Précédent</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-1 relative pt-4">
+<!-- SVG Sparkline Representation -->
+<svg class="absolute inset-0 w-full h-full preserve-3d" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="gradient-area" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#003b5a" stop-opacity="0.1"></stop>
+<stop offset="100%" stop-color="#003b5a" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 Q50,140 100,100 T200,80 T300,120 T400,60 T500,40 T600,90 T700,50 T800,70" fill="none" stroke="#003b5a" stroke-linecap="round" stroke-width="4"></path>
+<path d="M0,150 Q50,140 100,100 T200,80 T300,120 T400,60 T500,40 T600,90 T700,50 T800,70 V200 H0 Z" fill="url(#gradient-area)"></path>
+</svg>
+<!-- Time Labels -->
+<div class="absolute bottom-[-24px] left-0 right-0 flex justify-between px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">01 Jan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">08 Jan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">15 Jan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">22 Jan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">30 Jan</span>
+</div>
+</div>
+</div>
+<!-- Category Bar Chart -->
+<div class="lg:col-span-4 bg-surface-container-lowest p-8 rounded-3xl shadow-md">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Top Catégories</h3>
+<div class="space-y-6">
+<div class="group">
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface">SUV / Tout-terrain</span>
+<span class="font-label-md text-label-md text-primary">42%</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000 group-hover:brightness-110" style="width: 42%;"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface">Berlines de luxe</span>
+<span class="font-label-md text-label-md text-primary">28%</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full transition-all duration-1000 group-hover:brightness-110" style="width: 28%;"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface">Citadines</span>
+<span class="font-label-md text-label-md text-primary">15%</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container rounded-full transition-all duration-1000 group-hover:brightness-110" style="width: 15%;"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface">Utilitaires</span>
+<span class="font-label-md text-label-md text-primary">15%</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-on-tertiary-container rounded-full transition-all duration-1000 group-hover:brightness-110" style="width: 15%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-10 p-4 rounded-2xl bg-surface-container flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary">lightbulb</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">Les SUV connaissent une hausse de demande de 5% par rapport au mois dernier.</p>
+</div>
+</div>
+</div>
+<!-- Regional Performance & Insights -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
+<!-- Table Section -->
+<div class="xl:col-span-2 bg-surface-container-lowest rounded-3xl shadow-md overflow-hidden">
+<div class="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Performance par région</h3>
+<button class="font-label-md text-label-md text-primary hover:underline">Voir tout le pays</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant">Région</th>
+<th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant text-center">Ventes</th>
+<th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant text-right">Volume (FCFA)</th>
+<th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant text-right">Évolution</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-8 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container font-bold text-xs">AB</div>
+<span class="font-label-md text-label-md text-on-surface">Abidjan District</span>
+</td>
+<td class="px-8 py-6 text-center font-body-md">842</td>
+<td class="px-8 py-6 text-right font-body-md font-semibold">312.4M</td>
+<td class="px-8 py-6 text-right text-secondary font-label-md">+14.2%</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-8 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary font-bold text-xs">YA</div>
+<span class="font-label-md text-label-md text-on-surface">Yamoussoukro</span>
+</td>
+<td class="px-8 py-6 text-center font-body-md">156</td>
+<td class="px-8 py-6 text-right font-body-md font-semibold">58.2M</td>
+<td class="px-8 py-6 text-right text-secondary font-label-md">+8.1%</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-8 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/10 flex items-center justify-center text-tertiary font-bold text-xs">BK</div>
+<span class="font-label-md text-label-md text-on-surface">Bouaké</span>
+</td>
+<td class="px-8 py-6 text-center font-body-md">112</td>
+<td class="px-8 py-6 text-right font-body-md font-semibold">42.8M</td>
+<td class="px-8 py-6 text-right text-error font-label-md">-2.4%</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-8 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim font-bold text-xs">SP</div>
+<span class="font-label-md text-label-md text-on-surface">San Pédro</span>
+</td>
+<td class="px-8 py-6 text-center font-body-md">98</td>
+<td class="px-8 py-6 text-right font-body-md font-semibold">35.7M</td>
+<td class="px-8 py-6 text-right text-secondary font-label-md">+5.3%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Insights Expert -->
+<div class="bg-primary text-on-primary rounded-3xl p-8 shadow-xl flex flex-col justify-between relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-on-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+<div>
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary">smart_toy</span>
+<h3 class="font-headline-md text-headline-md">Insights Expert AI</h3>
+</div>
+<div class="space-y-6">
+<div class="bg-on-primary/10 p-4 rounded-2xl border border-on-primary/5">
+<p class="font-label-sm text-label-sm text-primary-fixed opacity-80 uppercase mb-1">Stock Recommendation</p>
+<p class="font-body-md text-body-md leading-relaxed">Le marché de Yamoussoukro montre un déficit de 15% sur les utilitaires d'occasion. Encouragez les dépôts vendeurs dans cette région.</p>
+</div>
+<div class="bg-on-primary/10 p-4 rounded-2xl border border-on-primary/5">
+<p class="font-label-sm text-label-sm text-primary-fixed opacity-80 uppercase mb-1">Pricing Alert</p>
+<p class="font-body-md text-body-md leading-relaxed">Les Toyota Hilux se vendent 8% plus cher via Djona que sur le marché libre grâce à la garantie sécurisée.</p>
+</div>
+<div class="bg-on-primary/10 p-4 rounded-2xl border border-on-primary/5">
+<p class="font-label-sm text-label-sm text-primary-fixed opacity-80 uppercase mb-1">Seasonality Focus</p>
+<p class="font-body-md text-body-md leading-relaxed">Hausse saisonnière prévue des citadines à Abidjan pour la rentrée de mars. Préparez des campagnes ciblées.</p>
+</div>
+</div>
+</div>
+<button class="mt-8 w-full py-4 bg-secondary text-on-secondary font-headline-md text-label-md rounded-2xl hover:brightness-110 transition-all shadow-lg active:scale-[0.98]">
+                Générer un rapport détaillé
+            </button>
+</div>
+</div>
+</div>
+<script>
+    // Simple intersection observer for counter animation simulation
+    document.addEventListener('DOMContentLoaded', () => {
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.score-card').forEach(card => observer.observe(card));
+    });
+</script>
+<style>
+    @keyframes drawPath {
+        from { stroke-dashoffset: 1000; }
+        to { stroke-dashoffset: 0; }
+    }
+    
+    svg path {
+        stroke-dasharray: 1000;
+        animation: drawPath 3s ease-out forwards;
+    }
+
+    .preserve-3d {
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+</style></main></div></body></html>

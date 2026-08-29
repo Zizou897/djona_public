@@ -1,0 +1,45 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Annonces à valider — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Validation' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+<div class="reveal" style="animation-delay:.05s">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-8">Annonces à valider</h1>
+</div>
+<div class="flex flex-col gap-gutter">
+{% for annonce in annonces %}
+<a class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-5 flex items-center justify-between gap-4 hover:-translate-y-0.5 transition-all" href="{% url 'annonce_moderation_detail' annonce.pk %}" style="animation-delay:{{ forloop.counter|add:"6" }}0ms">
+<div class="flex items-center gap-4 min-w-0">
+<div class="w-10 h-10 flex-none rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ annonce.vendeur.prenom|first|upper }}{{ annonce.vendeur.nom|first|upper }}</div>
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">{{ annonce.marque }} {{ annonce.modele }} ({{ annonce.annee }})</p>
+<p class="text-[13px] text-on-surface-variant truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.prix }} CFA</p>
+</div>
+</div>
+<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
+</a>
+{% empty %}
+<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] text-center py-16 text-on-surface-variant" style="animation-delay:.14s">Aucune annonce en attente de validation.</div>
+{% endfor %}
+</div>
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='annonces' %}
+</div>
+{% endblock %}

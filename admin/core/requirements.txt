@@ -1,0 +1,11 @@
+django
+django-jazzmin
+django-tinymce==4.0.0
+django-colorfield==0.11.0
+django-cors-headers==4.3.1
+mysqlclient
+python-decouple==3.8
+pillow==12.3.0
+sweetify
+django-after-response
+celery[redis]

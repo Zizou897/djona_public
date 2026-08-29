@@ -1,0 +1,29 @@
+{% load static %}
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-72 bg-primary text-on-primary z-50 flex-col shadow-xl">
+<div class="p-gutter flex items-center gap-3 mb-section-gap">
+<img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+<span class="font-headline-md text-headline-md tracking-tight">Djona Admin</span>
+</div>
+<nav class="flex-1 px-4 flex flex-col gap-base">
+<a {% if active_nav == 'dashboard' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'dashboard_admin' %}">
+<span class="material-symbols-outlined mr-4">dashboard</span><span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a {% if active_nav == 'annonces' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'annonce_moderation_liste' %}">
+<span class="material-symbols-outlined mr-4">fact_check</span><span class="font-label-md text-label-md">Annonces à valider</span>
+</a>
+<a {% if active_nav == 'vendeurs' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'vendeur_liste' %}">
+<span class="material-symbols-outlined mr-4">group</span><span class="font-label-md text-label-md">Vendeurs</span>
+</a>
+<div class="mt-auto mb-4 border-t border-on-primary/10 pt-4">
+<a {% if active_nav == 'profil' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'profil_admin' %}">
+<span class="material-symbols-outlined mr-4">settings</span><span class="font-label-md text-label-md">Settings</span>
+</a>
+<form action="{% url 'deconnexion_admin' %}" method="post">
+{% csrf_token %}
+<button class="w-full flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
+<span class="material-symbols-outlined mr-4">logout</span><span class="font-label-md text-label-md">Déconnexion</span>
+</button>
+</form>
+</div>
+</nav>
+</aside>
