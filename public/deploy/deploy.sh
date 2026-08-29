@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-PROJECT_DIR="/var/www/project/djona_public"
+PROJECT_DIR="/var/www/project/djona_public/public"
 SERVICE_NAME="gunicorn_djona_public.service"
 
 cd "$PROJECT_DIR"
