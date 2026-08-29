@@ -1,0 +1,251 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Mes annonces — Djona Vendeur{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"outline-variant":"#c1c7cf","on-surface-variant":"#41474e","background":"#f8f9f9","surface-container":"#edeeee","surface-container-lowest":"#ffffff","on-primary":"#ffffff","primary-container":"#1a5276","outline":"#72787f","on-surface":"#191c1c","surface":"#f8f9f9","secondary":"#865300","secondary-container":"#fea520","on-secondary-container":"#694000","primary":"#003b5a","error":"#ba1a1a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"body-md":["Inter"],"headline-lg":["Montserrat"],"headline-md":["Montserrat"]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+    @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; animation: rise-in .6s cubic-bezier(.16,1,.3,1) forwards; }
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { animation: none; opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    <header class="lg:hidden w-full border-b border-outline-variant/30 bg-surface">
+        <div class="px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img alt="Djona" class="h-8 w-auto object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+                <span class="font-headline-md text-primary font-bold">Djona Vendeur</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors relative" type="button">
+                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                </button>
+                <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                    {% csrf_token %}
+                    <button class="text-sm font-semibold text-primary hover:underline" type="submit">Déconnexion</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary shadow-xl z-50">
+        <div class="flex items-center gap-3 px-2 pb-6 mb-2 border-b border-on-primary/10">
+            <img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <span class="font-headline-md text-base tracking-tight">Djona Vendeur</span>
+        </div>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'tableau_de_bord_vendeur' %}">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+            Tableau de bord
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm bg-secondary-container text-on-secondary-container shadow-sm" href="{% url 'mes_annonces' %}">
+            <span class="material-symbols-outlined text-[20px]">directions_car</span>
+            Mes annonces
+        </a>
+        <div class="mt-auto border-t border-on-primary/10 pt-4">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'profil_vendeur' %}">
+                <span class="material-symbols-outlined text-[20px]">settings</span>
+                Paramètres
+            </a>
+            <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                {% csrf_token %}
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    Déconnexion
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
+        <header class="hidden lg:flex w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl">
+            <div class="flex-1 px-6 h-16 flex items-center justify-end gap-3">
+                <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative" type="button">
+                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                </button>
+                <div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-on-surface">{{ user.prenom }} {{ user.nom }}</p>
+                        <p class="text-[11px] text-on-surface-variant">{{ user.get_type_compte_display }}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+                        {% if user.avatar_url %}
+                        <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ user.avatar_url }}">
+                        {% else %}
+                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-10 flex flex-col gap-8">
+            {% if messages %}
+            <div class="flex flex-col gap-2">
+                {% for message in messages %}
+                <div class="px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm font-medium">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <h1 class="font-headline-lg text-2xl text-primary">Mes annonces</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Gérez vos véhicules et suivez leur statut de publication.</p>
+                </div>
+                <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'annonce_creer' %}">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Ajouter un véhicule
+                </a>
+            </div>
+
+            {% if nb_total > 0 %}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="reveal bg-surface-container-lowest p-5 rounded-2xl shadow-sm flex items-center gap-4" style="animation-delay:.12s">
+                    <span class="w-12 h-12 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-[24px]">directions_car</span>
+                    </span>
+                    <div>
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_total }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Total</p>
+                    </div>
+                </div>
+                <div class="reveal bg-surface-container-lowest p-5 rounded-2xl shadow-sm flex items-center gap-4" style="animation-delay:.18s">
+                    <span class="w-12 h-12 shrink-0 rounded-xl bg-green-100 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-green-700 text-[24px]">check_circle</span>
+                    </span>
+                    <div>
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_publiees }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Publiées</p>
+                    </div>
+                </div>
+                <div class="reveal bg-surface-container-lowest p-5 rounded-2xl shadow-sm flex items-center gap-4" style="animation-delay:.24s">
+                    <span class="w-12 h-12 shrink-0 rounded-xl bg-secondary-container/15 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-secondary text-[24px]">hourglass_top</span>
+                    </span>
+                    <div>
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_en_attente }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">En attente</p>
+                    </div>
+                </div>
+                <div class="reveal bg-surface-container-lowest p-5 rounded-2xl shadow-sm flex items-center gap-4" style="animation-delay:.3s">
+                    <span class="w-12 h-12 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-red-700 text-[24px]">cancel</span>
+                    </span>
+                    <div>
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_refusees }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Refusées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal flex flex-col lg:flex-row lg:items-center gap-3" style="animation-delay:.36s">
+                <form class="flex-1" method="get">
+                    {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+                        <input class="w-full pl-11 pr-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" name="q" placeholder="Rechercher par marque, modèle..." type="text" value="{{ recherche }}">
+                    </div>
+                </form>
+                <select class="px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-sm text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary" onchange="window.location.href=this.value">
+                    <option value="?tri=recent{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}" {% if tri_actif == 'recent' %}selected{% endif %}>Plus récent</option>
+                    <option value="?tri=prix_croissant{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}" {% if tri_actif == 'prix_croissant' %}selected{% endif %}>Prix croissant</option>
+                    <option value="?tri=prix_decroissant{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}" {% if tri_actif == 'prix_decroissant' %}selected{% endif %}>Prix décroissant</option>
+                </select>
+            </div>
+
+            <div class="reveal flex flex-wrap items-center gap-2" style="animation-delay:.42s">
+                <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?{% if recherche %}q={{ recherche|urlencode }}&{% endif %}{% if tri_actif != 'recent' %}tri={{ tri_actif }}{% endif %}">Toutes</a>
+                <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'publiee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=publiee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}{% if tri_actif != 'recent' %}&tri={{ tri_actif }}{% endif %}">Publiées</a>
+                <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=en_attente{% if recherche %}&q={{ recherche|urlencode }}{% endif %}{% if tri_actif != 'recent' %}&tri={{ tri_actif }}{% endif %}">En attente</a>
+                <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'brouillon' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=brouillon{% if recherche %}&q={{ recherche|urlencode }}{% endif %}{% if tri_actif != 'recent' %}&tri={{ tri_actif }}{% endif %}">Brouillons</a>
+                <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'refusee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=refusee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}{% if tri_actif != 'recent' %}&tri={{ tri_actif }}{% endif %}">Refusées</a>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for annonce in annonces %}
+                <div class="reveal bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col" style="animation-delay:{{ forloop.counter|add:"8" }}0ms">
+                    {% with photo=annonce.photos.first %}
+                    <div class="relative h-44 w-full bg-surface-container overflow-hidden">
+                        {% if photo %}
+                        <img alt="{{ annonce.marque }} {{ annonce.modele }}" class="w-full h-full object-cover" src="{{ photo.image.url }}">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-outline-variant text-[40px]">directions_car</span>
+                        </div>
+                        {% endif %}
+                        <span class="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold
+                            {% if annonce.statut == 'brouillon' %}bg-surface-container-lowest/95 text-on-surface-variant
+                            {% elif annonce.statut == 'en_attente' %}bg-secondary-container text-primary
+                            {% elif annonce.statut == 'publiee' %}bg-primary text-on-primary
+                            {% else %}bg-error text-white{% endif %}">
+                            {% if annonce.statut == 'brouillon' %}Brouillon
+                            {% elif annonce.statut == 'en_attente' %}En attente
+                            {% elif annonce.statut == 'publiee' %}Publiée
+                            {% else %}Refusée{% endif %}
+                        </span>
+                    </div>
+                    {% endwith %}
+                    <div class="p-5 flex flex-col gap-1 flex-1">
+                        <h3 class="text-xs font-bold text-primary uppercase tracking-tight">{{ annonce.marque }} {{ annonce.modele }} {{ annonce.annee }}</h3>
+                        <p class="font-headline-md text-lg text-secondary leading-none">{{ annonce.prix }} FCFA</p>
+                        <div class="flex items-center gap-4 mt-2 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">speed</span>{{ annonce.kilometrage }} km</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">settings</span>{{ annonce.get_boite_vitesses_display }}</span>
+                        </div>
+
+                        <div class="mt-auto pt-4">
+                            {% if annonce.statut == 'brouillon' %}
+                            <form action="{% url 'annonce_publier' annonce.pk %}" method="post" class="flex gap-2">
+                                {% csrf_token %}
+                                <button class="flex-1 px-3 py-2 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition-colors" type="submit">Publier</button>
+                                <a class="px-3 py-2 rounded-lg border border-outline-variant text-on-surface-variant text-xs font-bold hover:bg-surface-container transition-colors" href="{% url 'annonce_modifier' annonce.pk %}">Modifier</a>
+                            </form>
+                            {% elif annonce.statut == 'refusee' %}
+                            <a class="block text-center px-3 py-2 rounded-lg border border-primary text-primary text-xs font-bold hover:bg-primary/5 transition-colors" href="{% url 'annonce_modifier' annonce.pk %}">Corriger et republier</a>
+                            {% elif annonce.statut == 'en_attente' %}
+                            <p class="text-center text-xs text-on-surface-variant py-2">En cours de vérification par Djona</p>
+                            {% else %}
+                            <p class="text-center text-xs text-on-surface-variant py-2">Visible par les acheteurs</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="reveal sm:col-span-2 lg:col-span-3 text-center py-16 text-on-surface-variant" style="animation-delay:.42s">
+                    <p>Aucune annonce ne correspond à ces filtres.</p>
+                    <a class="text-primary font-semibold hover:underline" href="{% url 'mes_annonces' %}">Réinitialiser les filtres</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="reveal flex-1 flex items-center justify-center py-16" style="animation-delay:.12s">
+                <div class="max-w-md text-center flex flex-col items-center gap-5">
+                    <span class="flex items-center justify-center w-20 h-20 rounded-full bg-primary-container/10">
+                        <span class="material-symbols-outlined text-primary text-[40px]">directions_car</span>
+                    </span>
+                    <div class="flex flex-col gap-2">
+                        <h2 class="font-headline-md text-xl text-primary">Vous n'avez pas encore d'annonce</h2>
+                        <p class="text-on-surface-variant leading-relaxed">
+                            Ajoutez les informations de votre véhicule et des photos pour commencer à
+                            vendre sur Djona.
+                        </p>
+                    </div>
+                    <a class="mt-1 px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'annonce_creer' %}">
+                        Créer votre première annonce
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

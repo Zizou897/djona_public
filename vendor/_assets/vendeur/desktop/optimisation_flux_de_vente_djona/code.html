@@ -1,0 +1,568 @@
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
+        @layer base {
+            html, body { margin: 0; padding: 0; }
+            body { overscroll-behavior: none; }
+            main > :first-child { margin-top: 0 !important; }
+            main > :last-child { margin-bottom: 0 !important; }
+        }
+        ::-webkit-scrollbar { display: none; }
+        .step-active .step-num { @apply ring-4 ring-primary/20 scale-110; }
+        .tooltip-trigger:hover .tooltip-content { opacity: 1; visibility: visible; }
+    </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1c",
+                        "inverse-surface": "#2e3131",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#2b1700",
+                        "primary-fixed": "#cbe6ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e7e8e8",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "surface-container-highest": "#e1e3e3",
+                        "tertiary-fixed": "#d1e4fc",
+                        "surface-bright": "#f8f9f9",
+                        "primary-fixed-dim": "#9bccf6",
+                        "surface-variant": "#e1e3e3",
+                        "background": "#f8f9f9",
+                        "secondary-fixed": "#ffddb9",
+                        "surface": "#f8f9f9",
+                        "surface-tint": "#2f6388",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#fea520",
+                        "tertiary": "#26384b",
+                        "surface-dim": "#d9dada",
+                        "on-tertiary-fixed": "#091d2e",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c1c",
+                        "surface-container": "#edeeee",
+                        "on-secondary-container": "#694000",
+                        "on-primary-fixed": "#001e30",
+                        "surface-container-low": "#f3f4f4",
+                        "outline-variant": "#c1c7cf",
+                        "primary-container": "#1a5276",
+                        "outline": "#72787f",
+                        "on-tertiary-container": "#aec1d8",
+                        "tertiary-fixed-dim": "#b5c8e0",
+                        "secondary-fixed-dim": "#ffb961",
+                        "on-secondary-fixed-variant": "#663e00",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#9bccf6",
+                        "on-primary-fixed-variant": "#0e4b6e",
+                        "tertiary-container": "#3d4f63",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary": "#865300",
+                        "on-surface-variant": "#41474e",
+                        "on-primary-container": "#94c5ee",
+                        "on-tertiary-fixed-variant": "#36485c",
+                        "primary": "#003b5a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin-desktop": "32px",
+                        "base": "8px",
+                        "section-gap": "48px",
+                        "container-margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+</head>
+<body class="bg-background font-body-md text-on-background">
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_4px_12px_rgba(26,82,118,0.08)]">
+<div class="h-20 max-w-[1280px] mx-auto px-container-margin-mobile lg:px-container-margin-desktop flex items-center justify-between">
+<div class="flex items-center gap-base">
+<img alt="djona_logo.jpg" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLti_12mOSuv3JV-1K-PbPaBYaHsKPOi9yh_Rwq6ATH6jNekpqzGUG047baaE7zuYtw1wBSAXdkiLiPSjEzx3prlfWyKpUs9-OxCPTpcjMse2r6VZqo_GRPyKilg4BCIGeRFDGfi_pyur7fW20z4NGvt82Rn6gObDwbLGhKJjsWTKF3TEt2Igj2gyXo-4ZtUyacXliMztHAl4VFhMsg1duwi8lnwIlubqww69_wepUqyJzJOTrXNPDsZV9poUtw_WryG7kdpiuqUjw"/>
+<span class="font-headline-md text-headline-md text-primary">Djona</span>
+</div>
+<nav class="hidden lg:flex items-center gap-gutter">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2" href="#">Acheter</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2" href="#">Vendre</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2" href="#">Nos Services</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2" href="#">Contact</a>
+</nav>
+<div class="flex items-center gap-base">
+<a class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded-lg hover:bg-primary-fixed transition-colors" href="#">Publier mon véhicule</a>
+<button class="flex items-center gap-2 bg-secondary text-on-secondary px-6 py-2.5 rounded-lg font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[20px]">search</span>Rechercher
+                </button>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-2">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<main class="w-full pt-20 bg-background min-h-screen">
+<div class="flex flex-col w-full">
+<!-- Stepper Container -->
+<section class="relative pt-12 pb-6 px-container-margin-mobile lg:px-container-margin-desktop max-w-[1280px] mx-auto w-full">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-gutter">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded tracking-wider">Djona Verified Flow</span>
+<span class="font-label-md text-label-md text-secondary uppercase tracking-[0.2em]">Vendre mon véhicule</span>
+</div>
+<h1 class="font-display-lg text-[32px] lg:text-display-lg text-primary leading-tight">Mise en vente simplifiée</h1>
+</div>
+</div>
+<!-- Enhanced Progress Stepper -->
+<div class="hidden lg:grid grid-cols-4 gap-4 bg-surface-container-low p-2 rounded-2xl border border-outline-variant/30">
+<div class="step-item step-active flex items-center gap-4 p-4 rounded-xl transition-all" id="step-nav-1">
+<span class="step-num w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all">1</span>
+<div class="flex flex-col">
+<span class="font-label-md text-primary">Identité</span>
+<span class="text-[11px] text-on-surface-variant opacity-70">Général &amp; Modèle</span>
+</div>
+</div>
+<div class="step-item opacity-50 flex items-center gap-4 p-4 rounded-xl transition-all" id="step-nav-2">
+<span class="step-num w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md bg-surface-container-highest text-on-surface-variant transition-all">2</span>
+<div class="flex flex-col">
+<span class="font-label-md">Détails</span>
+<span class="text-[11px] text-on-surface-variant opacity-70">Spécifications techniques</span>
+</div>
+</div>
+<div class="step-item opacity-50 flex items-center gap-4 p-4 rounded-xl transition-all" id="step-nav-3">
+<span class="step-num w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md bg-surface-container-highest text-on-surface-variant transition-all">3</span>
+<div class="flex flex-col">
+<span class="font-label-md">Visuels</span>
+<span class="text-[11px] text-on-surface-variant opacity-70">Photos HD</span>
+</div>
+</div>
+<div class="step-item opacity-50 flex items-center gap-4 p-4 rounded-xl transition-all" id="step-nav-4">
+<span class="step-num w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md bg-surface-container-highest text-on-surface-variant transition-all">4</span>
+<div class="flex flex-col">
+<span class="font-label-md">Prix &amp; Lieu</span>
+<span class="text-[11px] text-on-surface-variant opacity-70">Publication</span>
+</div>
+</div>
+</div>
+<!-- Mobile Progress -->
+<div class="lg:hidden flex items-center justify-between bg-surface-container p-4 rounded-xl">
+<span class="font-label-md text-primary" id="mobile-step-label">Étape 1: Identité du véhicule</span>
+<span class="font-label-sm text-on-surface-variant" id="step-indicator-mob">1/4</span>
+</div>
+</div>
+</section>
+<!-- Content Grid -->
+<section class="pb-section-gap px-container-margin-mobile lg:px-container-margin-desktop max-w-[1280px] mx-auto w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Form Area -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<div class="bg-surface-container-lowest p-6 lg:p-10 rounded-2xl shadow-[0_8px_32px_rgba(0,59,90,0.04)] border border-outline-variant/20">
+<form class="space-y-8" id="sell-form">
+<!-- Step 1 -->
+<div class="step-panel space-y-6" id="step-content-1">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<label class="font-label-md text-on-surface">Type de véhicule</label>
+<div class="relative tooltip-trigger flex items-center">
+<span class="material-symbols-outlined text-[16px] text-outline cursor-help">info</span>
+<div class="tooltip-content absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-inverse-surface text-inverse-on-surface text-[11px] rounded shadow-lg w-48 opacity-0 invisible transition-all z-10">
+                                                        Inclut Berlines, SUV, Citadines et Pick-ups. Choisissez celui qui correspond à votre carte grise.
+                                                    </div>
+</div>
+</div>
+<select class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all appearance-none">
+<option>SUV / 4x4</option>
+<option>Berline</option>
+<option>Citadine</option>
+<option>Utilitaire</option>
+<option>Pick-up</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Marque</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all" placeholder="Ex: Toyota, Range Rover..." type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Modèle</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all" placeholder="Ex: Prado TXL, Evoque..." type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Année</label>
+<select class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all appearance-none">
+<script>
+                                                    for(let i=2024; i>=2000; i--) {
+                                                        document.write(`<option value="${i}">${i}</option>`);
+                                                    }
+                                                </script>
+</select>
+</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="step-panel hidden space-y-6" id="step-content-2">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Kilométrage (KM)</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all" placeholder="0" type="number"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-label-md">KM</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<label class="font-label-md text-on-surface">Carburant</label>
+<span class="material-symbols-outlined text-[16px] text-outline cursor-help" title="Essence ou Diesel">info</span>
+</div>
+<div class="flex gap-2">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="peer hidden" name="fuel" type="radio"/>
+<div class="p-4 text-center border border-outline-variant rounded-xl peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary transition-all font-label-md">Essence</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="peer hidden" name="fuel" type="radio"/>
+<div class="p-4 text-center border border-outline-variant rounded-xl peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary transition-all font-label-md">Diesel</div>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="font-label-md text-on-surface">Boîte de vitesse</label>
+<div class="flex gap-4">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="peer hidden" name="gear" type="radio"/>
+<div class="p-4 text-center border border-outline-variant rounded-xl peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary transition-all font-label-md">Automatique</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="peer hidden" name="gear" type="radio"/>
+<div class="p-4 text-center border border-outline-variant rounded-xl peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary transition-all font-label-md">Manuelle</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="step-panel hidden space-y-6" id="step-content-3">
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-primary">Photos du véhicule</h3>
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm rounded-full">Min. 3 photos HD</span>
+</div>
+<div class="w-full min-h-[260px] bg-surface-container-low border-2 border-dashed border-outline-variant/50 rounded-2xl flex flex-col items-center justify-center gap-4 transition-all hover:border-primary hover:bg-primary/5 cursor-pointer p-8" id="dropzone">
+<div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-[18px] text-on-surface">Glissez vos photos ici</p>
+<p class="font-body-md text-label-md text-on-surface-variant">JPG, PNG (Max 10MB par fichier)</p>
+</div>
+<button class="px-8 py-3 bg-primary text-on-primary rounded-xl font-label-md shadow-md hover:translate-y-[-2px] transition-all" type="button">Sélectionner</button>
+<input class="hidden" id="fileInput" multiple="" type="file"/>
+</div>
+<div class="grid grid-cols-3 md:grid-cols-5 gap-4" id="preview-grid"></div>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="step-panel hidden space-y-6" id="step-content-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Prix de vente souhaité</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all font-bold text-xl" placeholder="10.000.000" type="number"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-label-md">FCFA</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-on-surface">Ville / Quartier</label>
+<select class="w-full bg-surface-container-low border border-outline-variant/30 p-4 rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all appearance-none">
+<option>Abidjan - Cocody</option>
+<option>Abidjan - Marcory</option>
+<option>Abidjan - Yopougon</option>
+<option>Abidjan - Riviera</option>
+<option>Bouaké</option>
+<option>San Pedro</option>
+</select>
+</div>
+</div>
+<div class="bg-secondary-container/5 border border-secondary-container/20 p-6 rounded-2xl flex gap-4">
+<div class="pt-1">
+<input class="w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary cursor-pointer" id="terms" required="" type="checkbox"/>
+</div>
+<label class="font-body-md text-sm text-on-surface-variant leading-relaxed" for="terms">
+                                            Je certifie l'exactitude des informations fournies et j'accepte de collaborer avec les experts <span class="font-bold text-secondary">Djona</span> pour l'inspection technique avant la vente finale.
+                                        </label>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-outline-variant/20">
+<button class="invisible order-2 sm:order-1 flex items-center gap-2 text-on-surface-variant hover:text-primary font-label-md transition-all px-4 py-2" id="prevBtn" onclick="prevStep()" type="button">
+<span class="material-symbols-outlined">arrow_back</span> Retour
+                                    </button>
+<div class="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
+<button class="flex-1 sm:flex-none px-6 py-4 border border-outline text-on-surface-variant font-label-md rounded-xl hover:bg-surface-container transition-all flex items-center justify-center gap-2" id="previewBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span> Prévisualiser
+                                        </button>
+<button class="flex-1 sm:flex-none bg-primary text-on-primary px-10 py-4 rounded-xl font-headline-md text-[18px] shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2" id="nextBtn" onclick="nextStep()" type="button">
+                                            Continuer <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="hidden flex-1 sm:flex-none bg-secondary text-on-secondary px-10 py-4 rounded-xl font-headline-md text-[18px] shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-all" id="submitBtn" type="submit">
+                                            Publier l'annonce
+                                        </button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- Sidebar: Summary & Trust -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Summary Card -->
+<div class="sticky top-24 flex flex-col gap-gutter">
+<div class="bg-primary text-on-primary p-6 rounded-2xl shadow-xl overflow-hidden relative">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+<h4 class="font-headline-md text-[16px] mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                                    Estimation Djona
+                                </h4>
+<div class="flex flex-col gap-1 mb-6">
+<span class="text-[12px] opacity-70 uppercase tracking-widest">Valeur Marchande Estimée</span>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold" id="est-value">--.---.---</span>
+<span class="text-sm opacity-80">FCFA</span>
+</div>
+</div>
+<div class="space-y-3 pt-4 border-t border-on-primary/10">
+<div class="flex justify-between text-xs opacity-70">
+<span>Frais de service Djona</span>
+<span>Inclus</span>
+</div>
+<div class="flex justify-between text-xs opacity-70">
+<span>Délai de vente moyen</span>
+<span>12 jours</span>
+</div>
+</div>
+</div>
+<!-- Trust Badges -->
+<div class="bg-surface-container-high/50 p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-6">
+<h5 class="font-label-md text-primary">Pourquoi nous faire confiance ?</h5>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface leading-tight mb-1">Vendeur Certifié</p>
+<p class="text-[11px] text-on-surface-variant">Badge "Djona Verified" sur votre annonce pour rassurer les acheteurs.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[18px]">security</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface leading-tight mb-1">Paiement Sécurisé</p>
+<p class="text-[11px] text-on-surface-variant">Les fonds sont bloqués jusqu'à la remise effective des clés.</p>
+</div>
+</div>
+<div class="p-3 bg-white/50 rounded-xl border border-outline-variant/20 flex items-center gap-3">
+<img alt="Logo" class="h-5 w-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLti_12mOSuv3JV-1K-PbPaBYaHsKPOi9yh_Rwq6ATH6jNekpqzGUG047baaE7zuYtw1wBSAXdkiLiPSjEzx3prlfWyKpUs9-OxCPTpcjMse2r6VZqo_GRPyKilg4BCIGeRFDGfi_pyur7fW20z4NGvt82Rn6gObDwbLGhKJjsWTKF3TEt2Igj2gyXo-4ZtUyacXliMztHAl4VFhMsg1duwi8lnwIlubqww69_wepUqyJzJOTrXNPDsZV9poUtw_WryG7kdpiuqUjw"/>
+<span class="text-[11px] font-bold text-primary">DJONA PROTECTION+</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+            let currentStep = 1;
+            const totalSteps = 4;
+            const stepLabels = [
+                "Identité du véhicule",
+                "Spécifications techniques",
+                "Photos HD",
+                "Finalisation & Prix"
+            ];
+
+            function updateUI() {
+                // Update panels
+                document.querySelectorAll('.step-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`step-content-${currentStep}`).classList.remove('hidden');
+
+                // Update Desktop Stepper
+                document.querySelectorAll('.step-item').forEach((item, idx) => {
+                    const stepNum = idx + 1;
+                    const numCircle = item.querySelector('.step-num');
+                    const textSpan = item.querySelector('span:first-of-type');
+
+                    if(stepNum === currentStep) {
+                        item.classList.add('step-active', 'opacity-100');
+                        item.classList.remove('opacity-50');
+                        numCircle.classList.add('bg-primary', 'text-on-primary');
+                        numCircle.classList.remove('bg-surface-container-highest', 'text-on-surface-variant');
+                        textSpan.classList.add('text-primary');
+                    } else if (stepNum < currentStep) {
+                        item.classList.add('opacity-100');
+                        item.classList.remove('opacity-50', 'step-active');
+                        numCircle.classList.add('bg-secondary', 'text-on-secondary');
+                        numCircle.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span>';
+                    } else {
+                        item.classList.add('opacity-50');
+                        item.classList.remove('step-active', 'opacity-100');
+                        numCircle.classList.remove('bg-primary', 'bg-secondary', 'text-on-primary', 'text-on-secondary');
+                        numCircle.classList.add('bg-surface-container-highest', 'text-on-surface-variant');
+                        numCircle.innerText = stepNum;
+                        textSpan.classList.remove('text-primary');
+                    }
+                });
+
+                // Update Mobile Label
+                document.getElementById('mobile-step-label').innerText = `Étape ${currentStep}: ${stepLabels[currentStep-1]}`;
+                document.getElementById('step-indicator-mob').innerText = `${currentStep}/${totalSteps}`;
+
+                // Update Buttons
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const submitBtn = document.getElementById('submitBtn');
+
+                prevBtn.classList.toggle('invisible', currentStep === 1);
+                
+                if(currentStep === totalSteps) {
+                    nextBtn.classList.add('hidden');
+                    submitBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitBtn.classList.add('hidden');
+                }
+
+                // Mock dynamic estimation update
+                if(currentStep >= 2) {
+                    document.getElementById('est-value').innerText = '12.500.000';
+                } else {
+                    document.getElementById('est-value').innerText = '--.---.---';
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function nextStep() {
+                if(currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+
+            function prevStep() {
+                if(currentStep > 1) {
+                    currentStep--;
+                    updateUI();
+                }
+            }
+
+            // Photo Logic
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+            const previewGrid = document.getElementById('preview-grid');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const div = document.createElement('div');
+                        div.className = "relative group aspect-square rounded-xl overflow-hidden shadow-sm border border-outline-variant/30";
+                        div.innerHTML = `
+                            <img src="${event.target.result}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" class="bg-white/20 p-2 rounded-full text-white hover:bg-error transition-colors">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        `;
+                        previewGrid.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            document.getElementById('sell-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Félicitations ! Votre véhicule a été soumis. Un expert Djona vous contactera sous 24h.');
+            });
+
+            document.getElementById('previewBtn').addEventListener('click', () => {
+                alert('Prévisualisation en cours de génération...');
+            });
+        </script>
+</main>
+<footer class="w-full bg-primary text-on-primary py-section-gap">
+<div class="max-w-[1280px] mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-section-gap">
+<div class="flex flex-col gap-gutter">
+<div class="flex items-center gap-base">
+<img alt="djona_logo.jpg" class="h-8 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida/AP1WRLti_12mOSuv3JV-1K-PbPaBYaHsKPOi9yh_Rwq6ATH6jNekpqzGUG047baaE7zuYtw1wBSAXdkiLiPSjEzx3prlfWyKpUs9-OxCPTpcjMse2r6VZqo_GRPyKilg4BCIGeRFDGfi_pyur7fW20z4NGvt82Rn6gObDwbLGhKJjsWTKF3TEt2Igj2gyXo-4ZtUyacXliMztHAl4VFhMsg1duwi8lnwIlubqww69_wepUqyJzJOTrXNPDsZV9poUtw_WryG7kdpiuqUjw"/>
+<span class="font-headline-md text-headline-md">Djona</span>
+</div>
+<p class="font-body-md text-label-md opacity-80 max-w-xs">La marketplace automobile de confiance en Côte d'Ivoire. Achetez et vendez en toute sécurité.</p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-md text-[18px] uppercase tracking-wider">Marketplace</h4>
+<ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">Acheter</li>
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">Vendre</li>
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">F.A.Q</li>
+</ul>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-md text-[18px] uppercase tracking-wider">Entreprise</h4>
+<ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">À propos</li>
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">Contact</li>
+</ul>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-md text-[18px] uppercase tracking-wider">Légal</h4>
+<ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">CGU</li>
+<li class="hover:text-secondary-fixed transition-colors cursor-pointer">Confidentialité</li>
+</ul>
+</div>
+</div>
+<div class="mt-section-gap pt-8 border-t border-on-primary/10 flex flex-col md:flex-row justify-between items-center gap-4 opacity-60 font-label-sm text-label-sm">
+<span>© 2024 Djona Automotive. Tous droits réservés.</span>
+<span>Propulsé par la confiance.</span>
+</div>
+</div>
+</footer>
+</body></html>

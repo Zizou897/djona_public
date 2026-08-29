@@ -1,0 +1,187 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Inscription — Djona{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline-variant":"#c1c7cf","on-surface-variant":"#41474e","background":"#f8f9f9","surface-container":"#edeeee","on-primary":"#ffffff","primary-container":"#1a5276","outline":"#72787f","on-surface":"#191c1c","surface":"#f8f9f9","surface-container-lowest":"#ffffff","error":"#ba1a1a","error-container":"#ffdad6","on-error-container":"#93000a","secondary":"#865300","secondary-container":"#fea520","primary":"#003b5a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"display-lg":["Montserrat"],"headline-lg":["Montserrat"],"headline-md":["Montserrat"],"body-md":["Inter"],"label-md":["Inter"],"label-sm":["Inter"]},"fontSize":{"display-lg":["clamp(26px, 3.6vw, 36px)",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-lg":["26px",{"lineHeight":"32px","fontWeight":"700"}],"headline-md":["17px",{"lineHeight":"23px","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"21px","fontWeight":"400"}],"label-md":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"15px","fontWeight":"500"}]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col lg:flex-row font-body-md bg-surface-container-lowest">
+
+    <!-- Colonne gauche : image/marque (desktop uniquement) — reste fixe pendant le défilement du formulaire -->
+    <div class="hidden lg:flex lg:w-[42%] lg:sticky lg:top-0 lg:h-screen relative bg-primary text-on-primary flex-col p-12 overflow-hidden bg-cover bg-center" style="background-image: linear-gradient(180deg, rgba(0,25,40,0.55), rgba(0,20,32,0.75) 55%, rgba(0,15,25,0.92)), url('{% static 'app/assets/img/inscription-bg.jpg' %}')">
+
+        <div class="relative z-10 flex items-center gap-2.5">
+            <img alt="Djona" class="h-7 w-auto object-contain" src="{% static 'app/assets/img/djona-mark.png' %}">
+            <span class="font-headline-lg text-[19px] font-bold leading-none tracking-tight">Djona</span>
+        </div>
+
+        <div class="relative z-10 flex-1 flex flex-col justify-center max-w-sm">
+            <h2 class="font-display-lg text-[clamp(19px,2.4vw,24px)] font-bold leading-snug tracking-tight mb-2.5">La plateforme automobile premium de Côte d'Ivoire.</h2>
+            <p class="font-body-md text-[13px] leading-[19px] text-white/80">Achetez et vendez vos véhicules en toute sécurité.</p>
+        </div>
+
+        <div class="relative z-10 flex flex-col gap-5">
+            <div class="flex items-start gap-3.5">
+                <span class="material-symbols-outlined text-secondary-container bg-white/10 rounded-full p-2 text-[18px]">verified_user</span>
+                <div>
+                    <p class="font-headline-md text-[14px] font-bold leading-[19px]">Véhicules inspectés &amp; garantis</p>
+                    <p class="text-white/70 text-[11px] leading-[15px] mt-0.5">Chaque annonce est vérifiée pour garantir la qualité et l'authenticité.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3.5">
+                <span class="material-symbols-outlined text-secondary-container bg-white/10 rounded-full p-2 text-[18px]">lock</span>
+                <div>
+                    <p class="font-headline-md text-[14px] font-bold leading-[19px]">Transactions rapides &amp; sécurisées</p>
+                    <p class="text-white/70 text-[11px] leading-[15px] mt-0.5">Notre plateforme assure la protection de vos données et de vos échanges.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3.5">
+                <span class="material-symbols-outlined text-secondary-container bg-white/10 rounded-full p-2 text-[18px]">support_agent</span>
+                <div>
+                    <p class="font-headline-md text-[14px] font-bold leading-[19px]">Support dédié 7j/7</p>
+                    <p class="text-white/70 text-[11px] leading-[15px] mt-0.5">Une équipe dédiée pour vous accompagner à chaque étape de votre démarche.</p>
+                </div>
+            </div>
+            <p class="relative z-10 text-white/50 text-[11px] pt-1.5">&copy; 2026 Djona Motors. Tous droits réservés.</p>
+        </div>
+    </div>
+
+    <!-- Colonne droite : formulaire -->
+    <div class="flex-1 flex flex-col items-center justify-center px-6 py-10 md:px-16 bg-background lg:bg-surface-container-lowest">
+        <div class="w-full max-w-md flex flex-col items-center gap-1 mb-8 lg:hidden">
+            <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-md mb-3">
+                <img alt="Djona" class="w-10 h-10 object-contain" src="{% static 'app/assets/img/djona-logo.png' %}">
+            </div>
+            <h1 class="font-headline-lg text-headline-lg text-primary text-center">Bienvenue chez Djona</h1>
+            <p class="text-on-surface-variant text-body-md text-center">Votre portail automobile de confiance en Côte d'Ivoire</p>
+        </div>
+
+        <div class="w-full max-w-md flex flex-col gap-6">
+            <div class="hidden lg:block">
+                <h1 class="font-display-lg text-display-lg text-on-surface mb-2">Rejoignez Djona</h1>
+                <p class="text-on-surface-variant text-body-md">Créez votre compte pour commencer à acheter et vendre.</p>
+            </div>
+
+            <!-- Onglets Connexion / Inscription (mobile) -->
+            <div class="lg:hidden grid grid-cols-2 gap-1 p-1 bg-surface-container rounded-lg">
+                <a class="text-center py-2.5 rounded font-label-md text-label-md text-on-surface-variant" href="{% url 'connexion_vendeur' %}">Connexion</a>
+                <span class="text-center py-2.5 rounded font-label-md text-label-md bg-surface-container-lowest text-primary shadow-sm">Inscription</span>
+            </div>
+
+            <form class="flex flex-col gap-5" method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="px-4 py-3 rounded-lg bg-error-container text-on-error-container font-label-sm text-label-sm">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+
+                <!-- Onglets Particulier / Professionnel (fonctionnel — définit le type de compte) -->
+                <div class="grid grid-cols-2 gap-1 p-1 bg-surface-container rounded-lg">
+                    <label class="relative">
+                        <input class="peer sr-only" name="type_compte" type="radio" value="particulier" {% if form.type_compte.value|default:'particulier' == 'particulier' %}checked{% endif %}>
+                        <span class="block text-center py-2.5 rounded font-label-md text-label-md text-on-surface-variant peer-checked:bg-surface-container-lowest peer-checked:text-on-surface peer-checked:shadow-sm cursor-pointer transition-all">Particulier</span>
+                    </label>
+                    <label class="relative">
+                        <input class="peer sr-only" name="type_compte" type="radio" value="professionnel" {% if form.type_compte.value == 'professionnel' %}checked{% endif %}>
+                        <span class="block text-center py-2.5 rounded font-label-md text-label-md text-on-surface-variant peer-checked:bg-surface-container-lowest peer-checked:text-on-surface peer-checked:shadow-sm cursor-pointer transition-all">Professionnel</span>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="font-label-md text-label-md text-on-surface" for="id_prenom">Prénom</label>
+                        <input class="w-full px-4 py-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest lg:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_prenom" name="prenom" placeholder="Jean" required type="text" value="{{ form.prenom.value|default:'' }}">
+                        {% if form.prenom.errors %}<p class="text-error text-label-sm">{{ form.prenom.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="font-label-md text-label-md text-on-surface" for="id_nom">Nom</label>
+                        <input class="w-full px-4 py-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest lg:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_nom" name="nom" placeholder="Kouassi" required type="text" value="{{ form.nom.value|default:'' }}">
+                        {% if form.nom.errors %}<p class="text-error text-label-sm">{{ form.nom.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="font-label-md text-label-md text-on-surface" for="id_email">Email</label>
+                    <input class="w-full px-4 py-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest lg:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_email" name="email" placeholder="jean.kouassi@example.com" required type="email" value="{{ form.email.value|default:'' }}">
+                    {% if form.email.errors %}<p class="text-error text-label-sm">{{ form.email.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="font-label-md text-label-md text-on-surface" for="id_telephone">Numéro de téléphone</label>
+                    <div class="flex gap-2">
+                        <span class="flex items-center px-4 rounded-lg border border-outline-variant bg-surface-container text-on-surface-variant font-label-md text-label-md">+225</span>
+                        <input class="flex-1 min-w-0 px-4 py-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest lg:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_telephone" inputmode="numeric" name="telephone" placeholder="01 23 45 67 89" required type="text" value="{{ form.telephone.value|default:'' }}">
+                    </div>
+                    {% if form.telephone.errors %}<p class="text-error text-label-sm">{{ form.telephone.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="font-label-md text-label-md text-on-surface" for="id_password">Mot de passe</label>
+                    <div class="relative flex items-center">
+                        <input class="w-full pl-4 pr-11 py-3.5 rounded-lg border border-outline-variant bg-surface-container-lowest lg:bg-surface-container focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_password" name="password" placeholder="••••••••" required type="password">
+                        <button class="absolute right-3.5 text-outline hover:text-on-surface-variant" onclick="togglePassword()" type="button">
+                            <span class="material-symbols-outlined text-[20px]" id="pass-icon">visibility_off</span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant">Minimum 8 caractères, une majuscule et un chiffre.</p>
+                    {% if form.password.errors %}<p class="text-error text-label-sm">{{ form.password.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <input class="w-4 h-4 mt-0.5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" id="id_consentement" name="consentement" type="checkbox" {% if form.consentement.value %}checked{% endif %}>
+                    <label class="text-label-sm text-on-surface-variant cursor-pointer select-none" for="id_consentement">
+                        J'accepte les <a class="text-primary font-semibold hover:underline" href="#">conditions d'utilisation</a> et la <a class="text-primary font-semibold hover:underline" href="#">politique de confidentialité</a> de Djona.
+                    </label>
+                </div>
+                {% if form.consentement.errors %}<p class="text-error text-label-sm">{{ form.consentement.errors.0 }}</p>{% endif %}
+
+                <button class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:brightness-110 active:scale-[0.99] transition-all" type="submit">
+                    Créer mon compte
+                </button>
+            </form>
+
+            <div class="flex items-center gap-4">
+                <div class="flex-1 h-px bg-outline-variant/40"></div>
+                <span class="text-label-sm text-on-surface-variant tracking-widest">OU CONTINUER AVEC</span>
+                <div class="flex-1 h-px bg-outline-variant/40"></div>
+            </div>
+
+            <button class="w-full flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant/50 rounded-lg font-label-md text-label-md text-on-surface/50 cursor-not-allowed opacity-70" disabled title="Bientôt disponible" type="button">
+                <svg class="w-5 h-5" viewBox="0 0 48 48"><path d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" fill="#EA4335"/><path d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" fill="#4285F4"/><path d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" fill="#FBBC05"/><path d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" fill="#34A853"/></svg>
+                Continuer avec Google
+            </button>
+
+            <p class="hidden lg:block text-center text-body-md text-on-surface-variant">
+                Vous avez déjà un compte ? <a class="text-primary font-semibold hover:underline" href="{% url 'connexion_vendeur' %}">Se connecter</a>
+            </p>
+            <p class="lg:hidden flex items-center justify-center gap-1.5 text-label-sm text-on-surface-variant mt-2">
+                <span class="material-symbols-outlined text-secondary text-[16px]">verified_user</span>
+                Sécurisé par Djona Technologies
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function togglePassword() {
+        const input = document.getElementById('id_password');
+        const icon = document.getElementById('pass-icon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = 'visibility';
+        } else {
+            input.type = 'password';
+            icon.textContent = 'visibility_off';
+        }
+    }
+</script>
+{% endblock %}

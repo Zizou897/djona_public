@@ -1,0 +1,304 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Mon profil — Djona Vendeur{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"outline-variant":"#c1c7cf","on-surface-variant":"#41474e","background":"#f8f9f9","surface-container":"#edeeee","surface-container-low":"#f3f4f4","surface-container-lowest":"#ffffff","on-primary":"#ffffff","primary-container":"#1a5276","outline":"#72787f","on-surface":"#191c1c","surface":"#f8f9f9","secondary":"#865300","secondary-container":"#fea520","on-secondary-container":"#694000","primary":"#003b5a","error":"#ba1a1a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"body-md":["Inter"],"headline-lg":["Montserrat"],"headline-md":["Montserrat"]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    <header class="lg:hidden w-full border-b border-outline-variant/30 bg-surface">
+        <div class="px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img alt="Djona" class="h-8 w-auto object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+                <span class="font-headline-md text-primary font-bold">Djona Vendeur</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors relative" type="button">
+                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                </button>
+                <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                    {% csrf_token %}
+                    <button class="text-sm font-semibold text-primary hover:underline" type="submit">Déconnexion</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary shadow-xl z-50">
+        <div class="flex items-center gap-3 px-2 pb-6 mb-2 border-b border-on-primary/10">
+            <img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <span class="font-headline-md text-base tracking-tight">Djona Vendeur</span>
+        </div>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'tableau_de_bord_vendeur' %}">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+            Tableau de bord
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'mes_annonces' %}">
+            <span class="material-symbols-outlined text-[20px]">directions_car</span>
+            Mes annonces
+        </a>
+        <div class="mt-auto border-t border-on-primary/10 pt-4">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm bg-secondary-container text-on-secondary-container shadow-sm" href="{% url 'profil_vendeur' %}">
+                <span class="material-symbols-outlined text-[20px]">settings</span>
+                Paramètres
+            </a>
+            <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                {% csrf_token %}
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    Déconnexion
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
+        <header class="hidden lg:flex w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl">
+            <div class="flex-1 px-6 h-16 flex items-center justify-end gap-3">
+                <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative" type="button">
+                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                </button>
+                <div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-on-surface">{{ user.prenom }} {{ user.nom }}</p>
+                        <p class="text-[11px] text-on-surface-variant">{{ user.get_type_compte_display }}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+                        {% if user.avatar_url %}
+                        <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ user.avatar_url }}">
+                        {% else %}
+                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-10 flex flex-col gap-8">
+            {% if messages %}
+            <div class="flex flex-col gap-2">
+                {% for message in messages %}
+                <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div>
+                <h1 class="font-headline-lg text-2xl text-primary">Paramètres</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Gérez vos informations, votre sécurité et vos préférences.</p>
+            </div>
+
+            <form id="password-form" method="post" action="{% url 'profil_vendeur_mot_de_passe' %}">{% csrf_token %}</form>
+            <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {% csrf_token %}
+
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col items-center text-center">
+                        <div class="relative">
+                            <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-surface shadow-md bg-primary-container flex items-center justify-center">
+                                {% if user.avatar_url %}
+                                <img alt="Photo de profil" class="w-full h-full object-cover" id="avatar-preview" src="{{ user.avatar_url }}">
+                                {% else %}
+                                <img alt="Photo de profil" class="w-full h-full object-cover hidden" id="avatar-preview">
+                                <span class="material-symbols-outlined text-white text-[44px]" id="avatar-placeholder">person</span>
+                                {% endif %}
+                            </div>
+                            <label class="absolute bottom-0 right-0 bg-primary text-on-primary w-9 h-9 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer" for="avatar-input">
+                                <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                            </label>
+                            <input accept="image/*" class="hidden" id="avatar-input" name="avatar" type="file">
+                        </div>
+                        <h2 class="mt-4 font-headline-md text-lg text-on-surface">{{ user.prenom }} {{ user.nom }}</h2>
+                        <p class="text-sm text-on-surface-variant">Membre depuis {{ user.date_joined|date:"F Y" }}</p>
+                        <div class="w-full h-px bg-outline-variant/30 my-5"></div>
+                        <div class="w-full flex flex-col gap-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-on-surface-variant">Type de compte</span>
+                                <span class="px-3 py-1 bg-primary-container/15 text-primary rounded-full text-xs font-bold">{{ user.get_type_compte_display }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-on-surface-variant">Statut</span>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold
+                                    {% if user.statut_compte == 'actif' %}bg-green-100 text-green-700
+                                    {% elif user.statut_compte == 'suspendu' %}bg-red-100 text-red-700
+                                    {% else %}bg-secondary-container/20 text-secondary{% endif %}">
+                                    {{ user.get_statut_compte_display }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-on-surface-variant">Annonces</span>
+                                <span class="text-sm font-semibold text-on-surface">{{ nb_annonces }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary text-on-primary rounded-2xl shadow-sm p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined">security</span>
+                            <span class="text-sm font-semibold">Sécurité du compte</span>
+                        </div>
+                        <div class="w-full bg-white/20 h-2 rounded-full mt-3 overflow-hidden">
+                            <div class="bg-secondary-container h-full rounded-full" style="width: {{ securite_pourcentage }}%"></div>
+                        </div>
+                        {% if profil.two_factor_enabled %}
+                        <p class="text-white/75 text-xs mt-3">Authentification à deux facteurs activée — sécurité maximale.</p>
+                        {% else %}
+                        <p class="text-white/75 text-xs mt-3">Activez la 2FA ci-dessous pour atteindre 100% de sécurité.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 flex flex-col gap-6">
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8">
+                        <h3 class="font-headline-md text-lg text-primary mb-6">Informations personnelles</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1 md:col-span-2">
+                                <label class="text-sm text-on-surface-variant" for="id_nom_complet">Nom complet</label>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_nom_complet" name="nom_complet" type="text" value="{{ info_form.nom_complet.value|default:'' }}">
+                                {% if info_form.nom_complet.errors %}<p class="text-xs text-error">{{ info_form.nom_complet.errors.0 }}</p>{% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_email">Email</label>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_email" name="email" type="email" value="{{ info_form.email.value|default:'' }}">
+                                {% if info_form.email.errors %}<p class="text-xs text-error">{{ info_form.email.errors.0 }}</p>{% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_telephone">Téléphone</label>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_telephone" name="telephone" type="tel" value="{{ info_form.telephone.value|default:'' }}">
+                                {% if info_form.telephone.errors %}<p class="text-xs text-error">{{ info_form.telephone.errors.0 }}</p>{% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_type_compte">Type de compte</label>
+                                <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_type_compte" name="type_compte">
+                                    {% for value, label in info_form.fields.type_compte.choices %}<option value="{{ value }}" {% if value == info_form.type_compte.value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_ville">Ville</label>
+                                <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_ville" name="ville">
+                                    <option value="">Non renseignée</option>
+                                    {% for value, label in profil_form.fields.ville.choices %}<option value="{{ value }}" {% if value == profil_form.ville.value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8">
+                        <h3 class="font-headline-md text-lg text-primary mb-6">Sécurité</h3>
+                        <div class="flex flex-col gap-6">
+                            <div class="flex flex-col gap-4 p-4 rounded-lg bg-surface-container-low">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div>
+                                        <p class="text-sm font-bold text-on-surface">Mot de passe</p>
+                                        <p class="text-xs text-on-surface-variant">Modifiez votre mot de passe de connexion.</p>
+                                    </div>
+                                    <button class="shrink-0 px-5 py-2 border border-primary text-primary rounded-lg text-sm font-semibold hover:bg-primary/5 transition-colors" id="toggle-password-btn" type="button">Modifier le mot de passe</button>
+                                </div>
+                                <div class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 pt-2" id="password-fields">
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-sm text-on-surface-variant" for="id_old_password">Mot de passe actuel</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" form="password-form" id="id_old_password" name="old_password" type="password">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-sm text-on-surface-variant" for="id_new_password1">Nouveau mot de passe</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" form="password-form" id="id_new_password1" name="new_password1" type="password">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-sm text-on-surface-variant" for="id_new_password2">Confirmation</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" form="password-form" id="id_new_password2" name="new_password2" type="password">
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <button class="px-5 py-2 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors" form="password-form" type="submit">Confirmer le changement</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-lg border border-outline-variant/40">
+                                <div>
+                                    <p class="text-sm font-bold text-on-surface">Authentification à deux facteurs</p>
+                                    <p class="text-xs text-on-surface-variant">Ajoutez une couche de sécurité supplémentaire.</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input class="sr-only peer" name="two_factor_enabled" type="checkbox" {% if profil_form.two_factor_enabled.value %}checked{% endif %}>
+                                    <div class="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8">
+                        <h3 class="font-headline-md text-lg text-primary mb-6">Préférences</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-3">
+                                <span class="text-sm font-bold text-on-surface">Langue</span>
+                                <div class="flex gap-2">
+                                    <label class="cursor-pointer">
+                                        <input class="peer sr-only" name="langue" type="radio" value="fr" {% if profil_form.langue.value == 'fr' %}checked{% endif %}>
+                                        <span class="block px-4 py-2 rounded-lg text-sm bg-surface-container text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-white transition-colors">Français</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input class="peer sr-only" name="langue" type="radio" value="en" {% if profil_form.langue.value == 'en' %}checked{% endif %}>
+                                        <span class="block px-4 py-2 rounded-lg text-sm bg-surface-container text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-white transition-colors">English</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <span class="text-sm font-bold text-on-surface">Notifications</span>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input class="peer sr-only" name="notif_email" type="checkbox" {% if profil_form.notif_email.value %}checked{% endif %}>
+                                    <span class="w-5 h-5 border-2 border-outline rounded flex items-center justify-center peer-checked:bg-primary peer-checked:border-primary transition-all">
+                                        <span class="material-symbols-outlined text-white text-[14px]">check</span>
+                                    </span>
+                                    <span class="text-sm text-on-surface-variant">Email</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input class="peer sr-only" name="notif_whatsapp" type="checkbox" {% if profil_form.notif_whatsapp.value %}checked{% endif %}>
+                                    <span class="w-5 h-5 border-2 border-outline rounded flex items-center justify-center peer-checked:bg-primary peer-checked:border-primary transition-all">
+                                        <span class="material-symbols-outlined text-white text-[14px]">check</span>
+                                    </span>
+                                    <span class="text-sm text-on-surface-variant">WhatsApp</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-end gap-3 p-5 bg-surface-container-lowest rounded-2xl shadow-sm">
+                        <a class="text-sm text-on-surface-variant hover:underline" href="{% url 'tableau_de_bord_vendeur' %}">Annuler</a>
+                        <button class="px-6 py-3 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2" type="submit">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            Sauvegarder les modifications
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('toggle-password-btn').addEventListener('click', function () {
+  document.getElementById('password-fields').classList.toggle('hidden');
+});
+var avatarInput = document.getElementById('avatar-input');
+avatarInput.addEventListener('change', function (event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (loadEvent) {
+    var img = document.getElementById('avatar-preview');
+    img.src = loadEvent.target.result;
+    img.classList.remove('hidden');
+    var placeholder = document.getElementById('avatar-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+});
+</script>
+{% endblock %}
