@@ -73,14 +73,14 @@ module.exports = {
         'label-sm': ['Inter', 'sans-serif'],
       },
       fontSize: {
-        'display-lg': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'headline-lg': ['32px', { lineHeight: '40px', fontWeight: '700' }],
-        'headline-lg-mobile': ['24px', { lineHeight: '32px', fontWeight: '700' }],
-        'headline-md': ['24px', { lineHeight: '32px', fontWeight: '600' }],
-        'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
-        'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
-        'label-md': ['14px', { lineHeight: '20px', letterSpacing: '0.01em', fontWeight: '600' }],
-        'label-sm': ['12px', { lineHeight: '16px', fontWeight: '500' }],
+        'display-lg': ['44px', { lineHeight: '52px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'headline-lg': ['28px', { lineHeight: '36px', fontWeight: '700' }],
+        'headline-lg-mobile': ['22px', { lineHeight: '30px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', fontWeight: '600' }],
+        'body-lg': ['17px', { lineHeight: '26px', fontWeight: '400' }],
+        'body-md': ['15px', { lineHeight: '22px', fontWeight: '400' }],
+        'label-md': ['13px', { lineHeight: '18px', letterSpacing: '0.01em', fontWeight: '600' }],
+        'label-sm': ['11px', { lineHeight: '16px', fontWeight: '500' }],
       },
       borderRadius: {
         sm: '0.25rem',
@@ -102,6 +102,21 @@ module.exports = {
       },
       maxWidth: {
         page: '1280px',
+      },
+      keyframes: {
+        'slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      transitionTimingFunction: {
+        fluid: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
+      animation: {
+        'slide-up-1': 'slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0s both',
+        'slide-up-2': 'slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both',
+        'slide-up-3': 'slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both',
+        'slide-up-4': 'slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both',
       },
     },
   },

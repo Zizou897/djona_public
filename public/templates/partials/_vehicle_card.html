@@ -1,7 +1,7 @@
 {% comment %}
 Carte véhicule "vitrine" (accueil) — attend une variable `vehicle` (instance catalog.Vehicle).
 {% endcomment %}
-<a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col">
+<a href="{{ vehicle.get_absolute_url }}" class="reveal bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col">
   <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
     {% with image=vehicle.images.first %}
     {% if image %}

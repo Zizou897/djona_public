@@ -17,19 +17,6 @@
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}">
 {% endblock %}
 
-{% block styles %}
-<style>
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .animate-slide-up-1 { animation: slideUp 0.7s ease-out 0s    forwards; opacity: 0; }
-  .animate-slide-up-2 { animation: slideUp 0.7s ease-out 0.2s  forwards; opacity: 0; }
-  .animate-slide-up-3 { animation: slideUp 0.7s ease-out 0.4s  forwards; opacity: 0; }
-  .animate-slide-up-4 { animation: slideUp 0.7s ease-out 0.6s  forwards; opacity: 0; }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="flex flex-col w-full overflow-x-hidden">
 
@@ -150,7 +137,7 @@
     <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
       <h2 class="sr-only">Pourquoi choisir Djona ?</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="flex items-start gap-4 group">
+        <div class="reveal flex items-start gap-4 group">
           <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
             <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">verified_user</span>
           </div>
@@ -159,7 +146,7 @@
             <p class="font-body-md text-on-surface-variant">Chaque véhicule est inspecté par nos experts avant la mise en vente. Fini les mauvaises surprises.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 group">
+        <div class="reveal reveal-delay-1 flex items-start gap-4 group">
           <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
             <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">support_agent</span>
           </div>
@@ -168,7 +155,7 @@
             <p class="font-body-md text-on-surface-variant">De la visite à l'acte de vente final, nos conseillers Djona gèrent tout pour vous.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 group">
+        <div class="reveal reveal-delay-2 flex items-start gap-4 group">
           <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
             <span class="material-symbols-outlined text-primary text-[32px] group-hover:text-on-primary" aria-hidden="true">bolt</span>
           </div>
@@ -184,7 +171,7 @@
   {# Véhicules en avant #}
   <section class="w-full py-section-gap bg-surface-container-low">
     <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
-      <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-gutter">
+      <div class="reveal flex flex-col md:flex-row justify-between items-end mb-12 gap-gutter">
         <div class="max-w-2xl">
           <div class="flex items-center gap-2 mb-4">
             <div class="w-12 h-[2px] bg-secondary" aria-hidden="true"></div>
@@ -218,7 +205,7 @@
           <rect fill="url(#grid)" height="100%" width="100%"></rect>
         </svg>
       </div>
-      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-8 md:p-16">
+      <div class="reveal relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-8 md:p-16">
         <div class="flex flex-col gap-6">
           <h2 class="font-display-lg text-[40px] leading-tight text-on-primary">Vous souhaitez vendre <br>votre véhicule ?</h2>
           <p class="font-body-lg text-primary-fixed-dim/80">Rejoignez des milliers de vendeurs satisfaits. Nous nous occupons de l'inspection, des photos et de la mise en avant pour vous trouver l'acheteur idéal en un temps record.</p>
@@ -242,7 +229,7 @@
 
   {# Stats du marché local #}
   <section class="w-full pb-section-gap">
-    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop grid grid-cols-2 md:grid-cols-4 gap-gutter">
+    <div class="reveal max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop grid grid-cols-2 md:grid-cols-4 gap-gutter">
       {% for stat in stats %}
       <div class="text-center p-8 rounded-2xl bg-surface-container-low flex flex-col gap-2">
         <span class="font-display-lg text-[32px] text-primary js-stat-counter" data-target="{{ stat.end }}" data-suffix="{{ stat.suffix }}">0</span>

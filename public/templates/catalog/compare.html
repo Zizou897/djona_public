@@ -51,11 +51,11 @@
     </a>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
       <div>
-        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Analyse comparative</span>
-        <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-primary">
+        <span class="animate-slide-up-1 font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Analyse comparative</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-headline-lg text-primary">
           Comparer mes <span class="text-secondary">sélections</span>
         </h1>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+        <p class="animate-slide-up-3 font-body-md text-body-md text-on-surface-variant mt-1">
           Analysez les caractéristiques techniques pour faire le meilleur choix.
         </p>
       </div>
@@ -71,7 +71,7 @@
 
   {% if not vehicles %}
   {# État vide #}
-  <section class="flex-1 flex flex-col items-center justify-center py-16 px-4 text-center">
+  <section class="reveal flex-1 flex flex-col items-center justify-center py-16 px-4 text-center">
     <div class="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center mb-6">
       <span class="material-symbols-outlined text-primary text-[40px]" aria-hidden="true">balance</span>
     </div>
@@ -89,7 +89,7 @@
   {% else %}
 
   {# Tableau de comparaison #}
-  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
+  <section class="reveal max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
 
     {# Badge "Choix de l'Expert" — légende #}
     {% if expert_pick_id and vehicles|length >= 2 %}

@@ -3,7 +3,7 @@ Carte compacte pour la grille /vehicules/ — attend `vehicle` (instance catalog
 avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) dans le contexte.
 {% endcomment %}
 {% load humanize %}
-<div class="group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+<div class="reveal group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
   <div class="relative h-48 overflow-hidden bg-surface-container">
     {% with image=vehicle.images.first %}
     {% if image %}

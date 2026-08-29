@@ -98,8 +98,12 @@ def vehicle_list(request):
         vehicle.is_favorite = vehicle.id in favorite_ids
         vehicle.in_compare = vehicle.id in compare_ids
 
+    base_qs = request.GET.copy()
+    base_qs.pop('page', None)
+
     context = {
         'page_obj': page_obj,
+        'base_qs': base_qs.urlencode(),
         'total_count': paginator.count,
         'brands': Vehicle.objects.filter(publish=True).values_list('brand', flat=True).distinct().order_by('brand'),
         'cities': Vehicle.objects.filter(publish=True).values_list('city', flat=True).distinct().order_by('city'),

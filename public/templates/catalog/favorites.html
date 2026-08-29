@@ -11,9 +11,9 @@
   <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter border-b border-surface-container-highest pb-gutter">
       <div class="flex flex-col">
-        <span class="font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2">Sélection Personnelle</span>
-        <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-on-surface">Mes Véhicules Favoris</h1>
-        <p class="font-body-md text-on-surface-variant mt-1">Consultez et gérez vos coups de cœur enregistrés.</p>
+        <span class="animate-slide-up-1 font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2">Sélection Personnelle</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-headline-lg text-on-surface">Mes Véhicules Favoris</h1>
+        <p class="animate-slide-up-3 font-body-md text-on-surface-variant mt-1">Consultez et gérez vos coups de cœur enregistrés.</p>
       </div>
 
       <div class="flex items-center gap-4">
@@ -29,7 +29,7 @@
   <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter pb-16">
 
     {# État vide (affiché si aucun favori) #}
-    <div id="empty-state" class="{% if fav_count > 0 %}hidden{% endif %} bg-white rounded-md shadow-signature p-8 md:p-12 text-center flex flex-col items-center justify-center my-6">
+    <div id="empty-state" class="reveal {% if fav_count > 0 %}hidden{% endif %} bg-white rounded-md shadow-signature p-8 md:p-12 text-center flex flex-col items-center justify-center my-6">
       <div class="w-20 h-20 mb-6 rounded-full bg-surface-container flex items-center justify-center text-outline">
         <span class="material-symbols-outlined text-4xl" aria-hidden="true">favorite_border</span>
       </div>
@@ -54,7 +54,7 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="favorites-grid">
         {% for vehicle in vehicles %}
-        <div id="favorite-card-{{ vehicle.id }}" class="favorite-card group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col relative">
+        <div id="favorite-card-{{ vehicle.id }}" class="favorite-card reveal group bg-white rounded-md shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col relative">
           
           {# Photo & Badges #}
           <div class="relative h-48 overflow-hidden bg-surface-container">

@@ -97,8 +97,8 @@
       <div class="lg:col-span-4 flex flex-col gap-gutter">
         <div class="bg-surface p-6 rounded-md shadow-md flex flex-col gap-4">
           <div class="flex flex-col">
-            <span class="font-label-md text-on-surface-variant uppercase tracking-tighter">{{ vehicle.brand }}</span>
-            <h1 class="font-display-lg text-headline-lg lg:text-display-lg text-on-surface leading-tight">{{ vehicle.model_name }}</h1>
+            <span class="animate-slide-up-1 font-label-md text-on-surface-variant uppercase tracking-tighter">{{ vehicle.brand }}</span>
+            <h1 class="animate-slide-up-2 font-display-lg text-headline-lg lg:text-display-lg text-on-surface leading-tight">{{ vehicle.model_name }}</h1>
           </div>
           <div class="flex items-baseline gap-2">
             <span class="font-display-lg text-primary text-headline-lg lg:text-display-lg">{{ vehicle.price }}</span>
@@ -173,7 +173,7 @@
 
   {# Caractéristiques, description, localisation #}
   <section class="w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap bg-background">
-    <div class="max-w-page mx-auto grid grid-cols-1 lg:grid-cols-12 gap-section-gap">
+    <div class="reveal max-w-page mx-auto grid grid-cols-1 lg:grid-cols-12 gap-section-gap">
 
       <div class="lg:col-span-8 flex flex-col gap-10">
         <div class="flex flex-col gap-6">
@@ -291,7 +291,7 @@
   {# Véhicules similaires #}
   {% if similar_vehicles %}
   <section class="w-full bg-surface-container-lowest py-section-gap">
-    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="reveal max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
       <div class="flex justify-between items-end mb-8">
         <div>
           <h2 class="font-headline-lg text-headline-md text-on-surface">Véhicules similaires</h2>

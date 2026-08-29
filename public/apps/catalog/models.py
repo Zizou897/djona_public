@@ -10,7 +10,7 @@ class Convention(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    publish = models.BooleanField(default=False)
+    publish = models.BooleanField(default=True)
 
     class Meta:
         abstract = True
@@ -42,6 +42,10 @@ class Vehicle(Convention):
     condition = models.CharField('état', max_length=20, choices=Condition.choices, default=Condition.OCCASION)
     slug = models.SlugField('slug', max_length=160, unique=True, blank=True)
     is_verified = models.BooleanField('inspecté par Djona', default=False)
+    source_annonce_id = models.PositiveIntegerField(
+        'id annonce d\'origine', null=True, blank=True, unique=True,
+        help_text='Référence vers annonces.id (djona_vendor) si ce véhicule provient de la synchro back-office.',
+    )
     description = models.TextField('description', blank=True)
 
     class Meta:

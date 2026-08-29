@@ -19,8 +19,8 @@
 {% if page_obj.paginator.num_pages > 1 %}
 <div class="mt-section-gap flex justify-center items-center gap-2">
   {% if page_obj.has_previous %}
-  <a href="{% querystring page=page_obj.previous_page_number %}"
-     hx-get="{% querystring page=page_obj.previous_page_number %}"
+  <a href="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.previous_page_number }}"
+     hx-get="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.previous_page_number }}"
      hx-target="#catalog-results" hx-push-url="true"
      class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
     <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
@@ -28,8 +28,8 @@
   {% endif %}
 
   {% for page_number in page_obj.paginator.page_range %}
-  <a href="{% querystring page=page_number %}"
-     hx-get="{% querystring page=page_number %}"
+  <a href="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_number }}"
+     hx-get="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_number }}"
      hx-target="#catalog-results" hx-push-url="true"
      class="w-10 h-10 rounded flex items-center justify-center font-label-md {% if page_number == page_obj.number %}bg-primary text-on-primary{% else %}text-on-surface hover:bg-surface-container-highest transition-colors{% endif %}">
     {{ page_number }}
@@ -37,8 +37,8 @@
   {% endfor %}
 
   {% if page_obj.has_next %}
-  <a href="{% querystring page=page_obj.next_page_number %}"
-     hx-get="{% querystring page=page_obj.next_page_number %}"
+  <a href="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.next_page_number }}"
+     hx-get="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.next_page_number }}"
      hx-target="#catalog-results" hx-push-url="true"
      class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
     <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
