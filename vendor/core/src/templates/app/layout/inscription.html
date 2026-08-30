@@ -137,7 +137,7 @@
                 <div class="flex items-start gap-3">
                     <input class="w-4 h-4 mt-0.5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" id="id_consentement" name="consentement" type="checkbox" {% if form.consentement.value %}checked{% endif %}>
                     <label class="text-label-sm text-on-surface-variant cursor-pointer select-none" for="id_consentement">
-                        J'accepte les <a class="text-primary font-semibold hover:underline" href="#">conditions d'utilisation</a> et la <a class="text-primary font-semibold hover:underline" href="#">politique de confidentialité</a> de Djona.
+                        J'accepte les <a class="text-primary font-semibold hover:underline" href="https://djona.tech/cgu/" target="_blank" rel="noopener">conditions d'utilisation</a> et la <a class="text-primary font-semibold hover:underline" href="https://djona.tech/confidentialite/" target="_blank" rel="noopener">politique de confidentialité</a> de Djona.
                     </label>
                 </div>
                 {% if form.consentement.errors %}<p class="text-error text-label-sm">{{ form.consentement.errors.0 }}</p>{% endif %}
