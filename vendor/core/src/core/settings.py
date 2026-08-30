@@ -83,9 +83,14 @@ if config('USE_MYSQL', default=False, cast=bool):
             'PASSWORD': config('MYSQL_PASSWORD'),
             'HOST': config('MYSQL_HOST', default='localhost'),
             'PORT': config('MYSQL_PORT', default='3306'),
-            'OPTIONS': {'ssl': {'ssl-mode': 'REQUIRED'}},
         }
     }
+
+    # MYSQL_SSL_REQUIRED=True si MySQL est un service managé distant exigeant TLS
+    # (ex. Aiven). Un MySQL local (VPS ou poste de dev) n'a pas de certificat
+    # configuré par défaut — laisser à False dans ce cas (valeur par défaut).
+    if config('MYSQL_SSL_REQUIRED', default=False, cast=bool):
+        DATABASES['default']['OPTIONS'] = {'ssl': {'ssl-mode': 'REQUIRED'}}
 else:
     DATABASES = {
         'default': {
