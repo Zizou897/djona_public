@@ -23,7 +23,7 @@
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
 
-      <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
+      <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
@@ -31,7 +31,7 @@
     {% endwith %}
 
     <div class="flex items-center gap-2 sm:gap-base">
-      <a href="#"
+      <a href="https://vendor.djona.tech/"
          class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded hover:bg-primary-fixed transition-colors">
         Publier mon véhicule
       </a>
@@ -70,11 +70,11 @@
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
 
-      <a href="#" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
+      <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
-      <a href="#" class="mt-2 text-center px-4 py-3 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
+      <a href="https://vendor.djona.tech/" class="mt-2 text-center px-4 py-3 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
         Publier mon véhicule
       </a>
     </nav>
