@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
 from .models import AnnonceMirror, CompteVendeur
+from .sync import trigger_public_sync
 
 
 class VendeurListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -140,6 +141,8 @@ class _AnnonceActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         if annonce.statut == AnnonceMirror.Statut.EN_ATTENTE:
             annonce.statut = self.nouveau_statut
             annonce.save(using='vendor_db', update_fields=['statut'])
+            if self.nouveau_statut == AnnonceMirror.Statut.PUBLIEE:
+                trigger_public_sync.after_response()
         return redirect('annonce_moderation_liste')
 
 

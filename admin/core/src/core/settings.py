@@ -33,6 +33,7 @@ THIRD_PARTY_APPS = [
     'colorfield',
     'corsheaders',
     'sweetify',
+    'after_response',
 ]
 
 LOCAL_APPS = [
@@ -193,6 +194,14 @@ CELERY_BROKER_URL = config('REDIS_URL', default='redis://127.0.0.1:6379')
 CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://127.0.0.1:6379')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+# Déclenchement de la synchro marketplace (apps.vendor_sync côté projet public)
+# après validation d'une annonce — voir moderation/sync.py. Laisser vide en dev
+# si le projet public n'est pas installé localement : le déclenchement est alors
+# simplement ignoré (loggé), pas d'erreur.
+PUBLIC_SYNC_PYTHON = config('PUBLIC_SYNC_PYTHON', default='')
+PUBLIC_SYNC_MANAGE_PY = config('PUBLIC_SYNC_MANAGE_PY', default='')
+PUBLIC_SYNC_SETTINGS = config('PUBLIC_SYNC_SETTINGS', default='config.settings.prod')
 
 # Jazzmin
 JAZZMIN_SETTINGS = {
