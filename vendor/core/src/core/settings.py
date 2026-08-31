@@ -125,10 +125,16 @@ STATIC_ROOT = BASE_DIR / 'static_cdn'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media_cdn'
 
-# Doit rester alignée avec client_max_body_size (nginx) — sinon un fichier
-# accepté par nginx peut quand même être rejeté par Django avant nginx.
-DATA_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
+# Taille TOTALE de requête max (formulaire d'annonce : jusqu'à 4 photos de 4 Mo
+# chacune, voir annonces/forms.py::MAX_PHOTOS/MAX_PHOTO_SIZE, + marge pour les
+# autres champs et l'overhead multipart). La limite PAR image (4 Mo) est
+# appliquée séparément dans AnnonceForm.clean() — ces réglages-ci ne font que
+# laisser passer la requête jusqu'à Django pour que cette validation s'exécute ;
+# ils ne remplacent pas le contrôle par fichier. Doit rester alignée avec
+# client_max_body_size (nginx, site vendor.djona.tech) — sinon nginx rejette
+# la requête avant même que Django ne la voie.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
