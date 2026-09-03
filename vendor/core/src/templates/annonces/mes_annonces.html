@@ -202,7 +202,7 @@
                             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">settings</span>{{ annonce.get_boite_vitesses_display }}</span>
                         </div>
 
-                        <div class="mt-auto pt-4">
+                        <div class="mt-auto pt-4 flex flex-col gap-2">
                             {% if annonce.statut == 'brouillon' %}
                             <form action="{% url 'annonce_publier' annonce.pk %}" method="post" class="flex gap-2">
                                 {% csrf_token %}
@@ -214,8 +214,13 @@
                             {% elif annonce.statut == 'en_attente' %}
                             <p class="text-center text-xs text-on-surface-variant py-2">En cours de vérification par Djona</p>
                             {% else %}
-                            <p class="text-center text-xs text-on-surface-variant py-2">Visible par les acheteurs</p>
+                            <a class="block text-center px-3 py-2 rounded-lg border border-outline-variant text-on-surface-variant text-xs font-bold hover:bg-surface-container transition-colors" href="{% url 'annonce_modifier' annonce.pk %}">Modifier</a>
+                            <p class="text-center text-[11px] text-on-surface-variant">Visible par les acheteurs — la modifier la repasse en révision.</p>
                             {% endif %}
+                            <form action="{% url 'annonce_supprimer' annonce.pk %}" method="post" onsubmit="return confirm('Supprimer définitivement cette annonce ?');">
+                                {% csrf_token %}
+                                <button class="w-full px-3 py-2 rounded-lg border border-error text-error text-xs font-bold hover:bg-error/5 transition-colors" type="submit">Supprimer</button>
+                            </form>
                         </div>
                     </div>
                 </div>

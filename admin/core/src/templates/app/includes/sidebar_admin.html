@@ -9,7 +9,7 @@
 <span class="material-symbols-outlined mr-4">dashboard</span><span class="font-label-md text-label-md">Dashboard</span>
 </a>
 <a {% if active_nav == 'annonces' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'annonce_moderation_liste' %}">
-<span class="material-symbols-outlined mr-4">fact_check</span><span class="font-label-md text-label-md">Annonces à valider</span>
+<span class="material-symbols-outlined mr-4">fact_check</span><span class="font-label-md text-label-md">Annonces</span>
 </a>
 <a {% if active_nav == 'vendeurs' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'vendeur_liste' %}">
 <span class="material-symbols-outlined mr-4">group</span><span class="font-label-md text-label-md">Vendeurs</span>

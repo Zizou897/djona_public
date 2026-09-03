@@ -28,6 +28,12 @@ class Command(BaseCommand):
             if annonce.couleur:
                 description = f'{description}\n\nCouleur : {annonce.couleur}'.strip()
 
+            # 'publish' est volontairement absent de defaults : sur update, on ne
+            # touche jamais à la visibilité marketplace décidée par l'admin (voir
+            # moderation.views côté admin, toggle indépendant du statut) — sur
+            # create, le champ prend son défaut de modèle (True). Seule la
+            # dépublication automatique ci-dessous (annonce plus publiee) prime
+            # sur ce choix admin.
             vehicle, was_created = Vehicle.objects.update_or_create(
                 source_annonce_id=annonce.id,
                 defaults={
@@ -41,7 +47,6 @@ class Command(BaseCommand):
                     'description': description,
                     'city': DEFAULT_CITY,
                     'condition': DEFAULT_CONDITION,
-                    'publish': True,
                 },
             )
             created += was_created

@@ -167,7 +167,7 @@
 
                     <div data-step="3" class="hidden flex flex-col gap-4">
                         <h2 class="font-headline-md text-lg text-primary">Photos</h2>
-                        <p class="text-sm text-on-surface-variant">Jusqu'à 8 photos. <span id="photo-count">0/8</span></p>
+                        <p class="text-sm text-on-surface-variant">Jusqu'à 4 photos, 4 Mo maximum chacune. <span id="photo-count">0/4</span></p>
 
                         <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-lg py-8 cursor-pointer hover:border-primary transition-colors" for="id_photos">
                             <span class="material-symbols-outlined text-primary text-[32px]">add_photo_alternate</span>
@@ -275,7 +275,7 @@
         '<span class="material-symbols-outlined text-[16px]">close</span></button>';
       photoGrid.appendChild(item);
     });
-    photoCount.textContent = photoFiles.length + '/8';
+    photoCount.textContent = photoFiles.length + '/4';
     var dataTransfer = new DataTransfer();
     photoFiles.forEach(function (file) { dataTransfer.items.add(file); });
     photoInput.files = dataTransfer.files;
@@ -283,7 +283,7 @@
 
   photoInput.addEventListener('change', function () {
     var incoming = Array.prototype.slice.call(photoInput.files);
-    var room = 8 - photoFiles.length;
+    var room = 4 - photoFiles.length;
     photoFiles = photoFiles.concat(incoming.slice(0, Math.max(room, 0)));
     renderPhotoGrid();
   });

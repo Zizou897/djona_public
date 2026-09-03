@@ -59,6 +59,12 @@
     </header>
 
     <main class="flex-1 px-6 py-8">
+        {% if annonce.statut == 'publiee' %}
+        <div class="max-w-3xl mx-auto mb-4 px-4 py-3 rounded-lg bg-secondary-container/20 text-on-secondary-container text-sm">
+            Cette annonce est actuellement visible par les acheteurs. La modifier la retire du marketplace et la
+            repasse en attente de validation.
+        </div>
+        {% endif %}
         {% if form.non_field_errors %}
         <div class="max-w-3xl mx-auto mb-4 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm flex flex-col gap-1">
             {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}

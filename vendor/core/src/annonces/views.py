@@ -11,6 +11,7 @@ from django.views.generic import ListView
 
 from .forms import AnnonceForm
 from .models import Annonce, AnnoncePhoto
+from .sync import trigger_public_sync
 
 
 class _CompteActifRequisMixin(LoginRequiredMixin):
@@ -109,7 +110,7 @@ class AnnoncePublierView(_CompteActifRequisMixin, View):
 
 class AnnonceUpdateView(_CompteActifRequisMixin, View):
     template_name = 'annonces/annonce_form_edition.html'
-    statuts_modifiables = (Annonce.Statut.BROUILLON, Annonce.Statut.REFUSEE)
+    statuts_modifiables = (Annonce.Statut.BROUILLON, Annonce.Statut.REFUSEE, Annonce.Statut.PUBLIEE)
 
     def get_annonce(self, request, pk):
         return get_object_or_404(Annonce, pk=pk, vendeur=request.user)
@@ -134,6 +135,7 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
             return early_return
 
         etait_refusee = annonce.statut == Annonce.Statut.REFUSEE
+        etait_publiee = annonce.statut == Annonce.Statut.PUBLIEE
 
         form = AnnonceForm(request.POST, request.FILES, instance=annonce)
         if not form.is_valid():
@@ -144,8 +146,36 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
             annonce.statut = Annonce.Statut.BROUILLON
             annonce.save()
 
-        if etait_refusee:
+        if etait_publiee:
+            # Elle disparaît du marketplace immédiatement, sans attendre la
+            # prochaine validation admin (qui déclenche aussi une synchro).
+            trigger_public_sync.after_response()
+            messages.success(
+                request,
+                "Annonce mise à jour et retirée du marketplace — repassez-la en attente de "
+                "validation pour qu'elle soit de nouveau visible.",
+            )
+        elif etait_refusee:
             messages.success(request, "Annonce mise à jour et repassée en brouillon — pensez à la republier.")
         else:
             messages.success(request, 'Annonce mise à jour.')
+        return redirect('mes_annonces')
+
+
+class AnnonceDeleteView(_CompteActifRequisMixin, View):
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, pk):
+        annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user)
+        etait_publiee = annonce.statut == Annonce.Statut.PUBLIEE
+        annonce.delete()
+
+        if etait_publiee:
+            # Le véhicule correspondant doit disparaître du marketplace tout de
+            # suite, sans attendre la prochaine validation admin.
+            trigger_public_sync.after_response()
+
+        messages.success(request, 'Annonce supprimée.')
         return redirect('mes_annonces')

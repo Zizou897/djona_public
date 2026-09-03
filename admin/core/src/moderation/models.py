@@ -121,3 +121,28 @@ class AnnoncePhotoMirror(models.Model):
         managed = False
         db_table = 'annonce_photos'
         ordering = ['ordre']
+
+
+class VehicleMirror(models.Model):
+    """Miroir en lecture/écriture de public.apps.catalog.Vehicle (schéma
+    djona_public, connexion 'public_db'). Jamais migré depuis ce projet.
+
+    Usage prévu : LIRE le véhicule correspondant à une annonce déjà
+    synchronisée (via `source_annonce_id`), et METTRE À JOUR le seul champ
+    `publish` — pour activer/désactiver son affichage sur le marketplace
+    indépendamment du statut de modération côté vendor. Ne doit jamais servir
+    à créer/supprimer un véhicule : ce cycle de vie est possédé par
+    apps.vendor_sync.sync_validated_annonces côté projet public.
+    """
+
+    source_annonce_id = models.PositiveIntegerField(unique=True, null=True)
+    brand = models.CharField(max_length=80)
+    model_name = models.CharField(max_length=120)
+    publish = models.BooleanField(default=True)
+
+    class Meta:
+        managed = False
+        db_table = 'catalog_vehicle'
+
+    def __str__(self):
+        return f'{self.brand} {self.model_name}'

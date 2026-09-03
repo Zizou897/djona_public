@@ -26,7 +26,16 @@
 <h1 class="font-display-lg text-display-lg text-primary mb-1">{{ annonce.marque }} {{ annonce.modele }} ({{ annonce.annee }})</h1>
 <p class="font-body-md text-on-surface-variant">Proposée par {{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} — {{ annonce.vendeur.email }} — {{ annonce.vendeur.telephone }}</p>
 </div>
-<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
+<span class="flex-none px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tighter
+    {% if annonce.statut == 'publiee' %}bg-primary text-on-primary
+    {% elif annonce.statut == 'en_attente' %}bg-secondary-fixed text-on-secondary-fixed
+    {% elif annonce.statut == 'refusee' %}bg-error text-white
+    {% else %}bg-surface-container text-on-surface-variant{% endif %}">
+    {% if annonce.statut == 'publiee' %}Publiée
+    {% elif annonce.statut == 'en_attente' %}En attente
+    {% elif annonce.statut == 'refusee' %}Refusée
+    {% else %}Brouillon{% endif %}
+</span>
 </div>
 
 {% if photos %}
@@ -63,6 +72,7 @@
 <p class="font-body-md text-on-surface-variant mb-8">{{ annonce.description }}</p>
 
 <div class="flex flex-col sm:flex-row gap-3">
+{% if annonce.statut == 'en_attente' %}
 <form action="{% url 'annonce_valider' annonce.pk %}" method="post" class="w-full sm:w-auto">
 {% csrf_token %}
 <button class="w-full sm:w-auto px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" type="submit">
@@ -75,6 +85,29 @@
 <span class="material-symbols-outlined text-[20px]">cancel</span> Refuser
 </button>
 </form>
+{% elif annonce.statut == 'publiee' %}
+    {% if vehicle %}
+        {% if vehicle.publish %}
+        <form action="{% url 'annonce_desactiver_marketplace' annonce.pk %}" method="post" class="w-full sm:w-auto">
+        {% csrf_token %}
+        <button class="w-full sm:w-auto px-6 py-3 border-2 border-error text-error rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error-container/20 transition-colors" type="submit">
+        <span class="material-symbols-outlined text-[20px]">visibility_off</span> Désactiver sur le marketplace
+        </button>
+        </form>
+        <p class="text-[13px] text-on-surface-variant self-center">Visible par les acheteurs.</p>
+        {% else %}
+        <form action="{% url 'annonce_activer_marketplace' annonce.pk %}" method="post" class="w-full sm:w-auto">
+        {% csrf_token %}
+        <button class="w-full sm:w-auto px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" type="submit">
+        <span class="material-symbols-outlined text-[20px]">visibility</span> Activer sur le marketplace
+        </button>
+        </form>
+        <p class="text-[13px] text-on-surface-variant self-center">Masquée du marketplace.</p>
+        {% endif %}
+    {% else %}
+    <p class="text-[13px] text-on-surface-variant">Pas encore synchronisée avec le marketplace.</p>
+    {% endif %}
+{% endif %}
 </div>
 </div>
 </div>

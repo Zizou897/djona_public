@@ -1,7 +1,7 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Annonces à valider — Portail Admin{% endblock %}
+{% block title %}Annonces — Portail Admin{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
@@ -9,17 +9,62 @@
 
 {% block content %}
 <div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Validation' %}
+{% include 'app/includes/header_mobile_admin.html' with page_title='Annonces' %}
 {% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
 <div class="lg:pl-72">
 {% include 'app/includes/topbar_admin.html' %}
 <main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
 <div class="flex flex-col w-full">
 <div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
-<div class="reveal" style="animation-delay:.05s">
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-8">Annonces à valider</h1>
+
+<div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" style="animation-delay:.05s">
+    <div>
+        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
+        <h1 class="font-display-lg text-display-lg text-primary">Annonces</h1>
+    </div>
+    <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'annonce_creer_admin' %}">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+        Créer une annonce
+    </a>
 </div>
+
+<div class="reveal grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6" style="animation-delay:.1s">
+    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_total }}</p>
+        <p class="text-xs text-on-surface-variant mt-1">Total</p>
+    </div>
+    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_publiees }}</p>
+        <p class="text-xs text-on-surface-variant mt-1">Publiées</p>
+    </div>
+    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_en_attente }}</p>
+        <p class="text-xs text-on-surface-variant mt-1">En attente</p>
+    </div>
+    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_refusees }}</p>
+        <p class="text-xs text-on-surface-variant mt-1">Refusées</p>
+    </div>
+</div>
+
+<div class="reveal flex flex-col lg:flex-row lg:items-center gap-3 mb-4" style="animation-delay:.14s">
+    <form class="flex-1" method="get">
+        {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+            <input class="w-full pl-11 pr-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" name="q" placeholder="Rechercher par marque, modèle..." type="text" value="{{ recherche }}">
+        </div>
+    </form>
+</div>
+
+<div class="reveal flex flex-wrap items-center gap-2 mb-6" style="animation-delay:.18s">
+    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?{% if recherche %}q={{ recherche|urlencode }}{% endif %}">Toutes</a>
+    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=en_attente{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">En attente</a>
+    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'publiee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=publiee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Publiées</a>
+    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'refusee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=refusee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Refusées</a>
+    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'brouillon' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=brouillon{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Brouillons</a>
+</div>
+
 <div class="flex flex-col gap-gutter">
 {% for annonce in annonces %}
 <a class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-5 flex items-center justify-between gap-4 hover:-translate-y-0.5 transition-all" href="{% url 'annonce_moderation_detail' annonce.pk %}" style="animation-delay:{{ forloop.counter|add:"6" }}0ms">
@@ -30,10 +75,19 @@
 <p class="text-[13px] text-on-surface-variant truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.prix }} CFA</p>
 </div>
 </div>
-<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
+<span class="flex-none px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tighter
+    {% if annonce.statut == 'publiee' %}bg-primary text-on-primary
+    {% elif annonce.statut == 'en_attente' %}bg-secondary-fixed text-on-secondary-fixed
+    {% elif annonce.statut == 'refusee' %}bg-error text-white
+    {% else %}bg-surface-container text-on-surface-variant{% endif %}">
+    {% if annonce.statut == 'publiee' %}Publiée
+    {% elif annonce.statut == 'en_attente' %}En attente
+    {% elif annonce.statut == 'refusee' %}Refusée
+    {% else %}Brouillon{% endif %}
+</span>
 </a>
 {% empty %}
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] text-center py-16 text-on-surface-variant" style="animation-delay:.14s">Aucune annonce en attente de validation.</div>
+<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] text-center py-16 text-on-surface-variant" style="animation-delay:.14s">Aucune annonce ne correspond à ces filtres.</div>
 {% endfor %}
 </div>
 </div>

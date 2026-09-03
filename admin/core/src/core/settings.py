@@ -116,6 +116,24 @@ if config('USE_MYSQL', default=False, cast=bool):
                 'DEPENDENCIES': [],
             },
         },
+        # Connexion en lecture/écriture vers le schéma du projet public (catalogue
+        # marketplace) — utilisée uniquement par moderation.views pour basculer
+        # Vehicle.publish (activer/désactiver une annonce déjà validée sur le
+        # marketplace, sans toucher au statut de modération côté vendor). Même
+        # convention que vendor_db : jamais migrée depuis ce projet, jamais
+        # utilisée pour créer une annonce.
+        'public_db': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config('PUBLIC_MYSQL_DB', default='djona_public'),
+            'USER': config('MYSQL_USER'),
+            'PASSWORD': config('MYSQL_PASSWORD'),
+            'HOST': config('MYSQL_HOST', default='localhost'),
+            'PORT': config('MYSQL_PORT', default='3306'),
+            'TEST': {
+                'NAME': config('PUBLIC_TEST_MYSQL_DB', default='djona_public_test'),
+                'DEPENDENCIES': [],
+            },
+        },
     }
 
     # MYSQL_SSL_REQUIRED=True si MySQL est un service managé distant exigeant TLS
@@ -124,6 +142,7 @@ if config('USE_MYSQL', default=False, cast=bool):
     if config('MYSQL_SSL_REQUIRED', default=False, cast=bool):
         DATABASES['default']['OPTIONS'] = {'ssl': {'ssl-mode': 'REQUIRED'}}
         DATABASES['vendor_db']['OPTIONS'] = {'ssl': {'ssl-mode': 'REQUIRED'}}
+        DATABASES['public_db']['OPTIONS'] = {'ssl': {'ssl-mode': 'REQUIRED'}}
 else:
     DATABASES = {
         'default': {
