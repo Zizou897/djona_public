@@ -16,6 +16,59 @@ class Convention(models.Model):
         abstract = True
 
 
+class Seller(models.Model):
+    """Vitrine publique d'un vendeur — synchronisée en lecture seule depuis
+    vendor.app.Utilisateur/Profil (voir apps.vendor_sync.management.commands
+    .sync_validated_annonces). Ce projet ne fait qu'écrire ici via la
+    synchro : jamais créé/modifié par une action utilisateur publique.
+    """
+
+    class TypeCompte(models.TextChoices):
+        PARTICULIER = 'particulier', 'Particulier'
+        PROFESSIONNEL = 'professionnel', 'Professionnel'
+
+    source_vendeur_id = models.PositiveIntegerField(unique=True)
+    first_name = models.CharField('prénom', max_length=100)
+    last_name = models.CharField('nom', max_length=100)
+    phone = models.CharField('téléphone', max_length=10, blank=True)
+    type_compte = models.CharField(max_length=20, choices=TypeCompte.choices, default=TypeCompte.PARTICULIER)
+    company_name = models.CharField('raison sociale', max_length=150, blank=True)
+    logo = models.ImageField('logo', upload_to='sellers/', blank=True, null=True)
+    member_since = models.DateTimeField('membre depuis')
+    slug = models.SlugField('slug', max_length=180, unique=True, blank=True)
+
+    class Meta:
+        verbose_name = 'vendeur'
+        verbose_name_plural = 'vendeurs'
+
+    def __str__(self):
+        return self.display_name
+
+    @property
+    def is_professional(self):
+        return self.type_compte == self.TypeCompte.PROFESSIONNEL
+
+    @property
+    def display_name(self):
+        if self.is_professional and self.company_name:
+            return self.company_name
+        return f'{self.first_name} {self.last_name}'.strip()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.display_name) or f'vendeur-{self.source_vendeur_id}'
+            slug = base_slug
+            i = 1
+            while Seller.objects.exclude(pk=self.pk).filter(slug=slug).exists():
+                i += 1
+                slug = f'{base_slug}-{i}'
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('catalog:seller_detail', kwargs={'slug': self.slug})
+
+
 class Vehicle(Convention):
     class FuelType(models.TextChoices):
         ESSENCE = 'essence', 'Essence'
@@ -47,6 +100,9 @@ class Vehicle(Convention):
         help_text='Référence vers annonces.id (djona_vendor) si ce véhicule provient de la synchro back-office.',
     )
     description = models.TextField('description', blank=True)
+    seller = models.ForeignKey(
+        Seller, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehicles',
+    )
 
     class Meta:
         verbose_name = 'véhicule'

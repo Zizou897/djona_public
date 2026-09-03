@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator
 
-from .models import Favorite, Vehicle
+from .models import Favorite, Seller, Vehicle
 
 PAGE_SIZE = 9
 MAX_COMPARE = 3
@@ -156,6 +156,24 @@ def vehicle_detail(request, slug):
         'max_compare': MAX_COMPARE,
     }
     return render(request, 'catalog/detail.html', context)
+
+
+def seller_detail(request, slug):
+    """Page vitrine publique d'un vendeur — catalogue publié + historique
+    (annonces qu'il a eues sur le marketplace mais qui ne sont plus visibles :
+    retirées, dépubliées par l'admin, ou l'annonce d'origine a changé de
+    statut côté vendor). Voir apps.vendor_sync.models.Seller.
+    """
+    seller = get_object_or_404(Seller, slug=slug)
+    published_vehicles = list(seller.vehicles.filter(publish=True).prefetch_related('images'))
+    past_vehicles = list(seller.vehicles.filter(publish=False).prefetch_related('images'))
+
+    context = {
+        'seller': seller,
+        'published_vehicles': published_vehicles,
+        'past_vehicles': past_vehicles,
+    }
+    return render(request, 'catalog/seller_detail.html', context)
 
 
 def vehicle_favorites(request):

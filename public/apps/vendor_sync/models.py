@@ -10,6 +10,9 @@ class VendeurMirror(models.Model):
     email = models.EmailField()
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
+    telephone = models.CharField(max_length=10)
+    type_compte = models.CharField(max_length=20)
+    date_joined = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -17,6 +20,22 @@ class VendeurMirror(models.Model):
 
     def __str__(self):
         return f'{self.prenom} {self.nom} ({self.email})'
+
+
+class ProfilMirror(models.Model):
+    """Miroir en lecture seule de vendor.app.Profil (table app_profil, schéma
+    djona_vendor). Jamais migré depuis ce projet.
+    """
+
+    user = models.OneToOneField(
+        VendeurMirror, on_delete=models.DO_NOTHING, related_name='profil', db_constraint=False,
+    )
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    raison_sociale = models.CharField(max_length=150, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'app_profil'
 
 
 class AnnonceMirror(models.Model):

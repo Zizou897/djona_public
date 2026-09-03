@@ -275,6 +275,21 @@
           <a href="#" class="w-full text-center bg-primary text-on-primary py-3 rounded font-label-md shadow-md hover:translate-y-[-2px] transition-all">Simuler mon crédit</a>
         </div>
 
+        {% if vehicle.seller %}
+        <a href="{{ vehicle.seller.get_absolute_url }}" class="flex items-center gap-4 p-4 border border-outline-variant/30 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors">
+          <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 overflow-hidden">
+            {% if vehicle.seller.logo %}
+            <img src="{{ vehicle.seller.logo.url }}" alt="{{ vehicle.seller.display_name }}" class="w-full h-full object-cover">
+            {% else %}
+            <span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.seller.is_professional %}storefront{% else %}person{% endif %}</span>
+            {% endif %}
+          </div>
+          <div class="flex flex-col">
+            <span class="font-label-md text-on-surface">{{ vehicle.seller.display_name }}</span>
+            <span class="font-label-sm text-on-surface-variant opacity-60">{% if vehicle.seller.is_professional %}Professionnel{% else %}Particulier{% endif %} — Membre Djona</span>
+          </div>
+        </a>
+        {% else %}
         <div class="flex items-center gap-4 p-4 border border-outline-variant/30 rounded-md">
           <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-primary" aria-hidden="true">person</span>
@@ -284,6 +299,7 @@
             <span class="font-label-sm text-on-surface-variant opacity-60">Membre Djona</span>
           </div>
         </div>
+        {% endif %}
       </div>
     </div>
   </section>

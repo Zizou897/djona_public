@@ -104,7 +104,7 @@ class ProfilForm(forms.ModelForm):
     class Meta:
         model = Profil
         fields = [
-            'ville', 'avatar',
+            'ville', 'avatar', 'raison_sociale',
             'two_factor_enabled', 'langue', 'notif_email', 'notif_whatsapp',
         ]
 
@@ -112,6 +112,7 @@ class ProfilForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['langue'].required = False
         self.fields['ville'].required = False
+        self.fields['raison_sociale'].required = False
 
     def clean_langue(self):
         return self.cleaned_data.get('langue') or Profil.Langue.FRANCAIS

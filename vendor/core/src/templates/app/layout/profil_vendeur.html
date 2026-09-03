@@ -180,6 +180,11 @@
                                 </select>
                             </div>
                             <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_raison_sociale">Raison sociale <span class="text-[11px]">(comptes professionnels)</span></label>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_raison_sociale" name="raison_sociale" type="text" placeholder="Nom de votre entreprise" value="{{ profil_form.raison_sociale.value|default:'' }}">
+                                <p class="text-[11px] text-on-surface-variant">Affichée à la place de votre nom sur votre page vitrine publique.</p>
+                            </div>
+                            <div class="flex flex-col gap-1">
                                 <label class="text-sm text-on-surface-variant" for="id_ville">Ville</label>
                                 <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_ville" name="ville">
                                     <option value="">Non renseignée</option>

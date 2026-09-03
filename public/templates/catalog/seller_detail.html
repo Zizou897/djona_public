@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ seller.display_name }} — Vendeur Djona{% endblock %}
+{% block meta_description %}{% if seller.is_professional %}{{ seller.display_name }}, concessionnaire professionnel sur Djona{% else %}{{ seller.display_name }}, vendeur particulier sur Djona{% endif %} — {{ published_vehicles|length }} véhicule{{ published_vehicles|length|pluralize }} en vente, membre depuis {{ seller.member_since|date:"F Y" }}.{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# En-tête vendeur #}
+  <section class="w-full {% if seller.is_professional %}bg-primary text-on-primary{% else %}bg-surface-container-low{% endif %} px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="max-w-page mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-6">
+      <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl overflow-hidden bg-surface-container-lowest shadow-md flex items-center justify-center">
+        {% if seller.logo %}
+        <img src="{{ seller.logo.url }}" alt="{{ seller.display_name }}" class="w-full h-full object-cover">
+        {% else %}
+        <span class="material-symbols-outlined text-primary text-[48px]" aria-hidden="true">
+          {% if seller.is_professional %}storefront{% else %}person{% endif %}
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="flex-1 text-center sm:text-left">
+        {% if seller.is_professional %}
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wide mb-2">
+          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">verified</span>
+          Professionnel
+        </span>
+        {% endif %}
+        <h1 class="font-display-lg text-headline-lg">{{ seller.display_name }}</h1>
+        <p class="font-body-md {% if seller.is_professional %}text-primary-fixed-dim/80{% else %}text-on-surface-variant{% endif %} mt-1">
+          Membre depuis {{ seller.member_since|date:"F Y" }}
+        </p>
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-4 font-label-md text-label-md">
+          {% if seller.phone %}
+          <a href="tel:+225{{ seller.phone }}" class="inline-flex items-center gap-2 {% if seller.is_professional %}text-on-primary{% else %}text-primary{% endif %} hover:underline">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span>
+            {{ seller.phone }}
+          </a>
+          {% endif %}
+          <span class="inline-flex items-center gap-2 {% if seller.is_professional %}text-primary-fixed-dim/80{% else %}text-on-surface-variant{% endif %}">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">directions_car</span>
+            {{ published_vehicles|length }} véhicule{{ published_vehicles|length|pluralize }} en vente
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Catalogue publié #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Véhicules en vente</h2>
+    {% if published_vehicles %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+      {% for vehicle in published_vehicles %}
+        {% include 'partials/_listing_vehicle_card.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="py-12 flex flex-col items-center gap-3 text-center text-on-surface-variant">
+      <span class="material-symbols-outlined text-outline text-[40px]" aria-hidden="true">directions_car</span>
+      <p>Aucun véhicule en vente actuellement.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  {# Historique #}
+  {% if past_vehicles %}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
+    <h2 class="font-headline-lg text-headline-lg text-on-surface-variant mb-2">Historique</h2>
+    <p class="font-body-md text-on-surface-variant mb-6">Annonces précédentes de ce vendeur, plus visibles sur le marketplace.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter opacity-70">
+      {% for vehicle in past_vehicles %}
+        {% include 'partials/_listing_vehicle_card.html' %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

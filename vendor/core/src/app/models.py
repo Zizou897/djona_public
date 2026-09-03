@@ -85,6 +85,13 @@ class Profil(models.Model):
     )
     ville = models.CharField(max_length=30, choices=Ville.choices, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    # Utilisé comme logo sur la page vitrine publique quand type_compte est
+    # 'professionnel' (Utilisateur.type_compte) — sinon comme photo de profil
+    # classique. Pas de champ logo séparé : un seul et même emplacement image.
+    raison_sociale = models.CharField(
+        'raison sociale', max_length=150, blank=True,
+        help_text="Nom de l'entreprise, affiché sur la page vitrine publique (comptes professionnels).",
+    )
     two_factor_enabled = models.BooleanField(default=False)
     langue = models.CharField(max_length=2, choices=Langue.choices, default=Langue.FRANCAIS)
     notif_email = models.BooleanField(default=True)
