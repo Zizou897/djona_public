@@ -11,6 +11,7 @@ urlpatterns = [
     path('annonces-a-valider/<int:pk>/', views.AnnonceModerationDetailView.as_view(), name='annonce_moderation_detail'),
     path('annonces-a-valider/<int:pk>/valider/', views.AnnonceValiderView.as_view(), name='annonce_valider'),
     path('annonces-a-valider/<int:pk>/refuser/', views.AnnonceRefuserView.as_view(), name='annonce_refuser'),
+    path('annonces-a-valider/<int:pk>/modifier/', views.AnnonceModifierAdminView.as_view(), name='annonce_modifier_admin'),
     path('annonces-a-valider/<int:pk>/activer/', views.AnnonceActiverMarketplaceView.as_view(), name='annonce_activer_marketplace'),
     path('annonces-a-valider/<int:pk>/desactiver/', views.AnnonceDesactiverMarketplaceView.as_view(), name='annonce_desactiver_marketplace'),
 ]

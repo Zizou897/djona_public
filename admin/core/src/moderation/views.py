@@ -13,6 +13,22 @@ from .models import AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, VehicleMir
 from .sync import trigger_public_sync
 
 SYSTEM_VENDOR_EMAIL = 'officiel@djona.tech'
+SLA_HEURES = 24
+
+
+def _annoter_sla(annonce, now=None):
+    """Ajoute `.heures_attente`/`.sla_depasse` sur une annonce en_attente — objectif de
+    réponse < 24h (voir AGENTS.md modération). Ne fait rien pour les autres statuts.
+    """
+    now = now or timezone.now()
+    if annonce.statut == AnnonceMirror.Statut.EN_ATTENTE:
+        heures = (now - annonce.created_at).total_seconds() / 3600
+        annonce.heures_attente = int(heures)
+        annonce.sla_depasse = heures > SLA_HEURES
+    else:
+        annonce.heures_attente = None
+        annonce.sla_depasse = False
+    return annonce
 
 
 class _StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -95,7 +111,11 @@ class AnnonceModerationListView(_StaffRequiredMixin, ListView):
             annonces = annonces.filter(marque__icontains=recherche) | annonces.filter(modele__icontains=recherche)
 
         tri = self.TRIS.get(self.request.GET.get('tri'), self.TRIS['recent'])
-        return annonces.order_by(tri)
+        annonces = list(annonces.order_by(tri))
+        now = timezone.now()
+        for annonce in annonces:
+            _annoter_sla(annonce, now)
+        return annonces
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,11 +137,17 @@ class AnnonceModerationDetailView(_StaffRequiredMixin, View):
         annonce = get_object_or_404(
             AnnonceMirror.objects.using('vendor_db').select_related('vendeur'), pk=pk,
         )
+        _annoter_sla(annonce)
         photos = annonce.photos.using('vendor_db').all()
         vehicle = None
         if annonce.statut == AnnonceMirror.Statut.PUBLIEE:
             vehicle = VehicleMirror.objects.using('public_db').filter(source_annonce_id=annonce.pk).first()
-        return render(request, self.template_name, {'annonce': annonce, 'photos': photos, 'vehicle': vehicle})
+        return render(request, self.template_name, {
+            'annonce': annonce,
+            'photos': photos,
+            'vehicle': vehicle,
+            'motifs_refus': AnnonceMirror.MotifRefus.choices,
+        })
 
 
 class _AnnonceActionView(_StaffRequiredMixin, View):
@@ -131,11 +157,22 @@ class _AnnonceActionView(_StaffRequiredMixin, View):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    def extra_fields(self, request):
+        """Champs additionnels à appliquer avec le nouveau statut. Retourner None
+        annule l'action (ex : motif de refus manquant/invalide).
+        """
+        return {}
+
     def post(self, request, pk):
         annonce = get_object_or_404(AnnonceMirror.objects.using('vendor_db'), pk=pk)
         if annonce.statut == AnnonceMirror.Statut.EN_ATTENTE:
+            extra = self.extra_fields(request)
+            if extra is None:
+                return redirect('annonce_moderation_detail', pk=pk)
             annonce.statut = self.nouveau_statut
-            annonce.save(using='vendor_db', update_fields=['statut'])
+            for champ, valeur in extra.items():
+                setattr(annonce, champ, valeur)
+            annonce.save(using='vendor_db', update_fields=['statut', *extra.keys()])
             if self.nouveau_statut == AnnonceMirror.Statut.PUBLIEE:
                 trigger_public_sync.after_response()
         return redirect('annonce_moderation_liste')
@@ -147,6 +184,14 @@ class AnnonceValiderView(_AnnonceActionView):
 
 class AnnonceRefuserView(_AnnonceActionView):
     nouveau_statut = AnnonceMirror.Statut.REFUSEE
+    MOTIFS_VALIDES = {choix[0] for choix in AnnonceMirror.MotifRefus.choices}
+
+    def extra_fields(self, request):
+        motif = request.POST.get('motif')
+        if motif not in self.MOTIFS_VALIDES:
+            messages.error(request, 'Choisissez un motif de refus.')
+            return None
+        return {'motif_refus': motif}
 
 
 class _AnnoncePublishActionView(_StaffRequiredMixin, View):
@@ -183,6 +228,40 @@ class AnnonceActiverMarketplaceView(_AnnoncePublishActionView):
 
 class AnnonceDesactiverMarketplaceView(_AnnoncePublishActionView):
     nouvelle_visibilite = False
+
+
+class AnnonceModifierAdminView(_StaffRequiredMixin, View):
+    """Correction directe d'une annonce en_attente par un modérateur — alternative
+    au Refuser quand le problème est mineur (coquille, prix, description...).
+    """
+    template_name = 'moderation/annonce_modifier.html'
+
+    def get_annonce_ou_rediriger(self, request, pk):
+        annonce = get_object_or_404(AnnonceMirror.objects.using('vendor_db'), pk=pk)
+        if annonce.statut != AnnonceMirror.Statut.EN_ATTENTE:
+            messages.info(request, 'Seules les annonces en attente peuvent être modifiées ici.')
+            return None, redirect('annonce_moderation_detail', pk=pk)
+        return annonce, None
+
+    def get(self, request, pk):
+        annonce, early_return = self.get_annonce_ou_rediriger(request, pk)
+        if early_return:
+            return early_return
+        return render(request, self.template_name, {'form': AnnonceAdminForm(instance=annonce), 'annonce': annonce})
+
+    def post(self, request, pk):
+        annonce, early_return = self.get_annonce_ou_rediriger(request, pk)
+        if early_return:
+            return early_return
+
+        form = AnnonceAdminForm(request.POST, request.FILES, instance=annonce)
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form, 'annonce': annonce})
+
+        annonce = form.save(commit=False)
+        annonce.save(using='vendor_db')
+        messages.success(request, 'Annonce mise à jour.')
+        return redirect('annonce_moderation_detail', pk=pk)
 
 
 class AnnonceCreateAdminView(_StaffRequiredMixin, View):

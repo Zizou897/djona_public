@@ -93,10 +93,21 @@ class AnnonceModerationListViewTest(TestCase):
 
     def test_refuser_change_le_statut(self):
         self.client.force_login(self.admin)
-        response = self.client.post(reverse('annonce_refuser', args=[self.annonce_en_attente.pk]))
+        response = self.client.post(
+            reverse('annonce_refuser', args=[self.annonce_en_attente.pk]),
+            {'motif': AnnonceMirror.MotifRefus.INFOS_INSUFFISANTES},
+        )
         self.assertRedirects(response, reverse('annonce_moderation_liste'))
         self.annonce_en_attente.refresh_from_db(using='vendor_db')
         self.assertEqual(self.annonce_en_attente.statut, AnnonceMirror.Statut.REFUSEE)
+        self.assertEqual(self.annonce_en_attente.motif_refus, AnnonceMirror.MotifRefus.INFOS_INSUFFISANTES)
+
+    def test_refuser_sans_motif_ne_change_pas_le_statut(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse('annonce_refuser', args=[self.annonce_en_attente.pk]))
+        self.assertRedirects(response, reverse('annonce_moderation_detail', args=[self.annonce_en_attente.pk]))
+        self.annonce_en_attente.refresh_from_db(using='vendor_db')
+        self.assertEqual(self.annonce_en_attente.statut, AnnonceMirror.Statut.EN_ATTENTE)
 
     def test_valider_ne_change_pas_le_statut_dun_brouillon(self):
         self.client.force_login(self.admin)

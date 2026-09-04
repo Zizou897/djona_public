@@ -81,6 +81,12 @@ class AnnonceMirror(models.Model):
         MANUELLE = 'manuelle', 'Manuelle'
         AUTOMATIQUE = 'automatique', 'Automatique'
 
+    class MotifRefus(models.TextChoices):
+        INFOS_INSUFFISANTES = 'infos_insuffisantes', 'Informations insuffisantes'
+        MAUVAISES_PHOTOS = 'mauvaises_photos', 'Mauvaises photos'
+        VEHICULE_INTERDIT = 'vehicule_interdit', 'Véhicule interdit'
+        SUSPICION_FRAUDE = 'suspicion_fraude', 'Suspicion de fraude'
+
     vendeur = models.ForeignKey(
         CompteVendeur, on_delete=models.DO_NOTHING, related_name='annonces', db_constraint=False,
     )
@@ -94,6 +100,7 @@ class AnnonceMirror(models.Model):
     couleur = models.CharField(max_length=50)
     description = models.TextField()
     statut = models.CharField(max_length=20, choices=Statut.choices)
+    motif_refus = models.CharField(max_length=30, choices=MotifRefus.choices, blank=True)
     created_at = models.DateTimeField()
     # update_at/publish (colonnes réelles héritées de app.Convention côté vendor) ne
     # sont jamais lues/écrites intentionnellement depuis ce mirror, mais sont NOT NULL

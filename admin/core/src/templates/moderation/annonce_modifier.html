@@ -1,0 +1,95 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Modifier l'annonce — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Modifier' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
+
+<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'annonce_moderation_detail' annonce.pk %}" style="animation-delay:.05s">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour à l'annonce
+</a>
+
+<div class="reveal" style="animation-delay:.08s">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-8">Modifier l'annonce</h1>
+</div>
+
+<p class="reveal text-sm text-on-surface-variant mb-6 -mt-4" style="animation-delay:.1s">
+    {{ annonce.marque }} {{ annonce.modele }} — proposée par {{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }}.
+    Corrigez les informations avant de valider ou refuser.
+</p>
+
+{% if form.non_field_errors %}
+<div class="mb-6 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm flex flex-col gap-1">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+</div>
+{% endif %}
+
+<form method="post" class="reveal bg-surface-container-lowest rounded-2xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 md:p-8 flex flex-col gap-4" style="animation-delay:.14s">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.marque.id_for_label }}">Marque</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.marque.id_for_label }}" name="marque" required type="text" value="{{ form.marque.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.modele.id_for_label }}">Modèle</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.modele.id_for_label }}" name="modele" required type="text" value="{{ form.modele.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.annee.id_for_label }}">Année</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.annee.id_for_label }}" min="1980" name="annee" required type="number" value="{{ form.annee.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.prix.id_for_label }}">Prix (CFA)</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.prix.id_for_label }}" min="0" name="prix" required type="number" value="{{ form.prix.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.kilometrage.id_for_label }}">Kilométrage</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.kilometrage.id_for_label }}" min="0" name="kilometrage" required type="number" value="{{ form.kilometrage.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.couleur.id_for_label }}">Couleur</label>
+            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.couleur.id_for_label }}" name="couleur" required type="text" value="{{ form.couleur.value|default:'' }}">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.carburant.id_for_label }}">Carburant</label>
+            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.carburant.id_for_label }}" name="carburant" required>
+                {% for value, label in form.fields.carburant.choices %}<option value="{{ value }}" {% if form.carburant.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.boite_vitesses.id_for_label }}">Boîte de vitesses</label>
+            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.boite_vitesses.id_for_label }}" name="boite_vitesses" required>
+                {% for value, label in form.fields.boite_vitesses.choices %}<option value="{{ value }}" {% if form.boite_vitesses.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.description.id_for_label }}">Description</label>
+        <textarea class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.description.id_for_label }}" name="description" required rows="4">{{ form.description.value|default:'' }}</textarea>
+    </div>
+
+    <button class="self-end px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-sm" type="submit">Enregistrer les modifications</button>
+</form>
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='annonces' %}
+</div>
+{% endblock %}
