@@ -168,10 +168,20 @@ def seller_detail(request, slug):
     published_vehicles = list(seller.vehicles.filter(publish=True).prefetch_related('images'))
     past_vehicles = list(seller.vehicles.filter(publish=False).prefetch_related('images'))
 
+    favorite_ids = _favorite_vehicle_ids(request)
+    compare_ids = _compare_ids(request)
+    for vehicle in published_vehicles + past_vehicles:
+        vehicle.is_favorite = vehicle.id in favorite_ids
+        vehicle.in_compare = vehicle.id in compare_ids
+
     context = {
         'seller': seller,
         'published_vehicles': published_vehicles,
         'past_vehicles': past_vehicles,
+        'total_listed': len(published_vehicles) + len(past_vehicles),
+        'compare_ids': compare_ids,
+        'compare_count': len(compare_ids),
+        'max_compare': MAX_COMPARE,
     }
     return render(request, 'catalog/seller_detail.html', context)
 

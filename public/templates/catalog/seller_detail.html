@@ -7,75 +7,174 @@
 {% block content %}
 <div class="flex flex-col w-full">
 
+  {# Bannière #}
+  <section class="relative w-full h-40 sm:h-56 bg-primary overflow-hidden" aria-hidden="true">
+    <img src="{% static 'img/hero-banner.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
+    <div class="absolute inset-0 bg-primary/70"></div>
+    <div class="absolute inset-0 opacity-[0.08] pointer-events-none">
+      <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern height="40" id="seller-grid" patternUnits="userSpaceOnUse" width="40">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"></path>
+          </pattern>
+        </defs>
+        <rect fill="url(#seller-grid)" height="100%" width="100%"></rect>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+  </section>
+
   {# En-tête vendeur #}
-  <section class="w-full {% if seller.is_professional %}bg-primary text-on-primary{% else %}bg-surface-container-low{% endif %} px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
-    <div class="max-w-page mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-6">
-      <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl overflow-hidden bg-surface-container-lowest shadow-md flex items-center justify-center">
+  <section class="w-full px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="max-w-page mx-auto -mt-14 sm:-mt-16 relative z-10 flex flex-col sm:flex-row items-center sm:items-end gap-6">
+      <div class="w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-2xl overflow-hidden bg-primary shadow-xl border-4 border-background flex items-center justify-center">
         {% if seller.logo %}
         <img src="{{ seller.logo.url }}" alt="{{ seller.display_name }}" class="w-full h-full object-cover">
         {% else %}
-        <span class="material-symbols-outlined text-primary text-[48px]" aria-hidden="true">
+        <span class="material-symbols-outlined text-on-primary text-[56px]" aria-hidden="true">
           {% if seller.is_professional %}storefront{% else %}person{% endif %}
         </span>
         {% endif %}
       </div>
 
-      <div class="flex-1 text-center sm:text-left">
+      <div class="flex-1 text-center sm:text-left pb-1">
         {% if seller.is_professional %}
         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wide mb-2">
-          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">verified</span>
-          Professionnel
+          <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+          Vendeur Certifié Djona
         </span>
         {% endif %}
-        <h1 class="font-display-lg text-headline-lg">{{ seller.display_name }}</h1>
-        <p class="font-body-md {% if seller.is_professional %}text-primary-fixed-dim/80{% else %}text-on-surface-variant{% endif %} mt-1">
-          Membre depuis {{ seller.member_since|date:"F Y" }}
+        <h1 class="font-display-lg text-headline-lg text-on-background">{{ seller.display_name }}</h1>
+        {% if seller.city %}
+        <p class="inline-flex items-center gap-1 mt-1 font-body-md text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>
+          {{ seller.get_city_display }}
         </p>
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-4 font-label-md text-label-md">
-          {% if seller.phone %}
-          <a href="tel:+225{{ seller.phone }}" class="inline-flex items-center gap-2 {% if seller.is_professional %}text-on-primary{% else %}text-primary{% endif %} hover:underline">
-            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span>
-            {{ seller.phone }}
-          </a>
-          {% endif %}
-          <span class="inline-flex items-center gap-2 {% if seller.is_professional %}text-primary-fixed-dim/80{% else %}text-on-surface-variant{% endif %}">
-            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">directions_car</span>
-            {{ published_vehicles|length }} véhicule{{ published_vehicles|length|pluralize }} en vente
-          </span>
-        </div>
+        {% endif %}
+        {% if seller.phone %}
+        <a href="tel:+225{{ seller.phone }}" class="inline-flex items-center gap-2 mt-1 font-body-md text-on-surface-variant hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span>
+          {{ seller.phone }}
+        </a>
+        {% endif %}
       </div>
     </div>
   </section>
 
-  {# Catalogue publié #}
-  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
-    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Véhicules en vente</h2>
-    {% if published_vehicles %}
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
-      {% for vehicle in published_vehicles %}
-        {% include 'partials/_listing_vehicle_card.html' %}
-      {% endfor %}
+  {# Stats #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-8">
+    <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-outline-variant/30 bg-surface-container-low rounded-2xl overflow-hidden">
+      <div class="p-5 text-center">
+        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">Membre depuis</p>
+        <p class="font-headline-md text-headline-md text-primary">{{ seller.member_since|date:"M Y" }}</p>
+      </div>
+      <div class="p-5 text-center">
+        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">Véhicules en vente</p>
+        <p class="font-headline-md text-headline-md text-primary">{{ published_vehicles|length }}</p>
+      </div>
+      <div class="p-5 text-center">
+        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">Annonces publiées</p>
+        <p class="font-headline-md text-headline-md text-primary">{{ total_listed }}</p>
+      </div>
+      <div class="p-5 text-center">
+        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">Type de compte</p>
+        <p class="font-headline-md text-headline-md text-primary">{{ seller.get_type_compte_display }}</p>
+      </div>
     </div>
-    {% else %}
-    <div class="py-12 flex flex-col items-center gap-3 text-center text-on-surface-variant">
-      <span class="material-symbols-outlined text-outline text-[40px]" aria-hidden="true">directions_car</span>
-      <p>Aucun véhicule en vente actuellement.</p>
-    </div>
-    {% endif %}
   </section>
 
-  {# Historique #}
-  {% if past_vehicles %}
-  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
-    <h2 class="font-headline-lg text-headline-lg text-on-surface-variant mb-2">Historique</h2>
-    <p class="font-body-md text-on-surface-variant mb-6">Annonces précédentes de ce vendeur, plus visibles sur le marketplace.</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter opacity-70">
-      {% for vehicle in past_vehicles %}
-        {% include 'partials/_listing_vehicle_card.html' %}
-      {% endfor %}
+  {# Contenu principal #}
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop py-section-gap grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+
+    <div class="lg:col-span-8 flex flex-col gap-section-gap">
+
+      {% if seller.is_professional %}
+      <div>
+        <div class="flex items-center gap-2 text-secondary mb-3">
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+          <span class="font-label-md text-label-md uppercase tracking-wider">À propos du concessionnaire</span>
+        </div>
+        <div class="bg-surface-container-low border-l-4 border-secondary rounded-md p-6">
+          <p class="font-body-md text-body-md text-on-surface-variant">
+            {{ seller.display_name }} est un vendeur professionnel vérifié par Djona. Chaque véhicule publié sur cette page passe par notre processus d'inspection avant mise en vente, pour garantir la transparence et la sécurité de votre achat.
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Véhicules en vente</h2>
+        {% if published_vehicles %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+          {% for vehicle in published_vehicles %}
+            {% include 'partials/_listing_vehicle_card.html' %}
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="py-12 flex flex-col items-center gap-3 text-center text-on-surface-variant bg-surface-container-low rounded-2xl">
+          <span class="material-symbols-outlined text-outline text-[40px]" aria-hidden="true">directions_car</span>
+          <p>Aucun véhicule en vente actuellement.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if past_vehicles %}
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface-variant mb-2">Historique</h2>
+        <p class="font-body-md text-on-surface-variant mb-6">Annonces précédentes de ce vendeur, plus visibles sur le marketplace.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter opacity-70">
+          {% for vehicle in past_vehicles %}
+            {% include 'partials/_listing_vehicle_card.html' %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </div>
+
+    {# Sidebar #}
+    <div class="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
+      <div class="bg-surface p-6 rounded-md shadow-signature flex flex-col gap-4">
+        <h3 class="font-headline-md text-[18px] text-on-surface">Contactez ce vendeur</h3>
+        {% if seller.phone %}
+        <a href="https://wa.me/225{{ seller.phone }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md hover:brightness-105 transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> Contacter via WhatsApp
+        </a>
+        <a href="tel:+225{{ seller.phone }}" class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md hover:brightness-110 transition-colors">
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span> Appeler le vendeur
+        </a>
+        {% else %}
+        <p class="font-body-md text-on-surface-variant">Coordonnées non disponibles pour ce vendeur.</p>
+        {% endif %}
+
+        <div class="bg-secondary-container/20 border border-secondary/30 rounded-md p-4 flex items-start gap-3">
+          <span class="material-symbols-outlined text-secondary mt-0.5" aria-hidden="true">verified_user</span>
+          <div>
+            <p class="font-label-md text-label-md text-on-surface">Achetez via Djona</p>
+            <p class="font-body-md text-label-sm text-on-surface-variant">Bloquez le véhicule en ligne et sécurisez vos fonds jusqu'à la livraison finale.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-tertiary text-on-tertiary p-6 rounded-md flex flex-col gap-4">
+        <h4 class="font-headline-md text-[18px]">Pourquoi acheter via Djona ?</h4>
+        <ul class="flex flex-col gap-3">
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-tertiary-fixed" aria-hidden="true">check_circle</span>
+            <p class="font-body-md text-label-sm opacity-80">Inspection technique en 150 points</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-tertiary-fixed" aria-hidden="true">check_circle</span>
+            <p class="font-body-md text-label-sm opacity-80">Paiement sécurisé par séquestre</p>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-tertiary-fixed" aria-hidden="true">check_circle</span>
+            <p class="font-body-md text-label-sm opacity-80">Accompagnement jusqu'à l'immatriculation</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </section>
-  {% endif %}
 
 </div>
 {% endblock %}

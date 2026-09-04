@@ -84,6 +84,7 @@ class Command(BaseCommand):
                 'phone': vendeur.telephone,
                 'type_compte': vendeur.type_compte,
                 'company_name': profil.raison_sociale if profil else '',
+                'city': profil.ville if profil else '',
                 'member_since': vendeur.date_joined,
             },
         )

@@ -30,6 +30,7 @@ class ProfilMirror(models.Model):
     user = models.OneToOneField(
         VendeurMirror, on_delete=models.DO_NOTHING, related_name='profil', db_constraint=False,
     )
+    ville = models.CharField(max_length=30, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     raison_sociale = models.CharField(max_length=150, blank=True)
 

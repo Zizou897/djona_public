@@ -27,12 +27,20 @@ class Seller(models.Model):
         PARTICULIER = 'particulier', 'Particulier'
         PROFESSIONNEL = 'professionnel', 'Professionnel'
 
+    class Ville(models.TextChoices):
+        ABIDJAN_COCODY = 'abidjan_cocody', 'Abidjan, Cocody'
+        ABIDJAN_MARCORY = 'abidjan_marcory', 'Abidjan, Marcory'
+        ABIDJAN_KOUMASSI = 'abidjan_koumassi', 'Abidjan, Koumassi'
+        YAMOUSSOUKRO = 'yamoussoukro', 'Yamoussoukro'
+        BOUAKE = 'bouake', 'Bouaké'
+
     source_vendeur_id = models.PositiveIntegerField(unique=True)
     first_name = models.CharField('prénom', max_length=100)
     last_name = models.CharField('nom', max_length=100)
     phone = models.CharField('téléphone', max_length=10, blank=True)
     type_compte = models.CharField(max_length=20, choices=TypeCompte.choices, default=TypeCompte.PARTICULIER)
     company_name = models.CharField('raison sociale', max_length=150, blank=True)
+    city = models.CharField('ville', max_length=30, choices=Ville.choices, blank=True)
     logo = models.ImageField('logo', upload_to='sellers/', blank=True, null=True)
     member_since = models.DateTimeField('membre depuis')
     slug = models.SlugField('slug', max_length=180, unique=True, blank=True)
