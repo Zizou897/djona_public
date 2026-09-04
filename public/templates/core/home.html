@@ -22,6 +22,8 @@
 
   {# Hero #}
   <section class="relative w-full min-h-[85vh] sm:min-h-screen overflow-hidden bg-primary pt-28 pb-20 sm:pt-36 sm:pb-28 lg:py-32 flex flex-col items-center justify-center -mt-20">
+    <img src="{% static 'img/hero-banner.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover" aria-hidden="true">
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/55 to-primary/35" aria-hidden="true"></div>
     <div class="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
       <div class="absolute top-0 right-0 w-72 sm:w-96 h-72 sm:h-96 bg-secondary-container rounded-full blur-[90px] sm:blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
       <div class="absolute bottom-0 left-0 w-60 sm:w-80 h-60 sm:h-80 bg-primary-fixed-dim rounded-full blur-[80px] sm:blur-[100px] translate-y-1/2 -translate-x-1/4"></div>
@@ -33,7 +35,7 @@
       <h1 class="animate-slide-up-2 font-display-lg text-3xl sm:text-4xl lg:text-display-lg text-on-primary mb-4 sm:mb-gutter max-w-4xl mx-auto leading-tight sm:leading-tight">
         Achetez, vendez et gérez votre véhicule <span class="text-secondary-container">simplement</span> avec Djona
       </h1>
-      <p class="animate-slide-up-3 font-body-lg text-base sm:text-body-lg text-primary-fixed-dim/80 mb-8 sm:mb-12 max-w-2xl mx-auto px-2">
+      <p class="animate-slide-up-3 font-body-lg text-base sm:text-body-lg text-on-primary mb-8 sm:mb-12 max-w-2xl mx-auto px-2 [text-shadow:0_2px_10px_rgba(0,0,0,0.6)]">
         La première plateforme sécurisée qui vous accompagne de l'inspection à l'immatriculation pour une sérénité totale.
       </p>
 
@@ -221,7 +223,7 @@
         </div>
         <div class="hidden lg:block relative">
           <div class="absolute inset-0 bg-secondary-container/20 blur-3xl rounded-full scale-75" aria-hidden="true"></div>
-          <img src="{% static 'img/sell-cta-placeholder.svg' %}" alt="Illustration Djona Vendre" class="relative z-10 w-full h-auto rounded-2xl shadow-2xl">
+          <img src="{% static 'img/sell-cta.jpg' %}" alt="Illustration Djona Vendre" class="relative z-10 w-full h-auto rounded-2xl shadow-2xl">
         </div>
       </div>
     </div>
