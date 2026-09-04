@@ -144,6 +144,7 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
         with transaction.atomic():
             annonce = form.save(commit=False)
             annonce.statut = Annonce.Statut.BROUILLON
+            annonce.motif_refus = ''
             annonce.save()
 
         if etait_publiee:

@@ -210,6 +210,9 @@
                                 <a class="px-3 py-2 rounded-lg border border-outline-variant text-on-surface-variant text-xs font-bold hover:bg-surface-container transition-colors" href="{% url 'annonce_modifier' annonce.pk %}">Modifier</a>
                             </form>
                             {% elif annonce.statut == 'refusee' %}
+                            {% if annonce.motif_refus %}
+                            <p class="text-[11px] text-error font-semibold">Motif : {{ annonce.get_motif_refus_display }}</p>
+                            {% endif %}
                             <a class="block text-center px-3 py-2 rounded-lg border border-primary text-primary text-xs font-bold hover:bg-primary/5 transition-colors" href="{% url 'annonce_modifier' annonce.pk %}">Corriger et republier</a>
                             {% elif annonce.statut == 'en_attente' %}
                             <p class="text-center text-xs text-on-surface-variant py-2">En cours de vérification par Djona</p>

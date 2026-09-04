@@ -21,6 +21,12 @@ class Annonce(Convention):
         MANUELLE = 'manuelle', 'Manuelle'
         AUTOMATIQUE = 'automatique', 'Automatique'
 
+    class MotifRefus(models.TextChoices):
+        INFOS_INSUFFISANTES = 'infos_insuffisantes', 'Informations insuffisantes'
+        MAUVAISES_PHOTOS = 'mauvaises_photos', 'Mauvaises photos'
+        VEHICULE_INTERDIT = 'vehicule_interdit', 'Véhicule interdit'
+        SUSPICION_FRAUDE = 'suspicion_fraude', 'Suspicion de fraude'
+
     vendeur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='annonces')
     marque = models.CharField(max_length=80)
     modele = models.CharField(max_length=80)
@@ -32,6 +38,7 @@ class Annonce(Convention):
     couleur = models.CharField(max_length=50)
     description = models.TextField()
     statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.BROUILLON, db_index=True)
+    motif_refus = models.CharField(max_length=30, choices=MotifRefus.choices, blank=True)
 
     class Meta:
         db_table = 'annonces'
