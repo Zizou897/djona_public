@@ -16,13 +16,6 @@
       <a href="{% url 'catalog:list' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
-      <a href="{% url 'catalog:favorites' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:favorites' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:favorites' %}aria-current="page"{% endif %}>Favoris</a>
-      <a href="{% url 'catalog:compare' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
-
       <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
@@ -63,13 +56,6 @@
       <a href="{% url 'catalog:list' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
-      <a href="{% url 'catalog:favorites' %}"
-         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:favorites' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:favorites' %}aria-current="page"{% endif %}>Mes Favoris</a>
-      <a href="{% url 'catalog:compare' %}"
-         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:compare' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:compare' %}aria-current="page"{% endif %}>Comparateur</a>
-
       <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"

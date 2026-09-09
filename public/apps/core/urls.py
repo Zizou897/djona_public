@@ -12,4 +12,5 @@ urlpatterns = [
     path('cgu/', views.terms, name='terms'),
     path('conditions-vendeurs/', views.seller_terms, name='seller_terms'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('newsletter/', views.newsletter_subscribe, name='newsletter_subscribe'),
 ]

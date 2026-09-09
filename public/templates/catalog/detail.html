@@ -77,7 +77,6 @@
             <span class="bg-surface/90 backdrop-blur-md text-on-surface px-3 py-1 rounded-full font-label-md text-label-sm shadow-md">Vérifié par Djona</span>
             {% endif %}
           </div>
-          {% include 'partials/_favorite_button.html' with is_favorite=vehicle.is_favorite %}
         </div>
 
         {% if vehicle.images.all|length > 1 %}
@@ -98,11 +97,11 @@
         <div class="bg-surface p-6 rounded-md shadow-md flex flex-col gap-4">
           <div class="flex flex-col">
             <span class="animate-slide-up-1 font-label-md text-on-surface-variant uppercase tracking-tighter">{{ vehicle.brand }}</span>
-            <h1 class="animate-slide-up-2 font-display-lg text-headline-lg lg:text-display-lg text-on-surface leading-tight">{{ vehicle.model_name }}</h1>
+            <h1 class="animate-slide-up-2 font-display-lg text-[26px] text-on-surface leading-tight">{{ vehicle.model_name }}</h1>
           </div>
           <div class="flex items-baseline gap-2">
-            <span class="font-display-lg text-primary text-headline-lg lg:text-display-lg">{{ vehicle.price }}</span>
-            <span class="font-headline-md text-primary text-[20px]">FCFA</span>
+            <span class="font-display-lg text-primary text-[26px]">{{ vehicle.price }}</span>
+            <span class="font-headline-md text-primary text-[16px]">FCFA</span>
           </div>
           <div class="flex items-center gap-3 py-4 border-y border-outline-variant/30">
             <div class="flex flex-col items-center flex-1">
@@ -133,7 +132,6 @@
                 <span>Démarrer l'achat sécurisé</span>
                 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
               </a>
-              {% include 'partials/_compare_button.html' with vehicle=vehicle in_compare=vehicle.in_compare compare_count=compare_count max_compare=max_compare %}
             </div>
 
             <div class="p-5 rounded-md bg-surface-container-highest/50 flex flex-col gap-3">
@@ -325,6 +323,8 @@
     </div>
   </section>
   {% endif %}
+
+  {% include 'partials/_partners_band.html' %}
 
 </div>
 {% endblock %}

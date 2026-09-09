@@ -1,7 +1,16 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.contrib import messages
+from django.core.cache import cache
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from apps.catalog.models import Vehicle
+
+from .forms import NewsletterForm
+from .models import NewsletterSubscriber
+
+NEWSLETTER_RATE_LIMIT = 5
+NEWSLETTER_RATE_WINDOW = 600  # secondes (10 min)
 
 HOME_STATS = [
     {'end': 1450, 'suffix': '+', 'label': 'Véhicules vendus'},
@@ -16,7 +25,7 @@ def home(request):
     _mockups/01_public/desktop/djona_accueil/code.html.
     """
     context = {
-        'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:6],
+        'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:8],
         'stats': HOME_STATS,
         'search_brands': Vehicle.objects.filter(publish=True).values_list('brand', flat=True).distinct().order_by('brand'),
         'search_cities': Vehicle.objects.filter(publish=True).values_list('city', flat=True).distinct().order_by('city'),
@@ -89,3 +98,56 @@ def robots_txt(request):
         f'Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml',
     ]
     return HttpResponse('\n'.join(lines), content_type='text/plain')
+
+
+def _client_ip(request):
+    # X-Real-IP posé par nginx en prod (voir deploy/nginx/djona.tech.conf) —
+    # plus fiable que X-Forwarded-For, qu'un client peut usurper directement
+    # s'il n'est pas nettoyé. REMOTE_ADDR suffit en local (pas de proxy).
+    return request.META.get('HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR', 'unknown')
+
+
+@require_POST
+def newsletter_subscribe(request):
+    """Inscription newsletter — formulaire dans le footer, présent sur toutes
+    les pages. Répond en JSON pour l'appel fetch() du footer (static/js/newsletter.js,
+    popup SweetAlert2 + pas de rechargement) ; retombe sur une redirection classique
+    avec django.contrib.messages si JS est désactivé.
+
+    Rate-limité par IP (cache partagé entre workers gunicorn, voir CACHES dans
+    settings) pour empêcher un script de spammer la table des abonnés.
+    """
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    cache_key = f'newsletter-subscribe:{_client_ip(request)}'
+    attempts = cache.get(cache_key, 0)
+    if attempts >= NEWSLETTER_RATE_LIMIT:
+        status, message = 'error', 'Trop de tentatives — réessayez dans quelques minutes.'
+        if is_ajax:
+            return JsonResponse({'status': status, 'message': message}, status=429)
+        messages.error(request, message)
+        return redirect(request.META.get('HTTP_REFERER') or 'core:home')
+    cache.set(cache_key, attempts + 1, NEWSLETTER_RATE_WINDOW)
+
+    form = NewsletterForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+        was_inactive = not subscriber.is_active
+        if was_inactive:
+            subscriber.is_active = True
+            subscriber.save(update_fields=['is_active'])
+
+        if created or was_inactive:
+            status, message = 'success', 'Merci ! Vous êtes désormais abonné à la newsletter Djona.'
+        else:
+            status, message = 'info', 'Vous êtes déjà abonné avec cette adresse.'
+    else:
+        status, message = 'error', "Adresse email invalide — vérifiez et réessayez."
+
+    if is_ajax:
+        return JsonResponse({'status': status, 'message': message})
+
+    getattr(messages, status)(request, message)
+    referer = request.META.get('HTTP_REFERER')
+    return redirect(referer or 'core:home')

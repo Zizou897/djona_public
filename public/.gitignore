@@ -221,6 +221,7 @@ __marimo__/
 # Django
 /media_cdn/
 /static_cdn/
+/cache_framework/
 *.sqlite3
 
 # Node / Tailwind

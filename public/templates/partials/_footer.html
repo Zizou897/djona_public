@@ -2,6 +2,19 @@
 {# Footer public — porté depuis _mockups/01_public/desktop/djona_accueil/code.html #}
 <footer class="print:hidden w-full bg-primary text-on-primary py-section-gap mt-section-gap">
   <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+
+    <div class="pb-section-gap mb-section-gap border-b border-on-primary/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div>
+        <h4 class="font-headline-md text-[20px]">Restez informé</h4>
+        <p class="font-body-md text-label-md opacity-70 mt-1 max-w-md">Nouvelles annonces, conseils d'achat et offres exclusives, directement dans votre boîte mail.</p>
+      </div>
+      <form id="newsletter-form" action="{% url 'core:newsletter_subscribe' %}" method="post" class="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+        {% csrf_token %}
+        <input type="email" name="email" required placeholder="Votre adresse email" class="w-full sm:w-72 px-4 py-3 rounded-md bg-white/10 border border-white/20 text-on-primary placeholder:text-on-primary/50 focus:outline-none focus:ring-2 focus:ring-secondary">
+        <button type="submit" class="px-6 py-3 bg-secondary text-on-secondary rounded-md font-label-md text-label-md hover:brightness-110 transition-all whitespace-nowrap">S'abonner</button>
+      </form>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-4 gap-section-gap">
 
       <div class="flex flex-col gap-gutter">
@@ -24,7 +37,6 @@
         <h4 class="font-headline-md text-[18px] uppercase tracking-wider">Marketplace</h4>
         <ul class="flex flex-col gap-2 font-body-md text-label-md opacity-70">
           <li><a href="{% url 'catalog:list' %}" class="hover:text-secondary-fixed transition-colors">Acheter</a></li>
-          <li><a href="{% url 'catalog:compare' %}" class="hover:text-secondary-fixed transition-colors">Comparateur</a></li>
           <li><a href="https://vendor.djona.tech/" class="hover:text-secondary-fixed transition-colors">Vendre</a></li>
           <li><a href="{% url 'core:contact' %}#faq" class="hover:text-secondary-fixed transition-colors">F.A.Q</a></li>
         </ul>

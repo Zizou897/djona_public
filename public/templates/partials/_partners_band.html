@@ -1,0 +1,31 @@
+{% comment %}
+Bandeau "Ils nous font confiance" — attend `active_partners` dans le contexte
+(injecté globalement par apps.core.context_processors.active_partners).
+Affiché juste avant le footer sur l'accueil, le catalogue et la fiche véhicule.
+{% endcomment %}
+{% if active_partners %}
+<section class="reveal w-full pt-section-gap pb-section-gap -mb-section-gap bg-surface-container-low">
+  <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="flex items-center justify-center gap-3 text-secondary mb-10">
+      <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+      <span class="font-label-md text-label-md uppercase tracking-wider">Ils nous font confiance</span>
+      <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+    </div>
+    <div class="flex flex-wrap items-center justify-center gap-gutter">
+      {% for partner in active_partners %}
+        {% if partner.website_url %}
+        <a href="{{ partner.website_url }}" target="_blank" rel="noopener" title="{{ partner.name }}"
+           class="group flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-2xl shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 w-auto object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
+        </a>
+        {% else %}
+        <div title="{{ partner.name }}"
+             class="group flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-2xl shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 w-auto object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

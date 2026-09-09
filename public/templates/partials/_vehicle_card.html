@@ -10,38 +10,38 @@ Carte véhicule "vitrine" (accueil) — attend une variable `vehicle` (instance 
     {% endwith %}
 
     {% if vehicle.is_verified %}
-    <div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-      <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+    <div class="absolute top-3 left-3 bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full font-label-sm text-[10px] flex items-center gap-1">
+      <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
       Inspecté par Djona
     </div>
     {% endif %}
 
-    <div class="absolute bottom-4 right-4 bg-primary/80 backdrop-blur-md text-on-primary px-3 py-1 rounded font-label-md text-label-md">
+    <div class="absolute bottom-3 right-3 bg-primary/80 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[11px]">
       {{ vehicle.get_condition_display }}
     </div>
   </div>
 
-  <div class="p-6 flex flex-col flex-grow">
-    <div class="flex justify-between items-start mb-2">
-      <h4 class="font-headline-md text-headline-md text-on-surface truncate">{{ vehicle.brand }} {{ vehicle.model_name }}</h4>
-      <span class="font-headline-md text-headline-md text-secondary whitespace-nowrap">{{ vehicle.price }} FCFA</span>
+  <div class="p-4 flex flex-col flex-grow">
+    <div class="flex justify-between items-start gap-2 mb-1">
+      <h4 class="font-headline-md text-[14px] leading-tight text-on-surface truncate">{{ vehicle.brand }} {{ vehicle.model_name }}</h4>
+      <span class="font-headline-md text-[14px] leading-tight text-secondary whitespace-nowrap">{{ vehicle.price }} FCFA</span>
     </div>
-    <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm mb-6">
-      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>
+    <div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-[11px] mb-3">
+      <span class="material-symbols-outlined text-[14px]" aria-hidden="true">location_on</span>
       {{ vehicle.city }}
     </div>
-    <div class="grid grid-cols-3 gap-2 border-t border-surface-variant pt-6">
-      <div class="flex flex-col items-center gap-1">
-        <span class="material-symbols-outlined text-primary/60" aria-hidden="true">calendar_today</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.year|stringformat:"d" }}</span>
+    <div class="grid grid-cols-3 gap-1 border-t border-surface-variant pt-3">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="material-symbols-outlined text-[16px] text-primary/60" aria-hidden="true">calendar_today</span>
+        <span class="font-label-sm text-[10px] text-on-surface-variant">{{ vehicle.year|stringformat:"d" }}</span>
       </div>
-      <div class="flex flex-col items-center gap-1">
-        <span class="material-symbols-outlined text-primary/60" aria-hidden="true">speed</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.mileage }} km</span>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="material-symbols-outlined text-[16px] text-primary/60" aria-hidden="true">speed</span>
+        <span class="font-label-sm text-[10px] text-on-surface-variant">{{ vehicle.mileage }} km</span>
       </div>
-      <div class="flex flex-col items-center gap-1">
-        <span class="material-symbols-outlined text-primary/60" aria-hidden="true">settings</span>
-        <span class="font-label-sm text-on-surface-variant">{{ vehicle.get_transmission_display }}</span>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="material-symbols-outlined text-[16px] text-primary/60" aria-hidden="true">settings</span>
+        <span class="font-label-sm text-[10px] text-on-surface-variant">{{ vehicle.get_transmission_display }}</span>
       </div>
     </div>
   </div>

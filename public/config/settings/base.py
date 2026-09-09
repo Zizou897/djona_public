@@ -57,6 +57,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_processors.active_partners',
             ],
         },
     },
@@ -90,5 +91,16 @@ MEDIA_ROOT = BASE_DIR / 'media_cdn'
 # accepté par nginx peut quand même être rejeté par Django avant nginx.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
+
+# Cache basé fichiers plutôt que LocMemCache (par défaut) : LocMemCache est
+# propre à chaque processus, donc un rate-limit ne serait pas partagé entre les
+# workers gunicorn en prod. FileBasedCache est partagé (simples fichiers sur
+# disque) sans dépendance supplémentaire (Redis/Memcached).
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR / 'cache_framework',
+    }
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
