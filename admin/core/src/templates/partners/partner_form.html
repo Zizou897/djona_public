@@ -1,0 +1,78 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}{% if partner %}Modifier{% else %}Ajouter{% endif %} un partenaire — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Partenaires' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='partenaires' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-2xl">
+
+<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'partner_liste' %}" style="animation-delay:.05s">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour à la liste
+</a>
+
+<div class="reveal" style="animation-delay:.08s">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Contenu du site</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-8">{% if partner %}Modifier{% else %}Ajouter{% endif %} un partenaire</h1>
+</div>
+
+{% if form.non_field_errors %}
+<div class="mb-6 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm flex flex-col gap-1">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="reveal bg-surface-container-lowest rounded-2xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 md:p-8 flex flex-col gap-4" style="animation-delay:.14s">
+    {% csrf_token %}
+
+    <div class="flex flex-col gap-1">
+        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.name.id_for_label }}">Nom du partenaire</label>
+        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.name.id_for_label }}" name="name" required type="text" value="{{ form.name.value|default:'' }}">
+        {% if form.name.errors %}<p class="text-[11px] text-error">{{ form.name.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.logo.id_for_label }}">Logo</label>
+        {% if partner.logo %}
+        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="h-12 w-auto max-w-[160px] object-contain bg-surface-container-low rounded-lg p-2">
+        {% endif %}
+        <input accept="image/*" class="w-full text-sm" id="{{ form.logo.id_for_label }}" name="logo" type="file" {% if not partner %}required{% endif %}>
+        {% if form.logo.errors %}<p class="text-[11px] text-error">{{ form.logo.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.website_url.id_for_label }}">Site web <span class="text-on-surface-variant/70">(optionnel)</span></label>
+        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.website_url.id_for_label }}" name="website_url" placeholder="https://…" type="url" value="{{ form.website_url.value|default:'' }}">
+        {% if form.website_url.errors %}<p class="text-[11px] text-error">{{ form.website_url.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.order.id_for_label }}">Ordre d'affichage</label>
+        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.order.id_for_label }}" min="0" name="order" type="number" value="{{ form.order.value|default:0 }}">
+        <p class="text-[11px] text-on-surface-variant">Les partenaires s'affichent du plus petit au plus grand.</p>
+    </div>
+
+    <label class="flex items-center gap-3 cursor-pointer">
+        <input class="w-5 h-5 accent-primary" id="{{ form.publish.id_for_label }}" name="publish" type="checkbox" {% if form.publish.value|default:True %}checked{% endif %}>
+        <span class="font-label-md text-sm text-on-surface">Actif (affiché sur le site)</span>
+    </label>
+
+    <button class="self-end px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-sm" type="submit">{% if partner %}Enregistrer{% else %}Ajouter le partenaire{% endif %}</button>
+</form>
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='partenaires' %}
+</div>
+{% endblock %}

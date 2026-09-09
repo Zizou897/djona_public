@@ -1,0 +1,93 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Newsletter — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Newsletter' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='newsletter' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+
+<div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" style="animation-delay:.05s">
+    <div>
+        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Contenu du site</span>
+        <h1 class="font-display-lg text-display-lg text-primary">Newsletter</h1>
+        <p class="text-sm text-on-surface-variant mt-2">{{ nb_total }} abonné{{ nb_total|pluralize }} inscrit{{ nb_total|pluralize }} via le formulaire du footer public.</p>
+    </div>
+    <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'newsletter_subscriber_export' %}">
+        <span class="material-symbols-outlined text-[20px]">download</span>
+        Exporter en CSV
+    </a>
+</div>
+
+{% if messages %}
+<div class="reveal mb-6 flex flex-col gap-2" style="animation-delay:.08s">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm font-medium">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
+<div class="hidden lg:block overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Email</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Inscrit le</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+{% for subscriber in subscribers %}
+<tr class="hover:bg-surface transition-colors">
+<td class="px-6 py-4 font-label-md text-label-md">{{ subscriber.email }}</td>
+<td class="px-6 py-4 text-on-surface-variant">{{ subscriber.created_at|date:'d/m/Y H:i' }}</td>
+<td class="px-6 py-4 text-right">
+<form action="{% url 'newsletter_subscriber_supprimer' subscriber.pk %}" method="post" onsubmit="return confirm('Retirer cet abonné de la newsletter ?');" class="inline">
+{% csrf_token %}
+<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Retirer</button>
+</form>
+</td>
+</tr>
+{% empty %}
+<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="3">Aucun abonné pour le moment.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<!-- Cartes : mobile/tablette uniquement (< lg) -->
+<div class="lg:hidden flex flex-col divide-y divide-surface-container">
+{% for subscriber in subscribers %}
+<div class="p-4 flex items-center justify-between gap-3">
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">{{ subscriber.email }}</p>
+<p class="text-[11px] text-on-surface-variant">{{ subscriber.created_at|date:'d/m/Y H:i' }}</p>
+</div>
+<form action="{% url 'newsletter_subscriber_supprimer' subscriber.pk %}" method="post" onsubmit="return confirm('Retirer cet abonné de la newsletter ?');">
+{% csrf_token %}
+<button class="px-3 py-2 rounded-lg border border-error text-error text-xs font-bold hover:bg-error-container/20 transition-colors" type="submit">Retirer</button>
+</form>
+</div>
+{% empty %}
+<div class="p-8 text-center text-on-surface-variant">Aucun abonné pour le moment.</div>
+{% endfor %}
+</div>
+</div>
+
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='newsletter' %}
+</div>
+{% endblock %}

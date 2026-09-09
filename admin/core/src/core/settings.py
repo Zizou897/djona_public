@@ -39,6 +39,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'app',
     'moderation',
+    'partners',
+    'newsletter',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -192,6 +194,13 @@ MEDIA_ROOT = BASE_DIR / 'media_cdn'
 #     (chemin relatif depuis admin/core/src)
 #   - Linux (VPS de prod — admin et vendor partagent le même serveur) :
 #     ln -s /chemin/absolu/vers/vendor/core/src/media_cdn/annonces media_cdn/annonces
+#
+# Même principe pour les logos partenaires (partners.PartnerMirror, référencés via
+# public_db) : media_cdn/partners/ de ce projet doit être un lien vers celui du
+# projet public (public/media_cdn/partners/).
+#   - Windows (dev local) : mklink /J media_cdn\partners ..\..\..\public\media_cdn\partners
+#   - Linux (VPS de prod — admin et public partagent le même serveur) :
+#     ln -s /chemin/absolu/vers/public/media_cdn/partners media_cdn/partners
 
 # Doit rester alignée avec client_max_body_size (nginx) — sinon un fichier
 # accepté par nginx peut quand même être rejeté par Django avant nginx.
