@@ -1,9 +1,19 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from annonces.models import Annonce
 from .forms import ConnexionForm, InscriptionForm
-from .models import Utilisateur
+from .models import Profil, Utilisateur
+
+# Le plus petit PNG valide possible (1x1 pixel transparent) — nécessaire pour
+# que la validation Pillow (forms.ImageField) accepte le fichier comme une
+# vraie image.
+PNG_1PX = (
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06'
+    b'\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00'
+    b'\x01\r\n\x2d\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+)
 
 
 class UtilisateurModelTest(TestCase):
@@ -93,6 +103,47 @@ class InscriptionFormTest(TestCase):
         form = InscriptionForm(data=self.valid_data(telephone='abc'))
         self.assertFalse(form.is_valid())
         self.assertIn('telephone', form.errors)
+
+    def test_professionnel_requiert_raison_sociale_rccm_et_adresse(self):
+        form = InscriptionForm(data=self.valid_data(type_compte=Utilisateur.TypeCompte.PROFESSIONNEL))
+        self.assertFalse(form.is_valid())
+        self.assertIn('raison_sociale', form.errors)
+        self.assertIn('numero_rccm', form.errors)
+        self.assertIn('adresse', form.errors)
+
+    def test_professionnel_valide_cree_un_profil_non_verifie(self):
+        form = InscriptionForm(data=self.valid_data(
+            type_compte=Utilisateur.TypeCompte.PROFESSIONNEL,
+            raison_sociale='Ivoire Auto Prestige SARL',
+            numero_rccm='CI-ABJ-2026-B-12345',
+            adresse='Boulevard VGE, Marcory, Abidjan',
+        ))
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        profil = Profil.objects.get(user=user)
+        self.assertEqual(profil.raison_sociale, 'Ivoire Auto Prestige SARL')
+        self.assertEqual(profil.numero_rccm, 'CI-ABJ-2026-B-12345')
+        self.assertEqual(profil.adresse, 'Boulevard VGE, Marcory, Abidjan')
+        self.assertFalse(profil.entreprise_verifiee)
+
+    def test_professionnel_avec_logo_enregistre_lavatar(self):
+        logo = SimpleUploadedFile('logo.png', PNG_1PX, content_type='image/png')
+        form = InscriptionForm(data=self.valid_data(
+            type_compte=Utilisateur.TypeCompte.PROFESSIONNEL,
+            raison_sociale='Ivoire Auto Prestige SARL',
+            numero_rccm='CI-ABJ-2026-B-12345',
+            adresse='Boulevard VGE, Marcory, Abidjan',
+        ), files={'logo': logo})
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        profil = Profil.objects.get(user=user)
+        self.assertTrue(profil.avatar)
+
+    def test_particulier_ne_cree_pas_de_profil(self):
+        form = InscriptionForm(data=self.valid_data())
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertFalse(Profil.objects.filter(user=user).exists())
 
 
 class ConnexionFormTest(TestCase):

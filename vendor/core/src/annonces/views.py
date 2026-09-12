@@ -24,6 +24,15 @@ class _CompteActifRequisMixin(LoginRequiredMixin):
             else:
                 messages.info(request, "Votre compte doit être activé pour gérer des annonces.")
             return redirect('tableau_de_bord_vendeur')
+
+        if request.user.is_authenticated and request.method != 'GET':
+            # Un membre d'équipe en rôle « lecture seule » peut consulter le
+            # stock du titulaire mais pas le modifier.
+            rattachement = getattr(request.user, 'rattachement_pro', None)
+            if rattachement and rattachement.actif and rattachement.role == 'lecture_seule':
+                messages.error(request, "Votre rôle « Lecture seule » ne permet pas cette action.")
+                return redirect('mes_annonces')
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -40,7 +49,7 @@ class AnnonceCreateView(_CompteActifRequisMixin, View):
 
         with transaction.atomic():
             annonce = form.save(commit=False)
-            annonce.vendeur = request.user
+            annonce.vendeur = request.user.compte_stock
             action = request.POST.get('action')
             annonce.statut = Annonce.Statut.EN_ATTENTE if action == 'soumettre' else Annonce.Statut.BROUILLON
             annonce.save()
@@ -48,7 +57,14 @@ class AnnonceCreateView(_CompteActifRequisMixin, View):
             for index, photo in enumerate(request.FILES.getlist('photos')):
                 AnnoncePhoto.objects.create(annonce=annonce, image=photo, ordre=index)
 
-        messages.success(request, 'Annonce enregistrée avec succès.')
+        if annonce.statut == Annonce.Statut.EN_ATTENTE:
+            messages.success(
+                request,
+                "Annonce envoyée — elle est en cours de vérification par l'équipe Djona "
+                "pour un délai de 48h maximum.",
+            )
+        else:
+            messages.success(request, 'Annonce enregistrée en brouillon.')
         return redirect(reverse('mes_annonces'))
 
 
@@ -65,7 +81,7 @@ class MesAnnoncesListView(_CompteActifRequisMixin, ListView):
     STATUTS_VALIDES = {choix[0] for choix in Annonce.Statut.choices}
 
     def toutes_les_annonces(self):
-        return Annonce.objects.filter(vendeur=self.request.user)
+        return Annonce.objects.filter(vendeur=self.request.user.compte_stock)
 
     def get_queryset(self):
         annonces = self.toutes_les_annonces()
@@ -100,11 +116,15 @@ class AnnoncePublierView(_CompteActifRequisMixin, View):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, pk):
-        annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user)
+        annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user.compte_stock)
         if annonce.statut == Annonce.Statut.BROUILLON:
             annonce.statut = Annonce.Statut.EN_ATTENTE
             annonce.save(update_fields=['statut'])
-            messages.success(request, 'Annonce soumise pour validation.')
+            messages.success(
+                request,
+                "Annonce envoyée — elle est en cours de vérification par l'équipe Djona "
+                "pour un délai de 48h maximum.",
+            )
         return redirect('mes_annonces')
 
 
@@ -113,7 +133,7 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
     statuts_modifiables = (Annonce.Statut.BROUILLON, Annonce.Statut.REFUSEE, Annonce.Statut.PUBLIEE)
 
     def get_annonce(self, request, pk):
-        return get_object_or_404(Annonce, pk=pk, vendeur=request.user)
+        return get_object_or_404(Annonce, pk=pk, vendeur=request.user.compte_stock)
 
     def get_annonce_ou_rediriger(self, request, pk):
         """Retourne (annonce, None) si modifiable, ou (None, redirect_response) sinon."""
@@ -169,7 +189,7 @@ class AnnonceDeleteView(_CompteActifRequisMixin, View):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, pk):
-        annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user)
+        annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user.compte_stock)
         etait_publiee = annonce.statut == Annonce.Statut.PUBLIEE
         annonce.delete()
 

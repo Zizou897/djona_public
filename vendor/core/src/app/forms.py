@@ -11,6 +11,13 @@ class InscriptionForm(forms.ModelForm):
         label="J'accepte les conditions d'utilisation et la politique de confidentialité.",
         error_messages={'required': "Vous devez accepter les conditions d'utilisation pour continuer."},
     )
+    # Champs "Entreprise" — appartiennent à Profil (pas à Utilisateur), donc
+    # déclarés ici à la main plutôt que via Meta.fields. Obligatoires
+    # uniquement si type_compte == professionnel (voir clean()).
+    raison_sociale = forms.CharField(label='Raison sociale', max_length=150, required=False)
+    numero_rccm = forms.CharField(label='Numéro RCCM', max_length=50, required=False)
+    adresse = forms.CharField(label='Adresse du showroom / point de vente', max_length=255, required=False)
+    logo = forms.ImageField(label='Logo de l\'entreprise', required=False)
 
     class Meta:
         model = Utilisateur
@@ -38,6 +45,12 @@ class InscriptionForm(forms.ModelForm):
                 password_validation.validate_password(password, user=candidat)
             except forms.ValidationError as error:
                 self.add_error('password', error)
+
+        if cleaned_data.get('type_compte') == Utilisateur.TypeCompte.PROFESSIONNEL:
+            for field in ('raison_sociale', 'numero_rccm', 'adresse'):
+                if not cleaned_data.get(field):
+                    self.add_error(field, 'Champ obligatoire pour un compte entreprise.')
+
         return cleaned_data
 
     def save(self, commit=True):
@@ -45,6 +58,16 @@ class InscriptionForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
+            if user.type_compte == Utilisateur.TypeCompte.PROFESSIONNEL:
+                Profil.objects.update_or_create(
+                    user=user,
+                    defaults={
+                        'raison_sociale': self.cleaned_data['raison_sociale'],
+                        'numero_rccm': self.cleaned_data['numero_rccm'],
+                        'adresse': self.cleaned_data['adresse'],
+                        'avatar': self.cleaned_data.get('logo') or None,
+                    },
+                )
         return user
 
 
@@ -104,7 +127,7 @@ class ProfilForm(forms.ModelForm):
     class Meta:
         model = Profil
         fields = [
-            'ville', 'avatar', 'raison_sociale',
+            'ville', 'avatar', 'raison_sociale', 'numero_rccm', 'justificatif_rccm', 'adresse',
             'two_factor_enabled', 'langue', 'notif_email', 'notif_whatsapp',
         ]
 
@@ -113,7 +136,21 @@ class ProfilForm(forms.ModelForm):
         self.fields['langue'].required = False
         self.fields['ville'].required = False
         self.fields['raison_sociale'].required = False
+        self.fields['numero_rccm'].required = False
+        self.fields['adresse'].required = False
+        self.fields['justificatif_rccm'].required = False
 
     def clean_langue(self):
         return self.cleaned_data.get('langue') or Profil.Langue.FRANCAIS
+
+    def save(self, commit=True):
+        profil = super().save(commit=False)
+        # Un nouveau justificatif ou un RCCM modifié invalide la vérification
+        # précédente — elle doit être rejouée par l'équipe Djona sur les
+        # nouvelles pièces, pas héritée de l'ancien examen.
+        if 'justificatif_rccm' in self.changed_data or 'numero_rccm' in self.changed_data:
+            profil.entreprise_verifiee = False
+        if commit:
+            profil.save()
+        return profil
 

@@ -20,13 +20,28 @@
 </head>
 <body>
     {% if messages %}
-    <div class="fixed top-4 inset-x-4 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm pointer-events-none" id="djona-toasts">
         {% for message in messages %}
-        <div class="pointer-events-auto mx-auto max-w-md w-full px-4 py-3 rounded-lg shadow-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-600 text-white{% elif message.tags == 'success' %}bg-green-600 text-white{% else %}bg-gray-800 text-white{% endif %}">
-            {{ message }}
+        <div class="djona-toast pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 ease-out translate-x-6 opacity-0 {% if message.tags == 'error' %}bg-red-600 text-white{% elif message.tags == 'success' %}bg-green-600 text-white{% else %}bg-gray-800 text-white{% endif %}">
+            <span class="material-symbols-outlined text-[20px] shrink-0">{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}</span>
+            <span class="flex-1 leading-snug">{{ message }}</span>
+            <button class="shrink-0 opacity-80 hover:opacity-100 transition-opacity" onclick="this.closest('.djona-toast').remove()" type="button" aria-label="Fermer">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
         </div>
         {% endfor %}
     </div>
+    <script>
+        document.querySelectorAll('.djona-toast').forEach(function (toast, index) {
+            var delaiEntree = index * 80;
+            var dureeAffichage = 5000 + delaiEntree;
+            setTimeout(function () { toast.classList.remove('translate-x-6', 'opacity-0'); }, delaiEntree + 20);
+            setTimeout(function () {
+                toast.classList.add('translate-x-6', 'opacity-0');
+                setTimeout(function () { toast.remove(); }, 300);
+            }, dureeAffichage);
+        });
+    </script>
     {% endif %}
     {% block content %}{% endblock %}
     {% block scripts %}{% endblock %}

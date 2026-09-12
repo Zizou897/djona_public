@@ -1,0 +1,149 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Espace Pro — Djona Vendeur{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"outline-variant":"#c1c7cf","on-surface-variant":"#41474e","background":"#f8f9f9","surface-container":"#edeeee","surface-container-lowest":"#ffffff","on-primary":"#ffffff","primary-container":"#1a5276","outline":"#72787f","on-surface":"#191c1c","surface":"#f8f9f9","secondary":"#865300","secondary-container":"#fea520","on-secondary-container":"#694000","primary":"#003b5a","error":"#ba1a1a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"body-md":["Inter"],"headline-lg":["Montserrat"],"headline-md":["Montserrat"]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+    @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; animation: rise-in .6s cubic-bezier(.16,1,.3,1) forwards; }
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { animation: none; opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'pro/_sidebar.html' with page_active='dashboard' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-10 lg:pt-24 flex flex-col gap-8">
+            <div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="font-body-md text-xs text-secondary font-bold uppercase tracking-[0.2em]">Espace professionnel</span>
+                    <h1 class="font-headline-lg text-2xl text-primary">{{ compte_pro.profil.raison_sociale|default:compte_pro.get_full_name }}</h1>
+                    {% if not est_proprietaire %}
+                    <p class="text-sm text-on-surface-variant mt-1">Vous gérez ce compte en tant que {% if role == 'gestionnaire' %}gestionnaire{% else %}lecture seule{% endif %}.</p>
+                    {% endif %}
+                </div>
+                <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'annonce_creer' %}">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Ajouter un véhicule
+                </a>
+            </div>
+
+            <section class="reveal" style="animation-delay:.1s">
+                <h2 class="font-headline-md text-lg text-primary mb-3">Stock</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_publiees }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Publiées</p>
+                    </div>
+                    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_en_attente }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">En attente</p>
+                    </div>
+                    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
+                        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_brouillons }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Brouillons</p>
+                    </div>
+                    <a class="bg-primary-container/10 hover:bg-primary-container/20 p-5 rounded-2xl shadow-sm transition-colors" href="{% url 'mes_annonces' %}">
+                        <p class="text-lg font-bold text-primary leading-none">{{ valeur_stock|stringformat:"d" }} FCFA</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Valeur du stock publié</p>
+                    </a>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4" style="animation-delay:.16s">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-headline-md text-lg text-primary">Prospects</h2>
+                        <a class="text-sm font-semibold text-primary hover:underline flex items-center gap-1" href="{% url 'espace_pro_prospects' %}">Voir tout <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="flex-1 bg-secondary-container/15 rounded-xl p-4">
+                            <p class="text-xl font-bold text-secondary leading-none">{{ nb_prospects_nouveaux }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1">Nouveaux</p>
+                        </div>
+                        <div class="flex-1 bg-primary-container/10 rounded-xl p-4">
+                            <p class="text-xl font-bold text-primary leading-none">{{ nb_prospects_en_cours }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1">En cours</p>
+                        </div>
+                    </div>
+                    {% if prospects_recents %}
+                    <div class="flex flex-col divide-y divide-outline-variant/30">
+                        {% for prospect in prospects_recents %}
+                        <div class="py-3 flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-on-surface truncate">{{ prospect.nom }}</p>
+                                <p class="text-xs text-on-surface-variant truncate">{% if prospect.annonce %}{{ prospect.annonce.marque }} {{ prospect.annonce.modele }}{% else %}Intérêt général{% endif %}</p>
+                            </div>
+                            <span class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold bg-surface-container text-on-surface-variant">{{ prospect.get_statut_display }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-on-surface-variant">Aucun prospect enregistré pour le moment.</p>
+                    {% endif %}
+                </section>
+
+                <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4" style="animation-delay:.22s">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-headline-md text-lg text-primary">Équipe</h2>
+                        <a class="text-sm font-semibold text-primary hover:underline flex items-center gap-1" href="{% url 'espace_pro_equipe' %}">Gérer <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="w-14 h-14 shrink-0 rounded-full bg-primary-container/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-[28px]">groups</span>
+                        </span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_membres }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1">membre{{ nb_membres|pluralize }} actif{{ nb_membres|pluralize }}</p>
+                        </div>
+                    </div>
+                    {% if est_proprietaire %}
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Invitez des collaborateurs pour gérer votre stock — chacun avec son propre accès et un rôle (gestionnaire ou lecture seule).</p>
+                    {% else %}
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Seul le titulaire du compte peut ajouter ou retirer des membres.</p>
+                    {% endif %}
+                </section>
+            </div>
+
+            {% if annonces_recentes %}
+            <section class="reveal flex flex-col gap-4" style="animation-delay:.28s">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-headline-md text-lg text-primary">Véhicules récents</h2>
+                    <a class="text-sm font-semibold text-primary hover:underline flex items-center gap-1" href="{% url 'mes_annonces' %}">Voir tout <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {% for annonce in annonces_recentes %}
+                    <a class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" href="{% url 'mes_annonces' %}">
+                        {% with photo=annonce.photos.first %}
+                        <div class="relative h-32 w-full bg-surface-container overflow-hidden">
+                            {% if photo %}
+                            <img alt="{{ annonce.marque }} {{ annonce.modele }}" class="w-full h-full object-cover" src="{{ photo.image.url }}">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-outline-variant text-[32px]">directions_car</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                        <div class="p-4">
+                            <h3 class="text-xs font-bold text-primary uppercase tracking-tight truncate">{{ annonce.marque }} {{ annonce.modele }}</h3>
+                            <p class="font-headline-md text-sm text-secondary leading-none mt-1">{{ annonce.prix|stringformat:"d" }} FCFA</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

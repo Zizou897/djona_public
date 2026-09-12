@@ -1,0 +1,76 @@
+{% load static %}
+<header class="lg:hidden w-full border-b border-outline-variant/30 bg-surface">
+    <div class="px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <img alt="Djona" class="h-8 w-auto object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <span class="font-headline-md text-primary font-bold">Djona Vendeur</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors relative" type="button">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            </button>
+            <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                {% csrf_token %}
+                <button class="text-sm font-semibold text-primary hover:underline" type="submit">Déconnexion</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary shadow-xl z-50">
+    <div class="flex items-center gap-3 px-2 pb-6 mb-2 border-b border-on-primary/10">
+        <img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
+        <span class="font-headline-md text-base tracking-tight">Djona Pro</span>
+    </div>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'dashboard' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'espace_pro_dashboard' %}">
+        <span class="material-symbols-outlined text-[20px]">dashboard</span>
+        Tableau de bord
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'annonces' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'mes_annonces' %}">
+        <span class="material-symbols-outlined text-[20px]">directions_car</span>
+        Mon stock
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'prospects' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'espace_pro_prospects' %}">
+        <span class="material-symbols-outlined text-[20px]">contacts</span>
+        Prospects
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'equipe' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'espace_pro_equipe' %}">
+        <span class="material-symbols-outlined text-[20px]">groups</span>
+        Équipe
+    </a>
+    <div class="mt-auto border-t border-on-primary/10 pt-4">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'profil_vendeur' %}">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Paramètres
+        </a>
+        <form action="{% url 'deconnexion_vendeur' %}" method="post">
+            {% csrf_token %}
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
+                <span class="material-symbols-outlined text-[20px]">logout</span>
+                Déconnexion
+            </button>
+        </form>
+    </div>
+</aside>
+
+<div class="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl z-40 items-center justify-end px-6 gap-3">
+    <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative" type="button">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+    </button>
+    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+        <div class="text-right">
+            <p class="text-sm font-semibold text-on-surface">{{ user.prenom }} {{ user.nom }}</p>
+            <p class="text-[11px] text-on-surface-variant">
+                {% if est_proprietaire %}Titulaire{% elif role == 'gestionnaire' %}Gestionnaire{% else %}Lecture seule{% endif %}
+                {% if not est_proprietaire %} — {{ compte_pro.get_full_name }}{% endif %}
+            </p>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+            {% if user.avatar_url %}
+            <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ user.avatar_url }}">
+            {% else %}
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

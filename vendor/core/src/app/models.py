@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.core.validators import RegexValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 
@@ -67,6 +67,26 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
             return None
         return None
 
+    @property
+    def is_pro_ou_membre(self):
+        """True pour le titulaire d'un compte entreprise, ou pour un compte
+        rattaché en tant que membre actif de l'équipe d'un titulaire —
+        détermine quel tableau de bord s'affiche après connexion."""
+        if self.type_compte == self.TypeCompte.PROFESSIONNEL:
+            return True
+        rattachement = getattr(self, 'rattachement_pro', None)
+        return bool(rattachement and rattachement.actif)
+
+    @property
+    def compte_stock(self):
+        """Le compte dont les annonces doivent être gérées par cet
+        utilisateur : lui-même, sauf s'il s'agit d'un membre d'équipe
+        rattaché à un compte pro — auquel cas c'est le stock du titulaire."""
+        rattachement = getattr(self, 'rattachement_pro', None)
+        if rattachement is not None and rattachement.actif:
+            return rattachement.compte_pro
+        return self
+
 
 class Profil(models.Model):
     class Ville(models.TextChoices):
@@ -91,6 +111,20 @@ class Profil(models.Model):
     raison_sociale = models.CharField(
         'raison sociale', max_length=150, blank=True,
         help_text="Nom de l'entreprise, affiché sur la page vitrine publique (comptes professionnels).",
+    )
+    numero_rccm = models.CharField(
+        'numéro RCCM', max_length=50, blank=True,
+        help_text='Registre du Commerce et du Crédit Mobilier — sert de base à la vérification du compte entreprise.',
+    )
+    justificatif_rccm = models.FileField(
+        'justificatif RCCM', upload_to='justificatifs/', blank=True, null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],
+        help_text='Copie du registre de commerce (PDF ou image) — nécessaire pour obtenir le statut « Entreprise vérifiée ».',
+    )
+    adresse = models.CharField('adresse du showroom', max_length=255, blank=True)
+    entreprise_verifiee = models.BooleanField(
+        'entreprise vérifiée', default=False,
+        help_text="Passe à True après validation du justificatif RCCM par l'équipe Djona (comptes professionnels).",
     )
     two_factor_enabled = models.BooleanField(default=False)
     langue = models.CharField(max_length=2, choices=Langue.choices, default=Langue.FRANCAIS)

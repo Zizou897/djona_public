@@ -81,14 +81,6 @@
         </header>
 
         <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-10 flex flex-col gap-8">
-            {% if messages %}
-            <div class="flex flex-col gap-2">
-                {% for message in messages %}
-                <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <div>
                 <h1 class="font-headline-lg text-2xl text-primary">Paramètres</h1>
                 <p class="text-sm text-on-surface-variant mt-1">Gérez vos informations, votre sécurité et vos préférences.</p>
@@ -183,6 +175,32 @@
                                 <label class="text-sm text-on-surface-variant" for="id_raison_sociale">Raison sociale <span class="text-[11px]">(comptes professionnels)</span></label>
                                 <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_raison_sociale" name="raison_sociale" type="text" placeholder="Nom de votre entreprise" value="{{ profil_form.raison_sociale.value|default:'' }}">
                                 <p class="text-[11px] text-on-surface-variant">Affichée à la place de votre nom sur votre page vitrine publique.</p>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-sm text-on-surface-variant" for="id_numero_rccm">Numéro RCCM <span class="text-[11px]">(comptes professionnels)</span></label>
+                                    {% if profil.entreprise_verifiee %}
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold"><span class="material-symbols-outlined text-[13px]">verified</span> Entreprise vérifiée</span>
+                                    {% elif profil.justificatif_rccm %}
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[11px] font-bold">Justificatif en attente d'examen</span>
+                                    {% else %}
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold">Entreprise non vérifiée</span>
+                                    {% endif %}
+                                </div>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_numero_rccm" name="numero_rccm" type="text" placeholder="CI-ABJ-202X-B-XXXXX" value="{{ profil_form.numero_rccm.value|default:'' }}">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_adresse">Adresse du showroom <span class="text-[11px]">(comptes professionnels)</span></label>
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_adresse" name="adresse" type="text" placeholder="Boulevard VGE, Marcory, Abidjan" value="{{ profil_form.adresse.value|default:'' }}">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-sm text-on-surface-variant" for="id_justificatif_rccm">Justificatif RCCM <span class="text-[11px]">(comptes professionnels)</span></label>
+                                {% if profil.justificatif_rccm %}
+                                <a class="text-sm text-primary font-semibold hover:underline mb-1" href="{{ profil.justificatif_rccm.url }}" target="_blank" rel="noopener">Voir le document envoyé</a>
+                                {% endif %}
+                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary file:text-on-primary file:text-sm" id="id_justificatif_rccm" name="justificatif_rccm" type="file" accept=".pdf,image/*">
+                                <p class="text-[11px] text-on-surface-variant">Copie du registre de commerce (PDF ou image) — envoyer un nouveau document relance son examen par l'équipe Djona.</p>
+                                {% if profil_form.justificatif_rccm.errors %}<p class="text-[11px] text-error">{{ profil_form.justificatif_rccm.errors.0 }}</p>{% endif %}
                             </div>
                             <div class="flex flex-col gap-1">
                                 <label class="text-sm text-on-surface-variant" for="id_ville">Ville</label>

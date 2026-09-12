@@ -51,6 +51,11 @@ class TableauDeBordVendeurView(LoginRequiredMixin, TemplateView):
     template_name = 'app/layout/tableau_de_bord.html'
     login_url = 'connexion_vendeur'
 
+    def get(self, request, *args, **kwargs):
+        if request.user.statut_compte == Utilisateur.StatutCompte.ACTIF and request.user.is_pro_ou_membre:
+            return redirect('espace_pro_dashboard')
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.statut_compte != Utilisateur.StatutCompte.ACTIF:
