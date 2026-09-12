@@ -201,6 +201,13 @@ MEDIA_ROOT = BASE_DIR / 'media_cdn'
 #   - Windows (dev local) : mklink /J media_cdn\partners ..\..\..\public\media_cdn\partners
 #   - Linux (VPS de prod — admin et public partagent le même serveur) :
 #     ln -s /chemin/absolu/vers/public/media_cdn/partners media_cdn/partners
+#
+# Même principe pour les justificatifs RCCM (moderation.ProfilMirror, référencés
+# via vendor_db) : media_cdn/justificatifs/ de ce projet doit être un lien vers
+# celui de vendor (vendor/core/src/media_cdn/justificatifs/).
+#   - Windows (dev local) : mklink /J media_cdn\justificatifs ..\..\..\vendor\core\src\media_cdn\justificatifs
+#   - Linux (VPS de prod — admin et vendor partagent le même serveur) :
+#     ln -s /chemin/absolu/vers/vendor/core/src/media_cdn/justificatifs media_cdn/justificatifs
 
 # Doit rester alignée avec client_max_body_size (nginx) — sinon un fichier
 # accepté par nginx peut quand même être rejeté par Django avant nginx.

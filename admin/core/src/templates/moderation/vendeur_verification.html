@@ -1,0 +1,101 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Vérification entreprise — {{ vendeur.prenom }} {{ vendeur.nom }} — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Vérification' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='vendeurs' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
+
+<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'vendeur_liste' %}" style="animation-delay:.05s">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux vendeurs
+</a>
+
+{% if messages %}
+<div class="reveal mb-6 flex flex-col gap-2" style="animation-delay:.08s">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm font-medium">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 lg:p-8" style="animation-delay:.12s">
+<div class="flex items-start justify-between gap-4 mb-6">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Vérification entreprise</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ vendeur.prenom }} {{ vendeur.nom }}</h1>
+<p class="font-body-md text-on-surface-variant">{{ vendeur.email }} — {{ vendeur.telephone }}</p>
+</div>
+{% if profil.entreprise_verifiee %}
+<span class="flex-none inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-tighter"><span class="material-symbols-outlined text-[16px]">verified</span> Vérifiée</span>
+{% elif profil.justificatif_rccm %}
+<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">À examiner</span>
+{% else %}
+<span class="flex-none px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-[12px] font-bold uppercase tracking-tighter">Non vérifiée</span>
+{% endif %}
+</div>
+
+{% if profil %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Raison sociale</p>
+<p class="font-label-md text-label-md text-on-surface">{{ profil.raison_sociale|default:"Non renseignée" }}</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Numéro RCCM</p>
+<p class="font-label-md text-label-md text-on-surface">{{ profil.numero_rccm|default:"Non renseigné" }}</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 md:col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Adresse du showroom</p>
+<p class="font-label-md text-label-md text-on-surface">{{ profil.adresse|default:"Non renseignée" }}</p>
+</div>
+</div>
+
+<div class="mb-8">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Justificatif RCCM</p>
+{% if profil.justificatif_rccm %}
+<a href="{{ profil.justificatif_rccm.url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-3 rounded-md border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">description</span> Ouvrir le document envoyé
+</a>
+{% else %}
+<p class="text-on-surface-variant text-body-md">Aucun document envoyé pour le moment.</p>
+{% endif %}
+</div>
+
+<div class="flex flex-col sm:flex-row gap-3">
+{% if not profil.entreprise_verifiee %}
+<form action="{% url 'vendeur_verification_valider' vendeur.pk %}" method="post" class="w-full sm:w-auto">
+{% csrf_token %}
+<button class="w-full sm:w-auto px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" type="submit" {% if not profil.numero_rccm %}disabled title="Aucun numéro RCCM renseigné"{% endif %}>
+<span class="material-symbols-outlined text-[20px]">check_circle</span> Valider l'entreprise
+</button>
+</form>
+{% endif %}
+<form action="{% url 'vendeur_verification_refuser' vendeur.pk %}" method="post" class="w-full sm:w-auto" onsubmit="return confirm('Refuser ce justificatif ? Le vendeur devra en envoyer un nouveau.');">
+{% csrf_token %}
+<button class="w-full sm:w-auto px-6 py-3 border-2 border-error text-error rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error-container/20 transition-colors" type="submit" {% if not profil.justificatif_rccm and not profil.entreprise_verifiee %}disabled title="Aucun justificatif à refuser"{% endif %}>
+<span class="material-symbols-outlined text-[20px]">cancel</span> {% if profil.entreprise_verifiee %}Retirer la vérification{% else %}Refuser le justificatif{% endif %}
+</button>
+</form>
+</div>
+{% else %}
+<p class="text-on-surface-variant text-body-md">Ce vendeur n'a pas encore complété son profil entreprise.</p>
+{% endif %}
+</div>
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='vendeurs' %}
+</div>
+{% endblock %}

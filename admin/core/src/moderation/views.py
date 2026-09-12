@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
 from .forms import AnnonceAdminForm
-from .models import AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, VehicleMirror
+from .models import AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, ProfilMirror, VehicleMirror
 from .sync import trigger_public_sync
 
 SYSTEM_VENDOR_EMAIL = 'officiel@djona.tech'
@@ -60,6 +60,15 @@ class VendeurListView(_StaffRequiredMixin, ListView):
         }
         vendeurs = list(CompteVendeur.objects.using('vendor_db').all())
         vendeurs.sort(key=lambda v: (statut_order.get(v.statut_compte, 99), v.nom))
+
+        profils = {
+            profil.user_id: profil
+            for profil in ProfilMirror.objects.using('vendor_db').filter(
+                user_id__in=[v.pk for v in vendeurs if v.type_compte == CompteVendeur.TypeCompte.PROFESSIONNEL],
+            )
+        }
+        for vendeur in vendeurs:
+            vendeur.profil = profils.get(vendeur.pk)
         return vendeurs
 
 
@@ -83,6 +92,51 @@ class VendeurActiverView(_VendeurActionView):
 
 class VendeurSuspendreView(_VendeurActionView):
     nouveau_statut = CompteVendeur.StatutCompte.SUSPENDU
+
+
+class VendeurVerificationDetailView(_StaffRequiredMixin, View):
+    """Fiche de revue du dossier entreprise (raison sociale, RCCM,
+    justificatif) pour un vendeur professionnel — valider/refuser la
+    vérification qui donne le badge « Entreprise vérifiée ».
+    """
+    template_name = 'moderation/vendeur_verification.html'
+
+    def get(self, request, pk):
+        vendeur = get_object_or_404(CompteVendeur.objects.using('vendor_db'), pk=pk)
+        profil = ProfilMirror.objects.using('vendor_db').filter(user_id=vendeur.pk).first()
+        return render(request, self.template_name, {'vendeur': vendeur, 'profil': profil})
+
+
+class VendeurValiderEntrepriseView(_StaffRequiredMixin, View):
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, pk):
+        profil = get_object_or_404(ProfilMirror.objects.using('vendor_db'), user_id=pk)
+        profil.entreprise_verifiee = True
+        profil.save(using='vendor_db', update_fields=['entreprise_verifiee'])
+        messages.success(request, 'Entreprise vérifiée.')
+        return redirect('vendeur_liste')
+
+
+class VendeurRefuserEntrepriseView(_StaffRequiredMixin, View):
+    """Rejette le justificatif actuel — le vendeur doit en renvoyer un
+    nouveau. On supprime le fichier plutôt que de juste repasser
+    entreprise_verifiee à False, sinon rien ne distingue « jamais examiné »
+    de « examiné et refusé » côté vendeur (même badge « non vérifiée »).
+    """
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, pk):
+        profil = get_object_or_404(ProfilMirror.objects.using('vendor_db'), user_id=pk)
+        profil.entreprise_verifiee = False
+        profil.justificatif_rccm.delete(save=False)
+        profil.save(using='vendor_db', update_fields=['entreprise_verifiee', 'justificatif_rccm'])
+        messages.success(request, 'Vérification refusée — le vendeur doit envoyer un nouveau justificatif.')
+        return redirect('vendeur_liste')
 
 
 class AnnonceModerationListView(_StaffRequiredMixin, ListView):

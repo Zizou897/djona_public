@@ -1,10 +1,18 @@
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from moderation.models import CompteVendeur
+from moderation.models import CompteVendeur, ProfilMirror
 
 User = get_user_model()
+
+# Le plus petit PNG valide possible (1x1 pixel transparent).
+PNG_1PX = (
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06'
+    b'\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00'
+    b'\x01\r\n\x2d\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+)
 
 
 class VendeurListViewTest(TestCase):
@@ -96,3 +104,58 @@ class VendeurListViewTest(TestCase):
         url = reverse('vendeur_suspendre', args=[self.vendeur_actif.pk])
         response = self.client.post(url)
         self.assertRedirects(response, f"{reverse('connexion_admin')}?next={url}")
+
+
+class VendeurVerificationViewTest(TestCase):
+    databases = {'default', 'vendor_db'}
+
+    def setUp(self):
+        self.admin = User.objects.create_user(username='admin-verif', password='motdepasse', is_staff=True)
+        self.vendeur_pro = CompteVendeur.objects.using('vendor_db').create(
+            email='pro-verif@exemple.ci', nom='Toure', prenom='Ibrahim', telephone='0708091011',
+            type_compte=CompteVendeur.TypeCompte.PROFESSIONNEL,
+            statut_compte=CompteVendeur.StatutCompte.ACTIF,
+            is_active=True, date_joined='2026-09-01T10:00:00Z', password='inutilise',
+        )
+        self.profil = ProfilMirror.objects.using('vendor_db').create(
+            user=self.vendeur_pro, raison_sociale='Ivoire Auto Prestige SARL',
+            numero_rccm='CI-ABJ-2026-B-99999', adresse='Boulevard VGE, Marcory, Abidjan',
+            justificatif_rccm=SimpleUploadedFile('justificatif.png', PNG_1PX, content_type='image/png'),
+        )
+
+    def tearDown(self):
+        self.profil.justificatif_rccm.delete(save=False)
+        ProfilMirror.objects.using('vendor_db').filter(pk=self.profil.pk).delete()
+        CompteVendeur.objects.using('vendor_db').filter(pk=self.vendeur_pro.pk).delete()
+
+    def test_detail_requiert_authentification_staff(self):
+        url = reverse('vendeur_verification', args=[self.vendeur_pro.pk])
+        response = self.client.get(url)
+        self.assertRedirects(response, f"{reverse('connexion_admin')}?next={url}")
+
+    def test_detail_affiche_les_informations_entreprise(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('vendeur_verification', args=[self.vendeur_pro.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Ivoire Auto Prestige SARL')
+        self.assertContains(response, 'CI-ABJ-2026-B-99999')
+
+    def test_valider_marque_lentreprise_verifiee(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse('vendeur_verification_valider', args=[self.vendeur_pro.pk]))
+        self.assertRedirects(response, reverse('vendeur_liste'))
+        self.profil.refresh_from_db(using='vendor_db')
+        self.assertTrue(self.profil.entreprise_verifiee)
+
+    def test_refuser_efface_le_justificatif(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse('vendeur_verification_refuser', args=[self.vendeur_pro.pk]))
+        self.assertRedirects(response, reverse('vendeur_liste'))
+        self.profil.refresh_from_db(using='vendor_db')
+        self.assertFalse(self.profil.entreprise_verifiee)
+        self.assertFalse(self.profil.justificatif_rccm)
+
+    def test_valider_refuse_get(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('vendeur_verification_valider', args=[self.vendeur_pro.pk]))
+        self.assertEqual(response.status_code, 405)

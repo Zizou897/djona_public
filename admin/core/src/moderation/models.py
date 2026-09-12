@@ -55,6 +55,44 @@ class CompteVendeur(models.Model):
         return f'{self.prenom} {self.nom} ({self.email})'
 
 
+class ProfilMirror(models.Model):
+    """Miroir en lecture/écriture de vendor.app.Profil (table app_profil,
+    schéma djona_vendor, connexion 'vendor_db'). Jamais migré depuis ce
+    projet.
+
+    Usage prévu : LIRE les informations d'entreprise (raison sociale, RCCM,
+    justificatif) pour la revue de vérification, et METTRE À JOUR le seul
+    champ `entreprise_verifiee`. Jamais utilisé pour créer un profil — c'est
+    fait paresseusement côté vendor (ProfilVendeurView.get_or_create).
+    """
+
+    user = models.OneToOneField(
+        CompteVendeur, on_delete=models.DO_NOTHING, related_name='profil', db_constraint=False,
+    )
+    raison_sociale = models.CharField(max_length=150, blank=True)
+    numero_rccm = models.CharField(max_length=50, blank=True)
+    justificatif_rccm = models.FileField(upload_to='justificatifs/', blank=True, null=True)
+    adresse = models.CharField(max_length=255, blank=True)
+    entreprise_verifiee = models.BooleanField(default=False)
+    # ville/avatar/two_factor_enabled/langue/notif_email/notif_whatsapp : colonnes
+    # réelles NOT NULL côté vendor, jamais lues/écrites intentionnellement depuis ce
+    # mirror, mais nécessaires pour que .create() fonctionne sans erreur de colonne
+    # manquante (même principe que CompteVendeur.password/is_staff plus haut).
+    ville = models.CharField(max_length=30, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    two_factor_enabled = models.BooleanField(default=False)
+    langue = models.CharField(max_length=2, default='fr')
+    notif_email = models.BooleanField(default=True)
+    notif_whatsapp = models.BooleanField(default=True)
+
+    class Meta:
+        managed = False
+        db_table = 'app_profil'
+
+    def __str__(self):
+        return f'Profil de {self.user}'
+
+
 class AnnonceMirror(models.Model):
     """Miroir en lecture/écriture de vendor.annonces.Annonce (schéma djona_vendor,
     connexion 'vendor_db'). Jamais migré depuis ce projet.
