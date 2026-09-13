@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Favorite, Vehicle, VehicleImage
+from .models import Favorite, Interest, Vehicle, VehicleImage
 
 
 class VehicleImageInline(admin.TabularInline):
@@ -21,3 +21,10 @@ class VehicleAdmin(admin.ModelAdmin):
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ['vehicle', 'user', 'session_key', 'created_at']
     list_filter = ['created_at']
+
+
+@admin.register(Interest)
+class InterestAdmin(admin.ModelAdmin):
+    list_display = ['name', 'phone', 'vehicle', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['name', 'phone', 'vehicle__brand', 'vehicle__model_name']

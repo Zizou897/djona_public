@@ -90,14 +90,31 @@
           {% endfor %}
         </div>
         {% endif %}
+
+        <div class="p-5 rounded-md bg-surface-container-highest/50 flex flex-col gap-3">
+          <p class="font-label-sm text-center text-on-surface-variant">Échangez directement avec le vendeur</p>
+          <button type="button" onclick="ouvrirModalInteret()" class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-4 rounded font-label-md text-label-md shadow-md hover:bg-primary/90 transition-colors">
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">favorite</span> Je suis intéressé
+          </button>
+          {% if vehicle.seller.phone %}
+          <div class="grid grid-cols-2 gap-3">
+            <a href="tel:+225{{ vehicle.seller.phone }}" class="flex items-center justify-center gap-2 border border-primary text-primary py-3 rounded font-label-md hover:bg-primary/5 transition-colors">
+              <span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span> Appeler
+            </a>
+            <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded font-label-md hover:brightness-105 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
+            </a>
+          </div>
+          {% endif %}
+        </div>
       </div>
 
       {# Colonne info & CTA #}
       <div class="lg:col-span-4 flex flex-col gap-gutter">
         <div class="bg-surface p-6 rounded-md shadow-md flex flex-col gap-4">
           <div class="flex flex-col">
-            <span class="animate-slide-up-1 font-label-md text-on-surface-variant uppercase tracking-tighter">{{ vehicle.brand }}</span>
-            <h1 class="animate-slide-up-2 font-display-lg text-[26px] text-on-surface leading-tight">{{ vehicle.model_name }}</h1>
+            <h1 class="animate-slide-up-2 font-display-lg text-[28px] text-on-surface leading-tight">{{ vehicle.brand }}</h1>
+            <span class="animate-slide-up-1 font-label-md text-on-surface-variant tracking-tight">{{ vehicle.model_name }}</span>
           </div>
           <div class="flex items-baseline gap-2">
             <span class="font-display-lg text-primary text-[26px]">{{ vehicle.price }}</span>
@@ -133,20 +150,29 @@
                 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
               </a>
             </div>
-
-            <div class="p-5 rounded-md bg-surface-container-highest/50 flex flex-col gap-3">
-              <p class="font-label-sm text-center text-on-surface-variant">Échangez directement avec le vendeur</p>
-              <div class="grid grid-cols-2 gap-3">
-                <a href="tel:+2250102030405" class="flex items-center justify-center gap-2 border border-primary text-primary py-3 rounded font-label-md hover:bg-primary/5 transition-colors">
-                  <span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span> Appeler
-                </a>
-                <a href="https://wa.me/2250102030405" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded font-label-md hover:brightness-105 transition-colors shadow-sm">
-                  <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
-                </a>
-              </div>
-            </div>
           </div>
         </div>
+
+        {% if vehicle.seller %}
+        <div class="bg-surface p-6 rounded-md shadow-md flex flex-col items-center text-center gap-3">
+          <div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 overflow-hidden">
+            {% if vehicle.seller.logo %}
+            <img src="{{ vehicle.seller.logo.url }}" alt="{{ vehicle.seller.display_name }}" class="w-full h-full object-cover">
+            {% else %}
+            <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">{% if vehicle.seller.is_professional %}storefront{% else %}person{% endif %}</span>
+            {% endif %}
+          </div>
+          <div>
+            <span class="font-label-md text-on-surface block">{{ vehicle.seller.display_name }}</span>
+            <span class="font-label-sm text-on-surface-variant opacity-60">{% if vehicle.seller.is_professional %}Professionnel{% else %}Particulier{% endif %} — Membre Djona</span>
+          </div>
+          <p class="font-body-md text-label-sm text-on-surface-variant">Curieux d'en savoir plus sur ce vendeur ?</p>
+          <a href="{{ vehicle.seller.get_absolute_url }}" class="group w-full flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 rounded font-label-md hover:bg-primary/15 transition-colors">
+            <span>Voir le profil du vendeur</span>
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+        {% endif %}
 
         <div class="bg-tertiary p-6 rounded-md text-on-tertiary flex flex-col gap-4">
           <h4 class="font-headline-md text-[18px]">Pourquoi choisir Djona ?</h4>
@@ -179,30 +205,60 @@
             <span class="w-8 h-1 bg-primary rounded-full" aria-hidden="true"></span>
             Caractéristiques Techniques
           </h2>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-gutter">
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Transmission</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.get_transmission_display }}</span>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">settings</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Transmission</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.get_transmission_display }}</span>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Carburant</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.get_fuel_type_display }}</span>
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">local_gas_station</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Carburant</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.get_fuel_type_display }}</span>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">État</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.get_condition_display }}</span>
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">grade</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">État</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.get_condition_display }}</span>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Année</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.year|stringformat:"d" }}</span>
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">calendar_today</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Année</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.year|stringformat:"d" }}</span>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Kilométrage</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.mileage }} km</span>
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">speed</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Kilométrage</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.mileage }} km</span>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Localisation</span>
-              <span class="font-headline-md text-[18px] text-on-surface">{{ vehicle.city }}</span>
+            <div class="flex items-center gap-3 p-4 rounded-md bg-surface-container-low">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" aria-hidden="true">location_on</span>
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label-sm text-on-surface-variant uppercase opacity-60">Localisation</span>
+                <span class="font-headline-md text-[16px] text-on-surface truncate">{{ vehicle.city }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -218,20 +274,6 @@
           </div>
         </div>
         {% endif %}
-
-        <div class="flex flex-col gap-6">
-          <h2 class="font-headline-lg text-headline-md text-on-surface flex items-center gap-3">
-            <span class="w-8 h-1 bg-primary rounded-full" aria-hidden="true"></span>
-            Localisation du véhicule
-          </h2>
-          <div class="w-full h-[300px] bg-surface-container rounded-2xl shadow-inner overflow-hidden relative flex items-center justify-center">
-            <span class="material-symbols-outlined text-outline text-[64px] opacity-40" aria-hidden="true">map</span>
-            <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded shadow-md flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary" aria-hidden="true">location_on</span>
-              <span class="font-label-md text-on-surface">{{ vehicle.city }}</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {# Colonne latérale #}
@@ -266,38 +308,6 @@
           </div>
         </div>
 
-        <div class="bg-surface-container p-6 rounded-2xl flex flex-col gap-4">
-          <span class="font-label-sm text-on-surface-variant uppercase tracking-widest">Offre Spéciale</span>
-          <h4 class="font-headline-md text-[20px]">Besoin de financement ?</h4>
-          <p class="font-body-md text-label-sm text-on-surface-variant">Obtenez un crédit automobile en 48h avec nos banques partenaires pour ce véhicule.</p>
-          <a href="#" class="w-full text-center bg-primary text-on-primary py-3 rounded font-label-md shadow-md hover:translate-y-[-2px] transition-all">Simuler mon crédit</a>
-        </div>
-
-        {% if vehicle.seller %}
-        <a href="{{ vehicle.seller.get_absolute_url }}" class="flex items-center gap-4 p-4 border border-outline-variant/30 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors">
-          <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 overflow-hidden">
-            {% if vehicle.seller.logo %}
-            <img src="{{ vehicle.seller.logo.url }}" alt="{{ vehicle.seller.display_name }}" class="w-full h-full object-cover">
-            {% else %}
-            <span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.seller.is_professional %}storefront{% else %}person{% endif %}</span>
-            {% endif %}
-          </div>
-          <div class="flex flex-col">
-            <span class="font-label-md text-on-surface">{{ vehicle.seller.display_name }}</span>
-            <span class="font-label-sm text-on-surface-variant opacity-60">{% if vehicle.seller.is_professional %}Professionnel{% else %}Particulier{% endif %} — Membre Djona</span>
-          </div>
-        </a>
-        {% else %}
-        <div class="flex items-center gap-4 p-4 border border-outline-variant/30 rounded-md">
-          <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-primary" aria-hidden="true">person</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="font-label-md text-on-surface">Vendeur Particulier</span>
-            <span class="font-label-sm text-on-surface-variant opacity-60">Membre Djona</span>
-          </div>
-        </div>
-        {% endif %}
       </div>
     </div>
   </section>
@@ -327,8 +337,31 @@
   {% include 'partials/_partners_band.html' %}
 
 </div>
+
+<div class="fixed inset-0 z-[110] hidden items-center justify-center bg-on-surface/40 backdrop-blur-sm px-4" id="modal-interet">
+  <div class="relative bg-surface rounded-md shadow-xl max-w-sm w-full p-6 flex flex-col gap-4">
+    <button type="button" onclick="fermerModalInteret()" class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface" aria-label="Fermer">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+    <div class="flex flex-col items-center text-center gap-2">
+      <span class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">favorite</span>
+      </span>
+      <h3 class="font-headline-md text-[18px] text-on-surface">Je suis intéressé</h3>
+      <p class="font-body-md text-label-sm text-on-surface-variant">Laissez vos coordonnées, le vendeur de « {{ vehicle.brand }} {{ vehicle.model_name }} » vous recontacte rapidement.</p>
+    </div>
+    <form action="{% url 'catalog:express_interest' vehicle.slug %}" class="flex flex-col gap-3" id="interest-form" method="post">
+      {% csrf_token %}
+      <input class="w-full px-4 py-3 border border-outline-variant/50 rounded font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" name="name" placeholder="Votre nom" required type="text">
+      <input class="w-full px-4 py-3 border border-outline-variant/50 rounded font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" name="phone" placeholder="Votre téléphone" required type="tel">
+      <textarea class="w-full px-4 py-3 border border-outline-variant/50 rounded font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" name="message" placeholder="Message (optionnel)" rows="2"></textarea>
+      <button class="w-full bg-primary text-on-primary py-3 rounded font-label-md shadow-md hover:bg-primary/90 transition-colors" type="submit">Envoyer ma demande</button>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/vehicle-gallery.js' %}" defer></script>
+<script src="{% static 'js/interest-form.js' %}" defer></script>
 {% endblock %}

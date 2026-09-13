@@ -165,3 +165,23 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'{self.vehicle} — {self.user or self.session_key}'
+
+
+class Interest(models.Model):
+    """Contact laissé par un acheteur via le bouton « Je suis intéressé » sur
+    une fiche véhicule. Consultable pour l'instant via l'admin Django — pas
+    encore de back-office dédié côté vendeur."""
+
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='interests')
+    name = models.CharField('nom', max_length=150)
+    phone = models.CharField('téléphone', max_length=20)
+    message = models.TextField('message', blank=True)
+    created_at = models.DateTimeField('date', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'intérêt acheteur'
+        verbose_name_plural = 'intérêts acheteurs'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} — {self.vehicle}'

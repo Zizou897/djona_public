@@ -11,5 +11,6 @@ urlpatterns = [
     path('comparer/', views.vehicle_compare, name='compare'),
     path('comparer/toggle/<int:vehicle_id>/', views.toggle_compare, name='toggle_compare'),
     path('vendeur/<slug:slug>/', views.seller_detail, name='seller_detail'),
+    path('<slug:slug>/interet/', views.express_interest, name='express_interest'),
     path('<slug:slug>/', views.vehicle_detail, name='detail'),
 ]

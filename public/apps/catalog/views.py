@@ -1,11 +1,20 @@
-from django.http import HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.core.cache import cache
 from django.core.paginator import Paginator
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
+from apps.core.views import _client_ip
+
+from .forms import InterestForm
 from .models import Favorite, Seller, Vehicle
 
 PAGE_SIZE = 9
 MAX_COMPARE = 3
+
+INTEREST_RATE_LIMIT = 5
+INTEREST_RATE_WINDOW = 600  # secondes (10 min)
 
 SORT_OPTIONS = {
     'recent': '-created_at',
@@ -148,14 +157,57 @@ def vehicle_detail(request, slug):
         v.is_favorite = v.id in favorite_ids
         v.in_compare = v.id in compare_ids
 
+    whatsapp_message = (
+        f"Bonjour, je suis intéressé(e) par votre {vehicle.brand} {vehicle.model_name} "
+        f"({vehicle.year}) à {vehicle.price} FCFA sur Djona.\n{request.build_absolute_uri()}"
+    )
+
     context = {
         'vehicle': vehicle,
         'similar_vehicles': similar_vehicles,
         'compare_ids': compare_ids,
         'compare_count': len(compare_ids),
         'max_compare': MAX_COMPARE,
+        'interest_form': InterestForm(),
+        'whatsapp_message': whatsapp_message,
     }
     return render(request, 'catalog/detail.html', context)
+
+
+@require_POST
+def express_interest(request, slug):
+    """« Je suis intéressé » sur la fiche véhicule — enregistre le contact de
+    l'acheteur pour que le vendeur puisse le rappeler. Même schéma que
+    apps.core.views.newsletter_subscribe (JSON+SweetAlert2 si JS, redirect+
+    messages sinon), rate-limité par IP pour éviter le spam.
+    """
+    vehicle = get_object_or_404(Vehicle, slug=slug, publish=True)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    cache_key = f'express-interest:{_client_ip(request)}'
+    attempts = cache.get(cache_key, 0)
+    if attempts >= INTEREST_RATE_LIMIT:
+        status, message = 'error', 'Trop de tentatives — réessayez dans quelques minutes.'
+        if is_ajax:
+            return JsonResponse({'status': status, 'message': message}, status=429)
+        messages.error(request, message)
+        return redirect(vehicle.get_absolute_url())
+    cache.set(cache_key, attempts + 1, INTEREST_RATE_WINDOW)
+
+    form = InterestForm(request.POST)
+    if form.is_valid():
+        interest = form.save(commit=False)
+        interest.vehicle = vehicle
+        interest.save()
+        status, message = 'success', 'Merci ! Le vendeur a reçu vos coordonnées et va vous recontacter rapidement.'
+    else:
+        status, message = 'error', 'Merci de renseigner votre nom et un numéro de téléphone valide.'
+
+    if is_ajax:
+        return JsonResponse({'status': status, 'message': message})
+
+    getattr(messages, status)(request, message)
+    return redirect(vehicle.get_absolute_url())
 
 
 def seller_detail(request, slug):
