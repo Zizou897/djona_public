@@ -2,6 +2,7 @@ from django import forms
 
 from .models import Annonce
 
+MIN_PHOTOS = 3
 MAX_PHOTOS = 4
 # Doit rester alignée avec DATA_UPLOAD_MAX_MEMORY_SIZE/FILE_UPLOAD_MAX_MEMORY_SIZE
 # (core/settings.py) et client_max_body_size (nginx, site vendor.djona.tech) —
@@ -19,11 +20,23 @@ class AnnonceForm(forms.ModelForm):
             'description',
         ]
 
+    def __init__(self, *args, exiger_photos_minimum=False, **kwargs):
+        # True uniquement pour une création envoyée directement en validation
+        # (action=soumettre) — une modification repasse toujours en brouillon
+        # (voir AnnonceUpdateView) et n'a donc pas besoin de ce minimum ici ;
+        # publier un brouillon existant est vérifié séparément dans
+        # AnnoncePublierView, sur les photos déjà enregistrées.
+        self.exiger_photos_minimum = exiger_photos_minimum
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         errors = []
 
         photos = self.files.getlist('photos')
+        if self.exiger_photos_minimum and len(photos) < MIN_PHOTOS:
+            errors.append(f"Ajoutez au moins {MIN_PHOTOS} photos pour soumettre votre annonce à validation.")
+
         if len(photos) > MAX_PHOTOS:
             errors.append(f"Vous ne pouvez pas ajouter plus de {MAX_PHOTOS} photos.")
         else:

@@ -1,8 +1,23 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from app.models import Utilisateur
-from annonces.models import Annonce
+from annonces.models import Annonce, AnnoncePhoto
+
+# Le plus petit PNG valide possible (1x1 pixel transparent).
+PNG_1PX = (
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06'
+    b'\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00'
+    b'\x01\r\n\x2d\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+)
+
+
+def trois_photos():
+    return [
+        SimpleUploadedFile(f'photo{i}.png', PNG_1PX, content_type='image/png')
+        for i in range(3)
+    ]
 
 
 class AnnonceCreateViewTest(TestCase):
@@ -41,10 +56,25 @@ class AnnonceCreateViewTest(TestCase):
         self.assertEqual(annonce.statut, Annonce.Statut.BROUILLON)
 
     def test_creation_avec_action_soumettre_passe_en_attente(self):
-        response = self.client.post(reverse('annonce_creer'), self.annonce_data(action='soumettre'))
+        data = self.annonce_data(action='soumettre')
+        data['photos'] = trois_photos()
+        response = self.client.post(reverse('annonce_creer'), data)
         self.assertRedirects(response, reverse('mes_annonces'))
         annonce = Annonce.objects.get(vendeur=self.vendeur)
         self.assertEqual(annonce.statut, Annonce.Statut.EN_ATTENTE)
+        self.assertEqual(annonce.photos.count(), 3)
+
+    def test_soumettre_sans_assez_de_photos_est_refuse(self):
+        response = self.client.post(reverse('annonce_creer'), self.annonce_data(action='soumettre'))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Annonce.objects.exists())
+        self.assertContains(response, 'Ajoutez au moins 3 photos')
+
+    def test_enregistrer_en_brouillon_sans_photos_reste_possible(self):
+        response = self.client.post(reverse('annonce_creer'), self.annonce_data(action='enregistrer'))
+        self.assertRedirects(response, reverse('mes_annonces'))
+        annonce = Annonce.objects.get(vendeur=self.vendeur)
+        self.assertEqual(annonce.statut, Annonce.Statut.BROUILLON)
 
     def test_vendeur_est_toujours_utilisateur_connecte(self):
         self.client.post(reverse('annonce_creer'), self.annonce_data(action='enregistrer'))
@@ -74,10 +104,20 @@ class AnnoncePublierViewTest(TestCase):
 
     def test_publier_un_brouillon_passe_en_attente(self):
         annonce = self.create_annonce()
+        for i in range(3):
+            AnnoncePhoto.objects.create(annonce=annonce, image=SimpleUploadedFile(f'photo{i}.png', PNG_1PX, content_type='image/png'), ordre=i)
         response = self.client.post(reverse('annonce_publier', args=[annonce.pk]))
         self.assertRedirects(response, reverse('mes_annonces'))
         annonce.refresh_from_db()
         self.assertEqual(annonce.statut, Annonce.Statut.EN_ATTENTE)
+
+    def test_publier_bloque_si_moins_de_3_photos(self):
+        annonce = self.create_annonce()
+        AnnoncePhoto.objects.create(annonce=annonce, image=SimpleUploadedFile('photo0.png', PNG_1PX, content_type='image/png'), ordre=0)
+        response = self.client.post(reverse('annonce_publier', args=[annonce.pk]))
+        self.assertRedirects(response, reverse('mes_annonces'))
+        annonce.refresh_from_db()
+        self.assertEqual(annonce.statut, Annonce.Statut.BROUILLON)
 
     def test_publier_une_annonce_deja_en_attente_ne_fait_rien(self):
         annonce = self.create_annonce(statut=Annonce.Statut.EN_ATTENTE)

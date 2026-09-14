@@ -9,7 +9,7 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
-from .forms import AnnonceForm
+from .forms import MIN_PHOTOS, AnnonceForm
 from .models import Annonce, AnnoncePhoto
 from .sync import trigger_public_sync
 
@@ -43,14 +43,14 @@ class AnnonceCreateView(_CompteActifRequisMixin, View):
         return render(request, self.template_name, {'form': AnnonceForm()})
 
     def post(self, request):
-        form = AnnonceForm(request.POST, request.FILES)
+        action = request.POST.get('action')
+        form = AnnonceForm(request.POST, request.FILES, exiger_photos_minimum=(action == 'soumettre'))
         if not form.is_valid():
             return render(request, self.template_name, {'form': form})
 
         with transaction.atomic():
             annonce = form.save(commit=False)
             annonce.vendeur = request.user.compte_stock
-            action = request.POST.get('action')
             annonce.statut = Annonce.Statut.EN_ATTENTE if action == 'soumettre' else Annonce.Statut.BROUILLON
             annonce.save()
 
@@ -118,6 +118,12 @@ class AnnoncePublierView(_CompteActifRequisMixin, View):
     def post(self, request, pk):
         annonce = get_object_or_404(Annonce, pk=pk, vendeur=request.user.compte_stock)
         if annonce.statut == Annonce.Statut.BROUILLON:
+            if annonce.photos.count() < MIN_PHOTOS:
+                messages.error(
+                    request,
+                    f"Ajoutez au moins {MIN_PHOTOS} photos à cette annonce avant de la soumettre.",
+                )
+                return redirect('mes_annonces')
             annonce.statut = Annonce.Statut.EN_ATTENTE
             annonce.save(update_fields=['statut'])
             messages.success(

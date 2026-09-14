@@ -70,7 +70,7 @@
             </div>
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
+            <form id="annonce-form" method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
                 {% csrf_token %}
 
                 <div class="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible">
@@ -167,7 +167,7 @@
 
                     <div data-step="3" class="hidden flex flex-col gap-4">
                         <h2 class="font-headline-md text-lg text-primary">Photos</h2>
-                        <p class="text-sm text-on-surface-variant">Jusqu'à 4 photos, 4 Mo maximum chacune. <span id="photo-count">0/4</span></p>
+                        <p class="text-sm text-on-surface-variant">Entre 3 et 4 photos (obligatoire pour soumettre), 4 Mo maximum chacune. <span id="photo-count">0/4</span></p>
 
                         <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-lg py-8 cursor-pointer hover:border-primary transition-colors" for="id_photos">
                             <span class="material-symbols-outlined text-primary text-[32px]">add_photo_alternate</span>
@@ -196,7 +196,7 @@
                             <button class="wizard-prev px-6 py-3 bg-surface-container text-on-surface rounded-lg font-label-md text-sm flex items-center justify-center gap-2" type="button"><span class="material-symbols-outlined text-[18px]">arrow_back</span> Précédent</button>
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <button class="px-6 py-3 border-2 border-primary text-primary rounded-lg font-label-md text-sm" name="action" type="submit" value="enregistrer">Enregistrer comme brouillon</button>
-                                <button class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-sm" name="action" type="submit" value="soumettre">Soumettre pour validation</button>
+                                <button class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-sm" id="btn-soumettre" name="action" type="submit" value="soumettre">Soumettre pour validation</button>
                             </div>
                         </div>
                     </div>
@@ -293,6 +293,16 @@
     if (!button) return;
     photoFiles.splice(Number(button.dataset.index), 1);
     renderPhotoGrid();
+  });
+
+  var annonceForm = document.getElementById('annonce-form');
+  annonceForm.addEventListener('submit', function (event) {
+    var submitter = event.submitter;
+    if (submitter && submitter.value === 'soumettre' && photoFiles.length < 3) {
+      event.preventDefault();
+      showStep(3);
+      alert('Ajoutez au moins 3 photos pour soumettre votre annonce à validation (' + photoFiles.length + '/3 actuellement).');
+    }
   });
 })();
 </script>

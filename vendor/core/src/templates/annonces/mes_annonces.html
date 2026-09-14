@@ -196,13 +196,20 @@
 
                         <div class="mt-auto pt-4 flex flex-col gap-2">
                             {% if annonce.statut == 'brouillon' %}
+                            {% with nb_photos=annonce.photos.count %}
                             <div class="flex items-center gap-2">
+                                {% if nb_photos < 3 %}
+                                <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/40 text-on-primary cursor-not-allowed" title="Ajoutez au moins 3 photos pour publier ({{ nb_photos }}/3)" aria-label="Publier (photos manquantes)" disabled type="button">
+                                    <span class="material-symbols-outlined text-[20px]">publish</span>
+                                </button>
+                                {% else %}
                                 <form action="{% url 'annonce_publier' annonce.pk %}" method="post">
                                     {% csrf_token %}
                                     <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors" title="Publier" aria-label="Publier" type="submit">
                                         <span class="material-symbols-outlined text-[20px]">publish</span>
                                     </button>
                                 </form>
+                                {% endif %}
                                 <a class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors" title="Modifier" aria-label="Modifier" href="{% url 'annonce_modifier' annonce.pk %}">
                                     <span class="material-symbols-outlined text-[20px]">edit</span>
                                 </a>
@@ -210,6 +217,7 @@
                                     <span class="material-symbols-outlined text-[20px]">delete</span>
                                 </button>
                             </div>
+                            {% endwith %}
                             {% elif annonce.statut == 'refusee' %}
                             {% if annonce.motif_refus %}
                             <p class="text-[11px] text-error font-semibold">Motif : {{ annonce.get_motif_refus_display }}</p>
