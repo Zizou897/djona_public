@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page introuvable | Djona{% endblock %}
+{% block meta_description %}Cette page n'existe pas ou plus sur Djona.{% endblock %}
+
+{% block content %}
+<section class="relative w-full min-h-[75vh] overflow-hidden bg-[linear-gradient(135deg,#003b5a_0%,#0f4a6e_50%,#1a5276_100%)] flex flex-col items-center justify-center -mt-20 pt-28 pb-20 px-4">
+  <span class="material-symbols-outlined absolute -right-8 -bottom-20 text-[320px] text-white/[0.05] rotate-[-8deg] select-none pointer-events-none" aria-hidden="true">directions_car</span>
+
+  <div class="relative z-10 max-w-lg mx-auto text-center flex flex-col items-center gap-5">
+    <span class="flex items-center justify-center w-20 h-20 rounded-full bg-secondary-container/20">
+      <span class="material-symbols-outlined text-secondary-container text-[40px]" aria-hidden="true">signpost</span>
+    </span>
+    <span class="font-display-lg text-7xl text-white/90 leading-none">404</span>
+    <div class="flex flex-col gap-2">
+      <h1 class="font-headline-lg text-2xl sm:text-headline-md text-white">Cette page a pris un autre chemin</h1>
+      <p class="font-body-lg text-white/70 max-w-md mx-auto">
+        La page que vous cherchez n'existe pas ou plus — elle a peut-être été retirée du marketplace.
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto max-w-sm sm:max-w-none mx-auto mt-2">
+      <a href="{% url 'core:home' %}" class="group w-full sm:w-auto px-6 py-3.5 bg-secondary text-on-secondary font-label-md text-[16px] rounded-md shadow-xl hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2">
+        <span>Retour à l'accueil</span>
+        <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+      </a>
+      <a href="{% url 'catalog:list' %}" class="w-full sm:w-auto px-6 py-3.5 bg-transparent border border-white/40 text-white font-label-md text-[16px] rounded-md hover:bg-white/10 active:scale-98 transition-all text-center">
+        Voir le catalogue
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
