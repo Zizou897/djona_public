@@ -53,7 +53,7 @@
   </section>
 
   {# Barre de recherche rapide #}
-  <section class="relative z-20 -mt-12 sm:-mt-16 max-w-[1100px] mx-auto px-4 sm:px-container-margin-mobile w-full">
+  <section class="relative z-20 -mt-12 sm:-mt-16 mb-16 max-w-[1100px] mx-auto px-4 sm:px-container-margin-mobile w-full">
     <form method="GET" action="{% url 'catalog:list' %}" id="hero-search-form" class="bg-surface-container-lowest p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl">
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -89,14 +89,6 @@
           </div>
         </div>
 
-        {# Prix max #}
-        <div class="flex flex-col gap-1.5 sm:gap-2">
-          <label for="search-prix-max" class="font-label-md text-xs sm:text-sm text-on-surface-variant ml-1">Prix max (FCFA)</label>
-          <input id="search-prix-max" name="price_max" type="number" min="0" step="500000"
-                 placeholder="Ex : 15 000 000"
-                 class="w-full h-12 sm:h-14 px-3.5 sm:px-4 bg-surface-container rounded border-none focus:ring-2 focus:ring-primary font-body-md text-sm sm:text-base text-on-surface outline-none">
-        </div>
-
         {# Localisation — données réelles BDD #}
         <div class="flex flex-col gap-1.5 sm:gap-2">
           <label for="search-localisation" class="font-label-md text-xs sm:text-sm text-on-surface-variant ml-1">Localisation</label>
@@ -112,23 +104,15 @@
           </div>
         </div>
 
-      </div>
-
-      <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {# Liens de raccourcis rapides #}
-        <div class="flex flex-wrap gap-2">
-          <span class="font-label-sm text-xs text-on-surface-variant hidden sm:inline self-center">Recherches populaires :</span>
-          <a href="{% url 'catalog:list' %}?condition=neuf" class="inline-flex items-center px-3 py-1 bg-primary/5 hover:bg-primary/10 text-primary rounded-full font-label-sm text-xs transition-colors">Neuf</a>
-          <a href="{% url 'catalog:list' %}?condition=occasion" class="inline-flex items-center px-3 py-1 bg-primary/5 hover:bg-primary/10 text-primary rounded-full font-label-sm text-xs transition-colors">Occasion</a>
-          <a href="{% url 'catalog:list' %}?transmission=automatique" class="inline-flex items-center px-3 py-1 bg-primary/5 hover:bg-primary/10 text-primary rounded-full font-label-sm text-xs transition-colors">Automatique</a>
+        {# Bouton de soumission fonctionnel #}
+        <div class="flex flex-col gap-1.5 sm:gap-2">
+          <label class="font-label-md text-xs sm:text-sm invisible select-none" aria-hidden="true">Rechercher</label>
+          <button type="submit"
+                  class="w-full h-12 sm:h-14 bg-primary text-on-primary rounded font-label-md text-sm sm:text-base shadow-md hover:brightness-125 active:scale-98 transition-all flex items-center justify-center gap-2 sm:gap-3">
+            Lancer la recherche
+          </button>
         </div>
 
-        {# Bouton de soumission fonctionnel #}
-        <button type="submit"
-                class="w-full sm:w-auto bg-primary text-on-primary px-8 md:px-12 py-3.5 md:py-4 rounded-md font-label-md text-[18px] shadow-md hover:brightness-125 active:scale-98 transition-all flex items-center justify-center gap-2 sm:gap-3">
-          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">search</span>
-          Lancer la recherche
-        </button>
       </div>
 
     </form>

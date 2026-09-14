@@ -9,17 +9,17 @@
     </a>
 
     {% with underline="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-full after:bg-primary after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100" %}
-    <nav class="hidden lg:flex items-center gap-gutter" aria-label="Navigation principale">
+    <nav class="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
       <a href="{% url 'core:home' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
       <a href="{% url 'catalog:list' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
-      <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre</a>
+         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
+      <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre vos véhicules</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
+         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>
     </nav>
     {% endwith %}
 
@@ -55,11 +55,11 @@
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
       <a href="{% url 'catalog:list' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Catalogue</a>
-      <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre</a>
+         {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
+      <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre vos véhicules</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contact</a>
+         {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>
       <a href="https://vendor.djona.tech/" class="mt-2 text-center px-4 py-3 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
         Publier mon véhicule
       </a>
