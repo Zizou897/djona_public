@@ -41,7 +41,7 @@ class Seller(models.Model):
     type_compte = models.CharField(max_length=20, choices=TypeCompte.choices, default=TypeCompte.PARTICULIER)
     company_name = models.CharField('raison sociale', max_length=150, blank=True)
     city = models.CharField('ville', max_length=30, choices=Ville.choices, blank=True)
-    logo = models.ImageField('logo', upload_to='sellers/', blank=True, null=True)
+    logo = models.ImageField('logo', upload_to='sellers/', max_length=255, blank=True, null=True)
     member_since = models.DateTimeField('membre depuis')
     slug = models.SlugField('slug', max_length=180, unique=True, blank=True)
 
@@ -137,7 +137,7 @@ class Vehicle(Convention):
 
 class VehicleImage(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField('image', upload_to='vehicles/')
+    image = models.ImageField('image', upload_to='vehicles/', max_length=255)
     order = models.PositiveSmallIntegerField('ordre', default=0)
 
     class Meta:

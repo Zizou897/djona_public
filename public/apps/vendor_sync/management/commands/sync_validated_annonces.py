@@ -108,11 +108,16 @@ class Command(BaseCommand):
             self.stderr.write(self.style.WARNING(f'Logo introuvable sur disque, ignoré : {source_path}'))
             return
 
-        dest_dir = Path(settings.MEDIA_ROOT) / 'sellers' / str(seller.source_vendeur_id)
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source_path, dest_dir / filename)
-        seller.logo = dest_relative
-        seller.save(update_fields=['logo'])
+        try:
+            dest_dir = Path(settings.MEDIA_ROOT) / 'sellers' / str(seller.source_vendeur_id)
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source_path, dest_dir / filename)
+            seller.logo = dest_relative
+            seller.save(update_fields=['logo'])
+        except Exception as exc:
+            # Un logo en échec (fichier corrompu, nom de fichier trop long, etc.)
+            # ne doit jamais interrompre la synchro des autres vendeurs/annonces.
+            self.stderr.write(self.style.WARNING(f'Logo non synchronisé ({exc}) : {source_path}'))
 
     def _sync_photos(self, annonce, vehicle):
         if not VENDOR_MEDIA_ROOT:
@@ -135,9 +140,16 @@ class Command(BaseCommand):
                 self.stderr.write(self.style.WARNING(f'Photo introuvable sur disque, ignorée : {source_path}'))
                 continue
 
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source_path, dest_dir / filename)
-            VehicleImage.objects.create(vehicle=vehicle, image=dest_relative, order=photo.ordre)
-            synced += 1
+            try:
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source_path, dest_dir / filename)
+                VehicleImage.objects.create(vehicle=vehicle, image=dest_relative, order=photo.ordre)
+                synced += 1
+            except Exception as exc:
+                # Une photo en échec (fichier corrompu, nom de fichier trop long,
+                # etc.) ne doit jamais interrompre la synchro des autres photos/
+                # annonces — sinon une seule pièce jointe problématique bloque tout
+                # le catalogue marketplace en silence.
+                self.stderr.write(self.style.WARNING(f'Photo non synchronisée ({exc}) : {source_path}'))
 
         return synced
