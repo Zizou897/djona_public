@@ -34,3 +34,52 @@
 
   counters.forEach((counter) => observer.observe(counter));
 })();
+
+(() => {
+  const marqueSelect = document.getElementById('search-marque');
+  const carburantSelect = document.getElementById('search-carburant');
+  const localisationSelect = document.getElementById('search-localisation');
+  const dataEl = document.getElementById('search-brand-options-data');
+  if (!marqueSelect || !carburantSelect || !localisationSelect || !dataEl) return;
+
+  const brandOptions = JSON.parse(dataEl.textContent);
+
+  const fillOptions = (select, placeholder, items, toOption) => {
+    select.innerHTML = '';
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = placeholder;
+    select.appendChild(placeholderOption);
+    items.forEach((item) => select.appendChild(toOption(item)));
+  };
+
+  const updateDependentSelects = () => {
+    const data = brandOptions[marqueSelect.value];
+
+    if (!data) {
+      fillOptions(carburantSelect, "Choisissez d'abord une marque", []);
+      fillOptions(localisationSelect, "Choisissez d'abord une marque", []);
+      carburantSelect.disabled = true;
+      localisationSelect.disabled = true;
+      return;
+    }
+
+    fillOptions(carburantSelect, 'Tous les carburants', data.fuel_types, (fuel) => {
+      const option = document.createElement('option');
+      option.value = fuel.value;
+      option.textContent = fuel.label;
+      return option;
+    });
+    fillOptions(localisationSelect, 'Toutes les villes', data.cities, (city) => {
+      const option = document.createElement('option');
+      option.value = city;
+      option.textContent = city;
+      return option;
+    });
+    carburantSelect.disabled = false;
+    localisationSelect.disabled = false;
+  };
+
+  marqueSelect.addEventListener('change', updateDependentSelects);
+  updateDependentSelects();
+})();

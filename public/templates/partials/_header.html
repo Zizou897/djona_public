@@ -17,6 +17,9 @@
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
       <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre vos véhicules</a>
+      <a href="{% url 'core:transport' %}"
+         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:transport' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:transport' %}aria-current="page"{% endif %}>Transport</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>
@@ -57,6 +60,9 @@
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
       <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre vos véhicules</a>
+      <a href="{% url 'core:transport' %}"
+         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:transport' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
+         {% if request.resolver_match.view_name == 'core:transport' %}aria-current="page"{% endif %}>Transport</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>

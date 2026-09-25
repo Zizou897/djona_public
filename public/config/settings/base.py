@@ -104,3 +104,9 @@ CACHES = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Destinataires des notifications email de nouvelle demande de transport
+# (équipe Djona, contact transport du partenaire). Vide = pas d'email.
+from decouple import config as _config  # noqa: E402
+
+TRANSPORT_NOTIFY_EMAILS = [e.strip() for e in _config('TRANSPORT_NOTIFY_EMAILS', default='').split(',') if e.strip()]

@@ -55,6 +55,7 @@
   {# Barre de recherche rapide #}
   <section class="relative z-20 -mt-12 sm:-mt-16 mb-16 max-w-[1100px] mx-auto px-4 sm:px-container-margin-mobile w-full">
     <form method="GET" action="{% url 'catalog:list' %}" id="hero-search-form" class="bg-surface-container-lowest p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl">
+      {{ search_brand_options|json_script:"search-brand-options-data" }}
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 
@@ -73,32 +74,25 @@
           </div>
         </div>
 
-        {# Carburant #}
+        {# Carburant — activé une fois une marque choisie #}
         <div class="flex flex-col gap-1.5 sm:gap-2">
           <label for="search-carburant" class="font-label-md text-xs sm:text-sm text-on-surface-variant ml-1">Carburant</label>
           <div class="relative">
-            <select id="search-carburant" name="fuel_type"
-                    class="w-full h-12 sm:h-14 pl-3.5 sm:pl-4 pr-10 bg-surface-container rounded border-none focus:ring-2 focus:ring-primary font-body-md text-sm sm:text-base text-on-surface appearance-none outline-none cursor-pointer">
-              <option value="">Tous les carburants</option>
-              <option value="essence">Essence</option>
-              <option value="diesel">Diesel</option>
-              <option value="hybride">Hybride</option>
-              <option value="electrique">Électrique</option>
+            <select id="search-carburant" name="fuel_type" disabled
+                    class="w-full h-12 sm:h-14 pl-3.5 sm:pl-4 pr-10 bg-surface-container rounded border-none focus:ring-2 focus:ring-primary font-body-md text-sm sm:text-base text-on-surface appearance-none outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+              <option value="">Choisissez d'abord une marque</option>
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline" aria-hidden="true">keyboard_arrow_down</span>
           </div>
         </div>
 
-        {# Localisation — données réelles BDD #}
+        {# Localisation — activée une fois une marque choisie #}
         <div class="flex flex-col gap-1.5 sm:gap-2">
           <label for="search-localisation" class="font-label-md text-xs sm:text-sm text-on-surface-variant ml-1">Localisation</label>
           <div class="relative">
-            <select id="search-localisation" name="city"
-                    class="w-full h-12 sm:h-14 pl-3.5 sm:pl-4 pr-10 bg-surface-container rounded border-none focus:ring-2 focus:ring-primary font-body-md text-sm sm:text-base text-on-surface appearance-none outline-none cursor-pointer">
-              <option value="">Toutes les villes</option>
-              {% for city in search_cities %}
-                <option value="{{ city }}">{{ city }}</option>
-              {% endfor %}
+            <select id="search-localisation" name="city" disabled
+                    class="w-full h-12 sm:h-14 pl-3.5 sm:pl-4 pr-10 bg-surface-container rounded border-none focus:ring-2 focus:ring-primary font-body-md text-sm sm:text-base text-on-surface appearance-none outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+              <option value="">Choisissez d'abord une marque</option>
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline" aria-hidden="true">location_on</span>
           </div>

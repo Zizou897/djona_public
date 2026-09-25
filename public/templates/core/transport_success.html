@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Demande envoyée — Transport & Logistique — Djona{% endblock %}
+
+{% block content %}
+<section class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+  <div class="max-w-2xl mx-auto text-center bg-surface-container-lowest rounded-2xl shadow-xl p-8 sm:p-12">
+    <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-secondary flex items-center justify-center text-on-secondary">
+      <span class="material-symbols-outlined text-[32px]" aria-hidden="true">check</span>
+    </div>
+    <h1 class="font-headline-lg text-headline-lg text-primary mb-4">Votre demande a bien été envoyée.</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mb-6">
+      Merci pour votre confiance. Notre équipe reviendra vers vous dans les meilleurs délais afin d'étudier votre besoin et vous proposer une solution adaptée.
+    </p>
+    <p class="font-label-md text-label-md text-on-surface-variant mb-1">Numéro de votre demande</p>
+    <p class="font-headline-md text-headline-md text-primary mb-8">{{ reference }}</p>
+    <a href="{% url 'core:home' %}" class="inline-flex px-8 py-3 bg-primary text-on-primary rounded font-label-md text-label-md hover:brightness-125 transition-all">Retour à l'accueil</a>
+  </div>
+</section>
+{% endblock %}

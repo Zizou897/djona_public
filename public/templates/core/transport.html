@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transport & Logistique — Djona{% endblock %}
+{% block meta_description %}Besoin de transporter vos marchandises ? Djona Group vous met en relation avec ses partenaires transport pour vos opérations en Côte d'Ivoire et à l'international. Envoyez votre demande en quelques minutes.{% endblock %}
+
+{% block content %}
+<div class="relative flex flex-col w-full">
+
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop pt-section-gap pb-12">
+    <div class="max-w-page mx-auto">
+      <div class="max-w-3xl">
+        <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary mb-4 uppercase tracking-widest bg-secondary-fixed/30 px-3 py-1 rounded-full">Djona Group</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-display-lg text-primary mb-6 leading-tight">Transport &amp; <span class="text-secondary">Logistique</span></h1>
+        <p class="animate-slide-up-3 font-headline-md text-headline-md text-primary mb-4">Besoin de transporter vos marchandises ?</p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-4">
+          Djona Group vous accompagne dans la recherche de solutions de transport adaptées à vos besoins, pour vos opérations en Côte d'Ivoire et à l'international.
+        </p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-4">
+          Que vous soyez un particulier ou une entreprise, indiquez-nous votre besoin à travers le formulaire ci-dessous. Notre équipe étudiera votre demande et vous contactera afin de vous proposer une solution adaptée.
+        </p>
+        <p class="font-label-md text-label-md text-primary">Décrivez votre besoin, nous nous occupons du reste.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
+    <div class="max-w-page mx-auto">
+      <form method="post" action="{% url 'core:transport' %}" id="transport-form" class="max-w-3xl bg-surface-container-lowest rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col gap-10" novalidate>
+        {% csrf_token %}
+        <h2 class="font-headline-lg text-headline-lg text-primary -mb-4">Demande de transport</h2>
+
+        {% if form.non_field_errors %}
+        <div class="rounded bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <legend class="font-headline-md text-headline-md text-primary mb-4">Vos informations</legend>
+          {% include 'partials/_transport_field.html' with field=form.last_name %}
+          {% include 'partials/_transport_field.html' with field=form.first_name %}
+          {% include 'partials/_transport_field.html' with field=form.phone %}
+          {% include 'partials/_transport_field.html' with field=form.email %}
+          {% include 'partials/_transport_field.html' with field=form.requester_type is_select=True %}
+          <div id="transport-company-wrapper" {% if form.requester_type.value != 'entreprise' %}hidden{% endif %}>
+            {% include 'partials/_transport_field.html' with field=form.company_name %}
+          </div>
+        </fieldset>
+
+        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <legend class="font-headline-md text-headline-md text-primary mb-4">Le transport</legend>
+          {% include 'partials/_transport_field.html' with field=form.vehicle_type is_select=True %}
+          {% include 'partials/_transport_field.html' with field=form.quantity is_select=True %}
+        </fieldset>
+
+        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <legend class="font-headline-md text-headline-md text-primary mb-4">Chargement et livraison</legend>
+          {% include 'partials/_transport_field.html' with field=form.loading_date %}
+          {% include 'partials/_transport_field.html' with field=form.loading_place %}
+          {% include 'partials/_transport_field.html' with field=form.delivery_place extra_class='md:col-span-2' %}
+        </fieldset>
+
+        <fieldset class="grid grid-cols-1 gap-6">
+          <legend class="font-headline-md text-headline-md text-primary mb-4">Informations complémentaires</legend>
+          {% include 'partials/_transport_field.html' with field=form.message %}
+        </fieldset>
+
+        <div>
+          <button type="submit" class="w-full sm:w-auto px-10 py-4 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-98 transition-all">
+            Envoyer ma demande
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/transport.js' %}" defer></script>
+{% endblock %}
