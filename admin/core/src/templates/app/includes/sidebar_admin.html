@@ -17,6 +17,9 @@
 <a {% if active_nav == 'partenaires' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'partner_liste' %}">
 <span class="material-symbols-outlined mr-4">handshake</span><span class="font-label-md text-label-md">Partenaires</span>
 </a>
+<a {% if active_nav == 'transport' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'transport_demande_liste' %}">
+<span class="material-symbols-outlined mr-4">local_shipping</span><span class="font-label-md text-label-md">Transport</span>
+</a>
 <a {% if active_nav == 'newsletter' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'newsletter_subscriber_liste' %}">
 <span class="material-symbols-outlined mr-4">forward_to_inbox</span><span class="font-label-md text-label-md">Newsletter</span>
 </a>

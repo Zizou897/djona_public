@@ -1,0 +1,62 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Types de véhicules transport — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Transport' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='transport' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
+
+<a href="{% url 'transport_demande_liste' %}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-4">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux demandes
+</a>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Transport &amp; Logistique</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Types de véhicules</h1>
+<p class="text-sm text-on-surface-variant mb-8">Liste proposée dans le formulaire public. Masquez un type qui n'est plus disponible chez les partenaires.</p>
+
+<form method="post" class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 mb-6 grid grid-cols-1 sm:grid-cols-[1fr_120px_auto] gap-4 sm:items-end">
+    {% csrf_token %}
+    <div class="flex flex-col gap-2">
+        <label for="{{ form.name.id_for_label }}" class="font-label-md text-label-md">{{ form.name.label }}</label>
+        {{ form.name }}
+        {% for e in form.name.errors %}<p class="text-sm text-error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="flex flex-col gap-2">
+        <label for="{{ form.order.id_for_label }}" class="font-label-md text-label-md">{{ form.order.label }}</label>
+        {{ form.order }}
+        {% for e in form.order.errors %}<p class="text-sm text-error">{{ e }}</p>{% endfor %}
+    </div>
+    <button type="submit" class="px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">Ajouter</button>
+</form>
+
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] divide-y divide-surface-container">
+{% for t in types %}
+<div class="p-4 flex items-center justify-between gap-3">
+    <div><p class="font-label-md text-label-md {% if not t.is_active %}text-on-surface-variant line-through{% endif %}">{{ t.name }}</p><p class="text-[11px] text-on-surface-variant">Ordre {{ t.order }}</p></div>
+    <form method="post" action="{% url 'transport_type_basculer' t.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="px-4 py-2 rounded-lg border {% if t.is_active %}border-error text-error{% else %}border-primary text-primary{% endif %} font-label-md text-label-md transition-colors">{% if t.is_active %}Masquer{% else %}Réactiver{% endif %}</button>
+    </form>
+</div>
+{% empty %}
+<div class="p-8 text-center text-on-surface-variant">Aucun type de véhicule.</div>
+{% endfor %}
+</div>
+
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='transport' %}
+</div>
+{% endblock %}

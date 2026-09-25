@@ -1,0 +1,56 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}{{ demande.reference }} — Transport — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Transport' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='transport' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-4xl">
+
+<a href="{% url 'transport_demande_liste' %}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-4">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux demandes
+</a>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Demande de transport</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ demande.reference }}</h1>
+<p class="text-sm text-on-surface-variant mb-8">Reçue le {{ demande.created_at|date:'d/m/Y à H:i' }}</p>
+
+<form method="post" class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 mb-6 flex flex-col sm:flex-row sm:items-end gap-4">
+    {% csrf_token %}
+    <div class="flex flex-col gap-2 flex-1">
+        <label for="statut" class="font-label-md text-label-md">Statut de la demande</label>
+        <select id="statut" name="statut" class="px-4 py-3 rounded bg-surface-container outline-none focus:ring-2 focus:ring-primary">
+            {% for value, label in statuts %}<option value="{{ value }}" {% if demande.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">Mettre à jour</button>
+</form>
+
+<dl class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Demandeur</dt><dd class="font-label-md text-label-md">{{ demande.full_name }}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Type de demandeur</dt><dd class="font-label-md text-label-md">{{ demande.requester_label }}{% if demande.company_name %} — {{ demande.company_name }}{% endif %}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Téléphone</dt><dd class="font-label-md text-label-md"><a class="text-primary hover:underline" href="tel:{{ demande.phone }}">{{ demande.phone }}</a></dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Email</dt><dd class="font-label-md text-label-md">{% if demande.email %}<a class="text-primary hover:underline" href="mailto:{{ demande.email }}">{{ demande.email }}</a>{% else %}—{% endif %}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Véhicule souhaité</dt><dd class="font-label-md text-label-md">{{ demande.quantity }} × {{ demande.vehicle_type.name }}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Date de chargement</dt><dd class="font-label-md text-label-md">{{ demande.loading_date|date:'d/m/Y' }}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Lieu de chargement</dt><dd class="font-label-md text-label-md">{{ demande.loading_place }}</dd></div>
+    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Lieu de livraison</dt><dd class="font-label-md text-label-md">{{ demande.delivery_place }}</dd></div>
+    <div class="sm:col-span-2"><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Informations complémentaires</dt><dd class="whitespace-pre-line">{{ demande.message|default:"—" }}</dd></div>
+</dl>
+
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='transport' %}
+</div>
+{% endblock %}
