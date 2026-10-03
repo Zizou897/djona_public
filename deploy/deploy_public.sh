@@ -29,6 +29,12 @@ python manage.py migrate --noinput --settings=config.settings.prod
 echo "==> [public] collecte des statiques"
 python manage.py collectstatic --noinput --settings=config.settings.prod
 
+# Le cache fichiers (rate-limit des formulaires) doit appartenir à l'utilisateur
+# de gunicorn : créé par root, il fait planter contact/transport/newsletter en 500.
+echo "==> [public] droits du cache fichiers"
+mkdir -p cache_framework
+chown -R www-data:www-data cache_framework
+
 restart_and_check "$SERVICE" "$URL" 200
 
 echo "==> [public] déploiement réussi"
