@@ -131,7 +131,7 @@ AVANTAGES_CHECKLIST = [
 
 def avantages(request):
     """Page « Les avantages d'acheter avec Djona » — proposition de valeur
-    client portée depuis public/Avantages_Acheter_avec_Djona.docx (contenu
+    client portée depuis docs/Avantages_Acheter_avec_Djona.docx (contenu
     officiel fourni par l'équipe Djona, pas une maquette)."""
     context = {
         'items': AVANTAGES_ITEMS,
