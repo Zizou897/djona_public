@@ -22,7 +22,7 @@
           icon: ICONS[data.status] || 'error',
           title: TITLES[data.status] || 'Oups',
           text: data.message,
-          confirmButtonColor: '#003b5a',
+          confirmButtonColor: '#0c4b70',
         });
         if (data.status === 'success') {
           form.reset();
@@ -33,7 +33,7 @@
           icon: 'error',
           title: 'Oups',
           text: 'Une erreur est survenue — réessayez.',
-          confirmButtonColor: '#003b5a',
+          confirmButtonColor: '#0c4b70',
         });
       })
       .finally(function () {

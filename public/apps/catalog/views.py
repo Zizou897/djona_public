@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.core.views import _client_ip
+from apps.core.views import AVANTAGES_ITEMS, FAQ_ITEMS, _client_ip
 
 from .forms import InterestForm
 from .models import Favorite, Seller, Vehicle
@@ -170,6 +170,8 @@ def vehicle_detail(request, slug):
         'max_compare': MAX_COMPARE,
         'interest_form': InterestForm(),
         'whatsapp_message': whatsapp_message,
+        'avantages': AVANTAGES_ITEMS[:5],
+        'faq_items': FAQ_ITEMS,
     }
     return render(request, 'catalog/detail.html', context)
 

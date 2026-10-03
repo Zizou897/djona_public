@@ -161,3 +161,48 @@ class LegalPagesTests(TestCase):
         self.assertNotIn('Séquestre', sellers)
         self.assertNotIn('experts mécaniques certifiés', sellers)
         self.assertIn('Au moins 3 photos', sellers)
+
+
+class AskQuestionTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.url = reverse('core:ask_question')
+
+    def test_valid_question_saved_with_page(self):
+        response = self.client.post(self.url, {
+            'question': 'La voiture est-elle encore disponible ?', 'phone': '07 00 00 00 00',
+            'page': 'https://djona.tech/vehicules/toyota-corolla-2022/',
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.json()['status'], 'success')
+        msg = ContactMessage.objects.get()
+        self.assertEqual(msg.subject, ContactMessage.Subject.QUESTION)
+        self.assertEqual(msg.phone, '+225 0700000000')
+        self.assertIn('toyota-corolla-2022', msg.message)
+
+    def test_invalid_phone_rejected(self):
+        response = self.client.post(self.url, {'question': 'Une vraie question ?', 'phone': '12'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(ContactMessage.objects.count(), 0)
+
+    def test_get_not_allowed(self):
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_modal_on_contact_and_question_not_in_contact_subjects(self):
+        response = self.client.get(reverse('core:contact'))
+        self.assertContains(response, 'id="ask-modal"')
+        self.assertNotContains(response, '<option value="question"')
+
+
+class FooterSocialLinksTests(TestCase):
+    def test_only_filled_networks_are_shown(self):
+        response = self.client.get(reverse('core:home'))
+        self.assertNotContains(response, 'Djona sur Facebook')
+        SiteContact.objects.filter(pk=1).update(
+            facebook_url='https://www.facebook.com/djonagroup',
+            linkedin_url='https://www.linkedin.com/company/djonagroup',
+        )
+        response = self.client.get(reverse('core:home'))
+        self.assertContains(response, 'href="https://www.facebook.com/djonagroup"')
+        self.assertContains(response, 'Djona sur LinkedIn')
+        self.assertNotContains(response, 'Djona sur Instagram')
+        self.assertNotContains(response, 'Djona sur TikTok')

@@ -27,7 +27,7 @@
   {# En-tête vendeur #}
   <section class="w-full px-container-margin-mobile lg:px-container-margin-desktop">
     <div class="max-w-page mx-auto -mt-14 sm:-mt-16 relative z-10 flex flex-col sm:flex-row items-center sm:items-end gap-6">
-      <div class="w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-2xl overflow-hidden bg-primary shadow-xl border-4 border-background flex items-center justify-center">
+      <div class="w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-lg overflow-hidden bg-primary shadow-xl border-4 border-background flex items-center justify-center">
         {% if seller.logo %}
         <img src="{{ seller.logo.url }}" alt="{{ seller.display_name }}" class="w-full h-full object-cover">
         {% else %}
@@ -63,7 +63,7 @@
 
   {# Stats #}
   <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-8">
-    <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-outline-variant/30 bg-surface-container-low rounded-2xl overflow-hidden">
+    <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-outline-variant/30 bg-surface-container-low rounded-lg overflow-hidden">
       <div class="p-5 text-center">
         <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">Membre depuis</p>
         <p class="font-headline-md text-headline-md text-primary">{{ seller.member_since|date:"M Y" }}</p>
@@ -111,7 +111,7 @@
           {% endfor %}
         </div>
         {% else %}
-        <div class="py-12 flex flex-col items-center gap-3 text-center text-on-surface-variant bg-surface-container-low rounded-2xl">
+        <div class="py-12 flex flex-col items-center gap-3 text-center text-on-surface-variant bg-surface-container-low rounded-lg">
           <span class="material-symbols-outlined text-outline text-[40px]" aria-hidden="true">directions_car</span>
           <p>Aucun véhicule en vente actuellement.</p>
         </div>
@@ -133,7 +133,7 @@
 
     {# Sidebar #}
     <div class="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
-      <div class="bg-surface p-6 rounded-md shadow-signature flex flex-col gap-4">
+      <div class="bg-surface p-6 rounded-lg shadow-signature flex flex-col gap-4">
         <h3 class="font-headline-md text-[18px] text-on-surface">Contactez ce vendeur</h3>
         {% if seller.phone %}
         <a href="https://wa.me/225{{ seller.phone }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md hover:brightness-105 transition-colors shadow-sm">
@@ -155,7 +155,7 @@
         </div>
       </div>
 
-      <div class="bg-tertiary text-on-tertiary p-6 rounded-md flex flex-col gap-4">
+      <div class="bg-tertiary text-on-tertiary p-6 rounded-lg flex flex-col gap-4">
         <h4 class="font-headline-md text-[18px]">Pourquoi acheter via Djona ?</h4>
         <ul class="flex flex-col gap-3">
           <li class="flex items-start gap-3">

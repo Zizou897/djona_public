@@ -1,0 +1,72 @@
+{% load static %}
+{% comment %}Section FAQ commune (page Contact, fiche véhicule). Attend `faq_items`.{% endcomment %}
+<section id="faq" class="scroll-mt-24 w-full bg-surface-container-low py-section-gap">
+  <div class="reveal max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-gutter">
+    <div class="lg:col-span-4">
+      <span class="block w-16 h-1 rounded-full bg-secondary mb-4" aria-hidden="true"></span>
+      <h2 class="font-headline-lg text-[24px] sm:text-headline-lg text-on-background mb-3">Questions &amp; Réponses</h2>
+      <p class="font-body-md text-on-surface-variant mb-6">Les questions fréquentes de nos clients.</p>
+      <button type="button" class="js-ask-open inline-flex items-center gap-2 px-5 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">forum</span> Poser une question
+      </button>
+    </div>
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      {% for item in faq_items %}
+      <div class="faq-item bg-surface-container-lowest rounded-md px-6 shadow-sm">
+        <button type="button" class="js-faq-toggle w-full py-5 flex justify-between items-center gap-4 text-left hover:text-primary transition-colors">
+          <span class="font-label-md text-label-md md:text-body-lg text-on-surface">{{ item.question }}</span>
+          <span class="material-symbols-outlined shrink-0 transition-transform duration-300" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="faq-content h-0 overflow-hidden transition-all duration-300">
+          <p class="pb-6 font-body-md text-body-md text-on-surface-variant">{{ item.answer }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── Fenêtre « Poser une question » ── #}
+<div id="ask-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-on-surface/40 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-labelledby="ask-modal-title">
+  <div class="relative bg-surface rounded-lg shadow-xl w-full max-w-xl p-6 sm:p-8">
+    <button type="button" class="js-ask-close absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" aria-label="Fermer">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+
+    <span class="block w-20 h-1 rounded-full bg-secondary mb-4" aria-hidden="true"></span>
+    <h3 id="ask-modal-title" class="font-headline-md text-[22px] text-on-background mb-6">Poser une question</h3>
+
+    <form id="ask-form" action="{% url 'core:ask_question' %}" method="post" class="flex flex-col gap-4" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="page" value="{{ request.build_absolute_uri }}">
+      <label for="ask-question" class="sr-only">Votre question</label>
+      <textarea id="ask-question" name="question" rows="4" maxlength="2000" required placeholder="Quelle question voulez-vous poser ?" class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none"></textarea>
+
+      <label for="ask-phone" class="sr-only">Votre numéro de téléphone</label>
+      <div class="flex rounded border border-outline-variant/40 bg-surface-container overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+        <span class="flex items-center gap-2 px-4 bg-surface-container-high border-r border-outline-variant/40 shrink-0 text-on-surface font-label-md text-label-md">
+          <span class="flex w-5 h-3.5 rounded-[2px] overflow-hidden shadow-sm" aria-hidden="true"><span class="flex-1 bg-[#F77F00]"></span><span class="flex-1 bg-white"></span><span class="flex-1 bg-[#009E60]"></span></span>
+          +225
+        </span>
+        <input id="ask-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" required placeholder="Numéro de téléphone" class="flex-1 min-w-0 px-4 py-3 bg-transparent text-on-surface outline-none">
+      </div>
+
+      <p id="ask-error" class="hidden text-sm text-error" role="alert"></p>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+        <p class="text-label-sm text-on-surface-variant">En cliquant sur Envoyer, vous acceptez nos <a href="{% url 'core:terms' %}" target="_blank" class="text-primary underline">Conditions d'utilisation</a> et notre <a href="{% url 'core:privacy' %}" target="_blank" class="text-primary underline">Politique de confidentialité</a>.</p>
+        <button type="submit" id="ask-submit" disabled class="shrink-0 px-8 py-3.5 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all disabled:bg-outline disabled:cursor-not-allowed disabled:hover:brightness-100">Envoyer</button>
+      </div>
+    </form>
+
+    <div id="ask-success" class="hidden flex-col items-center text-center gap-3 py-4">
+      <span class="w-14 h-14 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
+        <span class="material-symbols-outlined text-[28px]" aria-hidden="true">check</span>
+      </span>
+      <p class="font-headline-md text-[18px] text-on-background">Question envoyée</p>
+      <p id="ask-success-message" class="text-body-md text-on-surface-variant"></p>
+      <button type="button" class="js-ask-close mt-2 px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md hover:brightness-125 transition-all">Fermer</button>
+    </div>
+  </div>
+</div>
+<script src="{% static 'js/ask-question.js' %}" defer></script>

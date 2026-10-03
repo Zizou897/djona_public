@@ -53,22 +53,16 @@
       {# Carte de visite #}
       <div class="lg:col-span-5 flex justify-center lg:justify-end">
         <div class="animate-slide-up-3 relative w-full max-w-[400px] rotate-[2deg] hover:rotate-0 transition-transform duration-500">
-          <div class="absolute inset-0 translate-x-3 translate-y-3 rounded-2xl bg-secondary/80" aria-hidden="true"></div>
-          <div class="relative bg-surface-container-lowest text-on-surface rounded-2xl shadow-2xl overflow-hidden">
+          <div class="absolute inset-0 translate-x-3 translate-y-3 rounded-lg bg-secondary/80" aria-hidden="true"></div>
+          <div class="relative bg-surface-container-lowest text-on-surface rounded-lg shadow-2xl overflow-hidden">
             <div class="absolute inset-0 opacity-[0.04] pointer-events-none" aria-hidden="true">
               <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
-                <defs><pattern height="24" id="card-grid" patternUnits="userSpaceOnUse" width="24"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#003b5a" stroke-width="1"></path></pattern></defs>
+                <defs><pattern height="24" id="card-grid" patternUnits="userSpaceOnUse" width="24"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#0c4b70" stroke-width="1"></path></pattern></defs>
                 <rect fill="url(#card-grid)" height="100%" width="100%"></rect>
               </svg>
             </div>
             <div class="relative p-7 sm:p-8 flex flex-col gap-6">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <img src="{% static 'img/djona-logo.png' %}" alt="" class="h-8 w-auto">
-                  <span class="font-headline-md text-[20px] text-primary">Djona</span>
-                </div>
-                <span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Groupe</span>
-              </div>
+              <img src="{% static 'img/djona-group-logo.png' %}" alt="Djona Group" width="644" height="240" class="h-14 w-auto self-start">
               <div class="h-px bg-outline-variant/40"></div>
               <ul class="flex flex-col gap-5">
                 <li>
@@ -122,7 +116,7 @@
   <section id="canaux" class="scroll-mt-24 py-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-section-gap items-start">
 
-      <form method="post" action="{% url 'core:contact' %}" class="reveal lg:col-span-8 bg-surface-container-lowest rounded-3xl shadow-signature p-6 sm:p-8 flex flex-col gap-8">
+      <form method="post" action="{% url 'core:contact' %}" class="reveal lg:col-span-8 bg-surface-container-lowest rounded-lg shadow-signature p-6 sm:p-8 flex flex-col gap-8">
         {% csrf_token %}
         <div>
           <h2 class="font-headline-lg text-headline-lg text-primary">Envoyez-nous un message</h2>
@@ -150,7 +144,7 @@
       </form>
 
       <div class="reveal lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
-        <a href="{{ contact.whatsapp_url }}" target="_blank" rel="noopener" class="group relative overflow-hidden bg-[#25D366] text-white p-6 rounded-3xl flex flex-col gap-2 shadow-signature hover:brightness-105 transition-all">
+        <a href="{{ contact.whatsapp_url }}" target="_blank" rel="noopener" class="group relative overflow-hidden bg-[#25D366] text-white p-6 rounded-lg flex flex-col gap-2 shadow-signature hover:brightness-105 transition-all">
           <span class="material-symbols-outlined absolute -right-4 -bottom-6 text-[120px] text-white/15 select-none" aria-hidden="true">chat</span>
           <span class="material-symbols-outlined text-[28px] mb-2" aria-hidden="true">chat</span>
           <h3 class="font-headline-md text-[17px]">Une réponse plus rapide ?</h3>
@@ -161,7 +155,7 @@
           </span>
         </a>
 
-        <div class="bg-tertiary text-on-tertiary p-6 rounded-3xl flex flex-col gap-4">
+        <div class="bg-tertiary text-on-tertiary p-6 rounded-lg flex flex-col gap-4">
           <span class="material-symbols-outlined text-secondary-fixed text-[28px]" aria-hidden="true">location_on</span>
           <div>
             <h3 class="font-headline-md text-[17px] mb-1">Notre siège social</h3>
@@ -173,7 +167,7 @@
           </a>
         </div>
 
-        <a href="{% url 'core:transport' %}" class="group bg-surface p-6 rounded-3xl shadow-signature flex items-center gap-4 hover:bg-surface-container-low transition-colors">
+        <a href="{% url 'core:transport' %}" class="group bg-surface p-6 rounded-lg shadow-signature flex items-center gap-4 hover:bg-surface-container-low transition-colors">
           <span class="w-12 h-12 shrink-0 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary" aria-hidden="true">local_shipping</span></span>
           <span class="flex-1">
             <span class="block font-headline-md text-[16px] text-on-background">Besoin d'un transport ?</span>
@@ -186,36 +180,7 @@
     </div>
   </section>
 
-  {# ── FAQ ── #}
-  <section id="faq" class="scroll-mt-24 py-section-gap bg-surface-container-low">
-    <div class="reveal max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-gutter">
-      <div class="lg:col-span-4">
-        <span class="inline-block font-label-md text-label-md text-secondary mb-3 uppercase tracking-widest">FAQ</span>
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Questions fréquentes</h2>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Tout ce que vous devez savoir pour acheter ou vendre en toute sérénité.</p>
-        <a href="{% url 'core:avantages' %}" class="group inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-secondary transition-colors">
-          Découvrir les avantages Djona
-          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
-        </a>
-      </div>
-      <div class="lg:col-span-8 flex flex-col gap-3">
-        {% for item in faq_items %}
-        <div class="faq-item bg-surface-container-lowest rounded-2xl px-6 shadow-sm">
-          <button type="button" class="js-faq-toggle w-full py-5 flex justify-between items-center gap-4 text-left hover:text-primary transition-colors">
-            <span class="flex items-center gap-4">
-              <span class="font-headline-md text-[15px] text-secondary">{{ forloop.counter|stringformat:"02d" }}</span>
-              <span class="font-label-md text-label-md md:text-body-lg text-on-surface">{{ item.question }}</span>
-            </span>
-            <span class="material-symbols-outlined shrink-0 transition-transform duration-300" aria-hidden="true">expand_more</span>
-          </button>
-          <div class="faq-content h-0 overflow-hidden transition-all duration-300">
-            <p class="pb-6 pl-10 font-body-md text-body-md text-on-surface-variant">{{ item.answer }}</p>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </section>
+  {% include 'partials/_faq_section.html' %}
 
 </div>
 {% endblock %}

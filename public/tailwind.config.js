@@ -28,16 +28,17 @@ module.exports = {
         'inverse-on-surface': '#f0f1f1',
         outline: '#72787f',
         'outline-variant': '#c1c7cf',
-        'surface-tint': '#2f6388',
-        primary: '#003b5a',
+        'surface-tint': '#2e6890',
+        // Couleurs du logo Djona Group : bleu #0C4B70, orange #EC6F1D.
+        primary: '#0c4b70',
         'on-primary': '#ffffff',
-        'primary-container': '#1a5276',
-        'on-primary-container': '#94c5ee',
+        'primary-container': '#1d5f88',
+        'on-primary-container': '#a9d4f3',
         'inverse-primary': '#9bccf6',
-        secondary: '#865300',
+        secondary: '#ec6f1d',
         'on-secondary': '#ffffff',
-        'secondary-container': '#fea520',
-        'on-secondary-container': '#694000',
+        'secondary-container': '#ff9a5c',
+        'on-secondary-container': '#4a1d00',
         tertiary: '#26384b',
         'on-tertiary': '#ffffff',
         'tertiary-container': '#3d4f63',
@@ -50,10 +51,10 @@ module.exports = {
         'primary-fixed-dim': '#9bccf6',
         'on-primary-fixed': '#001e30',
         'on-primary-fixed-variant': '#0e4b6e',
-        'secondary-fixed': '#ffddb9',
-        'secondary-fixed-dim': '#ffb961',
-        'on-secondary-fixed': '#2b1700',
-        'on-secondary-fixed-variant': '#663e00',
+        'secondary-fixed': '#ffdbc8',
+        'secondary-fixed-dim': '#ffb68c',
+        'on-secondary-fixed': '#341100',
+        'on-secondary-fixed-variant': '#7a3000',
         'tertiary-fixed': '#d1e4fc',
         'tertiary-fixed-dim': '#b5c8e0',
         'on-tertiary-fixed': '#091d2e',
@@ -82,6 +83,11 @@ module.exports = {
         'label-md': ['13px', { lineHeight: '18px', letterSpacing: '0.01em', fontWeight: '600' }],
         'label-sm': ['11px', { lineHeight: '16px', fontWeight: '500' }],
       },
+      // Échelle unique des arrondis (n'utiliser que ces niveaux) :
+      // sm 4px micro (icône logo) · DEFAULT 8px boutons, champs, alertes, petits carrés d'icône
+      // md 12px blocs à l'intérieur d'une carte (tuiles, lignes, miniatures, FAQ)
+      // lg 16px cartes et panneaux, fenêtres modales · xl 24px grandes sections mises en avant
+      // full pastilles et avatars. Ne pas utiliser rounded-2xl / rounded-3xl ni de valeurs arbitraires.
       borderRadius: {
         sm: '0.25rem',
         DEFAULT: '0.5rem',
@@ -98,7 +104,7 @@ module.exports = {
         'section-gap': '48px',
       },
       boxShadow: {
-        signature: '0px 4px 12px rgba(26, 82, 118, 0.08)',
+        signature: '0px 4px 12px rgba(12, 75, 112, 0.08)',
       },
       maxWidth: {
         page: '1280px',

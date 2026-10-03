@@ -135,6 +135,7 @@ class ContactMessage(models.Model):
         TRANSPORT = 'transport', 'Transport & logistique'
         PARTNERSHIP = 'partenariat', 'Partenariat'
         OTHER = 'autre', 'Autre'
+        QUESTION = 'question', 'Question (FAQ)'
 
     class Status(models.TextChoices):
         NEW = 'nouveau', 'Nouveau'
@@ -170,6 +171,10 @@ class SiteContact(models.Model):
     email = models.EmailField('email')
     address = models.CharField('siège social', max_length=255)
     city = models.CharField('ville', max_length=100)
+    facebook_url = models.URLField('Facebook', blank=True)
+    instagram_url = models.URLField('Instagram', blank=True)
+    tiktok_url = models.URLField('TikTok', blank=True)
+    linkedin_url = models.URLField('LinkedIn', blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -195,6 +200,16 @@ class SiteContact(models.Model):
     @property
     def whatsapp_url(self):
         return f'https://wa.me/{self._digits(self.whatsapp)}'
+
+    @property
+    def social_links(self):
+        links = [
+            ('facebook', 'Facebook', self.facebook_url),
+            ('instagram', 'Instagram', self.instagram_url),
+            ('tiktok', 'TikTok', self.tiktok_url),
+            ('linkedin', 'LinkedIn', self.linkedin_url),
+        ]
+        return [{'key': k, 'label': label, 'url': url} for k, label, url in links if url]
 
     @property
     def maps_url(self):

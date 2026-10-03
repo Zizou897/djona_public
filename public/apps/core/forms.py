@@ -73,6 +73,29 @@ class ContactMessageForm(forms.ModelForm):
         self.fields['phone'].widget = forms.TextInput(attrs={'type': 'tel', 'placeholder': 'Ex : 07 00 00 00 00', 'autocomplete': 'tel'})
         self.fields['email'].widget.attrs.update({'placeholder': 'jean@email.ci (facultatif)', 'autocomplete': 'email'})
         self.fields['message'].widget = forms.Textarea(attrs={'rows': 5, 'placeholder': 'Dites-nous comment nous pouvons vous aider…'})
+        self.fields['subject'].choices = [c for c in self.fields['subject'].choices if c[0] != ContactMessage.Subject.QUESTION]
         for field in self.fields.values():
             is_select = isinstance(field.widget, forms.Select)
             field.widget.attrs['class'] = INPUT_CLASS + (' appearance-none pr-10' if is_select else ' resize-none' if isinstance(field.widget, forms.Textarea) else '')
+
+
+class QuestionForm(forms.Form):
+    """« Poser une question » (fenêtre de la section FAQ) — question + téléphone ivoirien."""
+
+    question = forms.CharField(max_length=2000)
+    phone = forms.CharField(max_length=30)
+    page = forms.CharField(max_length=300, required=False)
+
+    def clean_question(self):
+        value = self.cleaned_data['question'].strip()
+        if len(value) < 5:
+            raise forms.ValidationError('Votre question est trop courte.')
+        return value
+
+    def clean_phone(self):
+        digits = ''.join(ch for ch in self.cleaned_data['phone'] if ch.isdigit())
+        if digits.startswith('225') and len(digits) > 10:
+            digits = digits[3:]
+        if not 8 <= len(digits) <= 10:
+            raise forms.ValidationError('Numéro de téléphone invalide.')
+        return f'+225 {digits}'

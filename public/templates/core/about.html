@@ -8,7 +8,7 @@
 <div class="flex flex-col w-full">
 
   {# ── Hero ── #}
-  <section class="relative w-full min-h-[55vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden bg-primary text-on-primary rounded-b-[32px] sm:rounded-b-[40px] shadow-lg -mt-20 pt-20">
+  <section class="relative w-full min-h-[55vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden bg-primary text-on-primary rounded-b-xl shadow-lg -mt-20 pt-20">
     <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
       <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
         <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
@@ -46,7 +46,7 @@
           Grâce à un <strong>accompagnement personnalisé à chaque étape</strong> et à une <strong>vérification des informations annoncées</strong>, nous aidons l'acheteur à acheter en connaissance de cause, dans un cadre plus structuré. Nous ne sommes pas juste une plateforme d'annonces, nous sommes votre interlocuteur de confiance.
         </p>
       </div>
-      <div class="flex-1 relative w-full aspect-video md:aspect-[4/3] rounded-3xl overflow-hidden shadow-xl group">
+      <div class="flex-1 relative w-full aspect-video md:aspect-[4/3] rounded-lg overflow-hidden shadow-xl group">
         <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
         <img src="{% static 'img/security-transaction.jpg' %}" alt="Remise sécurisée des clés lors d'une transaction Djona" class="w-full h-full object-cover">
       </div>
@@ -68,22 +68,22 @@
         <h2 class="font-headline-lg text-headline-lg text-primary">L'impact Djona</h2>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-lg shadow-signature hover:shadow-xl transition-shadow">
           <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">directions_car</span>
           <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2 js-about-counter" data-target="2500">0</span>
           <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Véhicules Inspectés</span>
         </div>
-        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-lg shadow-signature hover:shadow-xl transition-shadow">
           <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">star</span>
           <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2 js-about-counter" data-target="7">0</span>
           <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Avantages Djona</span>
         </div>
-        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-lg shadow-signature hover:shadow-xl transition-shadow">
           <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">shield</span>
           <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2"><span class="js-about-counter" data-target="100">0</span>%</span>
           <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Transactions Sécurisées</span>
         </div>
-        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-2xl shadow-signature hover:shadow-xl transition-shadow">
+        <div class="flex flex-col items-center text-center p-5 sm:p-6 bg-surface rounded-lg shadow-signature hover:shadow-xl transition-shadow">
           <span class="material-symbols-outlined text-primary text-[40px] sm:text-[48px] mb-3 sm:mb-4" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">group</span>
           <span class="font-headline-lg text-headline-lg text-primary mb-1 sm:mb-2"><span class="js-about-counter" data-target="15">0</span>K+</span>
           <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center text-[10px] sm:text-xs">Utilisateurs</span>
@@ -107,8 +107,8 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
       {# Transparence #}
-      <div class="reveal bg-surface p-6 sm:p-8 rounded-3xl shadow-signature hover:-translate-y-2 transition-all duration-300 group">
-        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-2xl flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
+      <div class="reveal bg-surface p-6 sm:p-8 rounded-lg shadow-signature hover:-translate-y-2 transition-all duration-300 group">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-md flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
           <span class="material-symbols-outlined text-primary text-[28px] sm:text-[32px] group-hover:text-on-primary transition-colors">visibility</span>
         </div>
         <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-background mb-3">Transparence</h3>
@@ -117,9 +117,9 @@
         </p>
       </div>
       {# Sécurité — Card mise en avant (primary background) #}
-      <div class="reveal reveal-delay-1 bg-primary text-on-primary p-6 sm:p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+      <div class="reveal reveal-delay-1 bg-primary text-on-primary p-6 sm:p-8 rounded-lg shadow-lg hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
         <div class="absolute -right-8 -top-8 w-32 h-32 bg-secondary rounded-full opacity-10 group-hover:scale-150 transition-transform duration-500" aria-hidden="true"></div>
-        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-5 sm:mb-6 backdrop-blur-sm">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 rounded-md flex items-center justify-center mb-5 sm:mb-6 backdrop-blur-sm">
           <span class="material-symbols-outlined text-on-primary text-[28px] sm:text-[32px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">security</span>
         </div>
         <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-primary mb-3">Sécurité</h3>
@@ -128,8 +128,8 @@
         </p>
       </div>
       {# Innovation #}
-      <div class="reveal reveal-delay-2 bg-surface p-6 sm:p-8 rounded-3xl shadow-signature hover:-translate-y-2 transition-all duration-300 group">
-        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-2xl flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
+      <div class="reveal reveal-delay-2 bg-surface p-6 sm:p-8 rounded-lg shadow-signature hover:-translate-y-2 transition-all duration-300 group">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-fixed rounded-md flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-primary transition-colors">
           <span class="material-symbols-outlined text-primary text-[28px] sm:text-[32px] group-hover:text-on-primary transition-colors">lightbulb</span>
         </div>
         <h3 class="font-headline-md text-[18px] sm:text-[20px] text-on-background mb-3">Innovation</h3>
@@ -141,7 +141,7 @@
   </section>
 
   {# ── Direction / Citation du Fondateur ── #}
-  <section class="py-section-gap my-4 mx-4 lg:mx-auto max-w-page bg-surface-container rounded-[32px] sm:rounded-[40px] shadow-inner overflow-hidden relative">
+  <section class="py-section-gap my-4 mx-4 lg:mx-auto max-w-page bg-surface-container rounded-xl shadow-inner overflow-hidden relative">
     <div class="absolute -left-[10%] -top-[20%] w-[40%] aspect-square bg-primary/5 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
     <div class="reveal relative z-10 flex flex-col md:flex-row items-center gap-8 sm:gap-12 px-container-margin-mobile lg:px-container-margin-desktop">
       {# Portrait #}
@@ -171,7 +171,7 @@
 
   {# ── CTA Final ── #}
   <section class="py-section-gap w-full flex justify-center px-4">
-    <div class="max-w-[800px] w-full bg-primary text-on-primary rounded-[24px] sm:rounded-[32px] p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl">
+    <div class="max-w-[800px] w-full bg-primary text-on-primary rounded-xl p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl">
       <div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
       <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary-fixed opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
       <div class="reveal relative z-10 flex flex-col items-center">
@@ -181,12 +181,12 @@
         </p>
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
           <a href="{% url 'catalog:list' %}"
-             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-secondary text-on-secondary rounded-xl font-label-md text-label-md uppercase tracking-wider shadow-md hover:-translate-y-1 hover:shadow-lg active:scale-98 transition-all">
+             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wider shadow-md hover:-translate-y-1 hover:shadow-lg active:scale-98 transition-all">
             Découvrir nos annonces
             <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
           </a>
           <a href="https://vendor.djona.tech/"
-             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border-2 border-on-primary/40 text-on-primary rounded-xl font-label-md text-label-md uppercase tracking-wider hover:bg-white/10 active:scale-98 transition-all">
+             class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border-2 border-on-primary/40 text-on-primary rounded font-label-md text-label-md uppercase tracking-wider hover:bg-white/10 active:scale-98 transition-all">
             Publier mon véhicule
           </a>
         </div>

@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 
 from apps.catalog.models import Vehicle
 
-from .forms import ContactMessageForm, NewsletterForm, TransportRequestForm
+from .forms import ContactMessageForm, NewsletterForm, QuestionForm, TransportRequestForm
 from .models import ContactMessage, NewsletterSubscriber, SiteContact, TransportRequest
 
 NEWSLETTER_RATE_LIMIT = 5
@@ -184,6 +184,32 @@ def contact(request):
     })
 
 
+@require_POST
+def ask_question(request):
+    """Fenêtre « Poser une question » de la section FAQ : enregistrée comme
+    message de contact (objet « Question (FAQ) ») pour être traitée dans le back-office."""
+    cache_key = f'faq-question:{_client_ip(request)}'
+    attempts = cache.get(cache_key, 0)
+    if attempts >= CONTACT_RATE_LIMIT:
+        return JsonResponse({'status': 'error', 'message': 'Trop de questions envoyées — réessayez plus tard.'}, status=429)
+
+    form = QuestionForm(request.POST)
+    if not form.is_valid():
+        first_error = next(iter(form.errors.values()))[0]
+        return JsonResponse({'status': 'error', 'message': first_error}, status=400)
+
+    cache.set(cache_key, attempts + 1, CONTACT_RATE_WINDOW)
+    message = form.cleaned_data['question']
+    if form.cleaned_data['page']:
+        message += NL + NL + f"— Envoyée depuis : {form.cleaned_data['page']}"
+    contact_message = ContactMessage.objects.create(
+        full_name='', phone=form.cleaned_data['phone'],
+        subject=ContactMessage.Subject.QUESTION, message=message,
+    )
+    _notify_contact_message(contact_message)
+    return JsonResponse({'status': 'success', 'message': 'Merci ! Notre équipe vous répondra très prochainement.'})
+
+
 def contact_success(request):
     full_name = request.session.pop('contact_sent', None)
     if not full_name:
@@ -200,7 +226,7 @@ def _notify_contact_message(contact_message):
     body = NL.join([
         f'Nouveau message de contact — {contact_message.get_subject_display()}',
         '',
-        f'Nom : {contact_message.full_name}',
+        f'Nom : {contact_message.full_name or "Visiteur"}',
         f'Téléphone : {contact_message.phone}',
         f'Email : {contact_message.email or "—"}',
         '',
@@ -208,7 +234,7 @@ def _notify_contact_message(contact_message):
     ])
     try:
         send_mail(
-            f'Contact Djona : {contact_message.get_subject_display()} — {contact_message.full_name}',
+            f'Contact Djona : {contact_message.get_subject_display()} — {contact_message.full_name or "Visiteur"}',
             body, None, recipients, fail_silently=True,
         )
     except Exception:

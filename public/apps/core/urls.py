@@ -10,6 +10,7 @@ urlpatterns = [
     path('avantages-djona/', views.avantages, name='avantages'),
     path('contact/', views.contact, name='contact'),
     path('contact/merci/', views.contact_success, name='contact_success'),
+    path('questions/', views.ask_question, name='ask_question'),
     path('confidentialite/', views.privacy, name='privacy'),
     path('cgu/', views.terms, name='terms'),
     path('conditions-vendeurs/', views.seller_terms, name='seller_terms'),

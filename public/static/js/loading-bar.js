@@ -14,7 +14,7 @@
   style.textContent = [
     '#djona-loading-bar {',
     '  position: fixed; top: 0; left: 0; height: 3px; width: 0%;',
-    '  background: linear-gradient(90deg, #865300, #fea520);',
+    '  background: linear-gradient(90deg, #ec6f1d, #ff9a5c);',
     '  z-index: 9999; transition: width .3s ease, opacity .3s ease;',
     '  opacity: 0; pointer-events: none;',
     '}',

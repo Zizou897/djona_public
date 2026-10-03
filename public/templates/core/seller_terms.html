@@ -35,13 +35,13 @@
 <section id="inscription" class="scroll-mt-32">
   {% include 'partials/_legal_heading.html' with num='02' title='Inscription' %}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="p-6 rounded-2xl bg-surface-container-low">
+    <div class="p-6 rounded-md bg-surface-container-low">
       <h3 class="flex items-center gap-2 font-label-md text-label-md text-on-surface mb-3">
         <span class="material-symbols-outlined text-secondary" aria-hidden="true">person</span> Vendeurs particuliers
       </h3>
       <p>Les vendeurs particuliers créent un compte vendeur pour publier leurs annonces. Djona peut demander une pièce d'identité officielle afin de vérifier l'identité du vendeur.</p>
     </div>
-    <div class="p-6 rounded-2xl bg-surface-container-low">
+    <div class="p-6 rounded-md bg-surface-container-low">
       <h3 class="flex items-center gap-2 font-label-md text-label-md text-on-surface mb-3">
         <span class="material-symbols-outlined text-primary" aria-hidden="true">storefront</span> Vendeurs professionnels
       </h3>
@@ -54,7 +54,7 @@
   {% include 'partials/_legal_heading.html' with num='03' title='Règles de publication' %}
   <p class="mb-6">Le Vendeur s'engage à publier des annonces conformes à la réalité. Chaque annonce est examinée par l'équipe Djona avant sa mise en ligne, et peut être refusée ou retirée si elle ne respecte pas ces règles.</p>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="p-6 rounded-2xl border-t-4 border-primary bg-surface-container-low">
+    <div class="p-6 rounded-md border-t-4 border-primary bg-surface-container-low">
       <h3 class="flex items-center gap-2 font-label-md text-label-md text-primary uppercase tracking-wide mb-4">
         <span class="material-symbols-outlined" aria-hidden="true">done</span> Obligations
       </h3>
@@ -65,7 +65,7 @@
         <li>Prix de vente en francs CFA (XOF).</li>
       </ul>
     </div>
-    <div class="p-6 rounded-2xl border-t-4 border-error bg-error-container/20">
+    <div class="p-6 rounded-md border-t-4 border-error bg-error-container/20">
       <h3 class="flex items-center gap-2 font-label-md text-label-md text-error uppercase tracking-wide mb-4">
         <span class="material-symbols-outlined" aria-hidden="true">close</span> Interdictions
       </h3>
@@ -81,14 +81,14 @@
 
 <section id="acheter-avec-djona" class="scroll-mt-32">
   {% include 'partials/_legal_heading.html' with num='04' title='Acheter avec Djona' %}
-  <div class="relative overflow-hidden rounded-3xl bg-primary text-on-primary p-8">
+  <div class="relative overflow-hidden rounded-md bg-primary text-on-primary p-8">
     <span class="material-symbols-outlined absolute -right-6 -bottom-8 text-[160px] text-white/[0.06] select-none" aria-hidden="true">handshake</span>
     <div class="relative">
       <p class="text-on-primary/85 mb-6 max-w-2xl">Lorsqu'un acheteur choisit d'acheter avec Djona, un interlocuteur Djona accompagne la transaction. Le Vendeur accepte dans ce cadre :</p>
       <ul class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <li class="p-4 rounded-2xl bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">fact_check</span>Que Djona vérifie les informations annoncées sur le véhicule.</li>
-        <li class="p-4 rounded-2xl bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">forum</span>Que Djona accompagne les échanges et la négociation.</li>
-        <li class="p-4 rounded-2xl bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">task_alt</span>De rester joignable jusqu'à la finalisation de la vente.</li>
+        <li class="p-4 rounded bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">fact_check</span>Que Djona vérifie les informations annoncées sur le véhicule.</li>
+        <li class="p-4 rounded bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">forum</span>Que Djona accompagne les échanges et la négociation.</li>
+        <li class="p-4 rounded bg-white/10"><span class="material-symbols-outlined text-secondary-container mb-2 block" aria-hidden="true">task_alt</span>De rester joignable jusqu'à la finalisation de la vente.</li>
       </ul>
       <a href="{% url 'core:avantages' %}" class="mt-6 inline-flex items-center gap-1 font-label-md text-label-md text-secondary-container hover:underline">
         Découvrir les avantages Djona

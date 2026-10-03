@@ -3,13 +3,13 @@
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-signature">
   <div class="h-20 max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop flex items-center justify-between">
 
-    <a href="{% url 'core:home' %}" class="flex items-center gap-base">
-      <img src="{% static 'img/djona-logo.png' %}" alt="Djona" class="h-8 w-auto object-contain">
-      <span class="font-headline-md text-headline-md text-primary">Djona</span>
+    <a href="{% url 'core:home' %}" class="flex items-center gap-2 sm:gap-2.5 shrink-0" aria-label="Djona Group — accueil">
+      <img src="{% static 'img/djona-logo.png' %}" alt="" width="40" height="40" class="h-9 w-9 sm:h-10 sm:w-10 rounded-sm object-cover">
+      <img src="{% static 'img/djona-group-logo.png' %}" alt="Djona Group" width="644" height="240" class="h-6 sm:h-7 w-auto object-contain translate-y-1">
     </a>
 
     {% with underline="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-full after:bg-primary after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100" %}
-    <nav class="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
+    <nav class="hidden lg:flex items-center gap-6 xl:gap-8" aria-label="Navigation principale">
       <a href="{% url 'core:home' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:home' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:home' %}aria-current="page"{% endif %}>Accueil</a>
@@ -25,14 +25,14 @@
 
     <div class="flex items-center gap-2 sm:gap-base">
       <a href="{% url 'core:transport' %}"
-         class="hidden md:inline-flex items-center gap-2 whitespace-nowrap bg-primary text-on-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-label-md shadow-md hover:brightness-125 transition-all">
-        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">local_shipping</span>
-        Transport &amp; Logistique
+         class="print:hidden flex items-center gap-1.5 sm:gap-2 whitespace-nowrap bg-primary text-on-primary px-3 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-xs sm:text-label-md shadow-md hover:brightness-125 transition-all">
+        <span class="material-symbols-outlined text-[18px] sm:text-[20px]" aria-hidden="true">local_shipping</span>
+        <span>Transport<span class="max-[379px]:hidden"> &amp; Logistique</span></span>
       </a>
       <a href="{% url 'core:pieces' %}"
-         class="print:hidden flex items-center gap-1.5 sm:gap-2 whitespace-nowrap bg-secondary text-on-secondary px-3 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-xs sm:text-label-md shadow-md hover:brightness-110 transition-all">
-        <span class="material-symbols-outlined text-[18px] sm:text-[20px]" aria-hidden="true">build</span>
-        <span>Pièces détachées</span>
+         class="hidden md:inline-flex items-center gap-2 whitespace-nowrap bg-secondary text-on-secondary px-6 py-2.5 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">build</span>
+        Pièces détachées
       </a>
       <button type="button" id="mobile-nav-toggle" data-open="false"
               class="group lg:hidden relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-primary/15 bg-surface hover:border-secondary/50 hover:bg-surface-container transition-colors shrink-0"

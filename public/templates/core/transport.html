@@ -74,7 +74,7 @@
   <section class="pb-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-section-gap items-start">
 
-      <form method="post" action="{% url 'core:transport' %}" id="transport-form" class="reveal lg:col-span-8 bg-surface-container-lowest rounded-3xl shadow-signature p-6 sm:p-8 flex flex-col gap-10" novalidate>
+      <form method="post" action="{% url 'core:transport' %}" id="transport-form" class="reveal lg:col-span-8 bg-surface-container-lowest rounded-lg shadow-signature p-6 sm:p-8 flex flex-col gap-10" novalidate>
         {% csrf_token %}
         <div>
           <h2 class="font-headline-lg text-headline-lg text-primary">Demande de transport</h2>
@@ -82,7 +82,7 @@
         </div>
 
         {% if form.non_field_errors %}
-        <div class="rounded-lg bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>
+        <div class="rounded bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>
         {% endif %}
 
         {# ── Indicateur d'étapes ── #}
@@ -110,7 +110,7 @@
 
         <fieldset class="transport-step flex flex-col gap-6" data-step="0">
           <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
-            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center">
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">person</span>
             </span>
             Vos informations
@@ -129,7 +129,7 @@
 
         <fieldset class="transport-step flex flex-col gap-6" data-step="1" style="display:none">
           <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
-            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center">
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_shipping</span>
             </span>
             Le transport
@@ -142,7 +142,7 @@
 
         <fieldset class="transport-step flex flex-col gap-6" data-step="2" style="display:none">
           <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
-            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center">
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">pin_drop</span>
             </span>
             Chargement et livraison
@@ -156,7 +156,7 @@
 
         <fieldset class="transport-step flex flex-col gap-6" data-step="3" style="display:none">
           <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
-            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center">
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">notes</span>
             </span>
             Informations complémentaires
@@ -183,13 +183,13 @@
 
       {# ── Colonne latérale ── #}
       <div class="reveal lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
-        <div class="bg-tertiary text-on-tertiary p-6 rounded-3xl flex flex-col gap-2">
+        <div class="bg-tertiary text-on-tertiary p-6 rounded-lg flex flex-col gap-2">
           <span class="material-symbols-outlined text-secondary-fixed text-[28px] mb-2" aria-hidden="true">tips_and_updates</span>
           <h3 class="font-headline-md text-[17px]">Décrivez votre besoin, nous nous occupons du reste.</h3>
           <p class="font-body-md text-body-md opacity-80">Que vous soyez un particulier ou une entreprise, indiquez-nous votre besoin : notre équipe étudiera votre demande et vous contactera pour vous proposer une solution adaptée.</p>
         </div>
 
-        <div class="bg-surface p-6 rounded-3xl shadow-signature flex flex-col gap-4">
+        <div class="bg-surface p-6 rounded-lg shadow-signature flex flex-col gap-4">
           <h3 class="font-headline-md text-[17px] text-on-background">Une question avant d'envoyer votre demande ?</h3>
           <a href="{% url 'core:contact' %}" class="group flex items-center justify-between gap-2 px-4 py-3 rounded border border-outline-variant/50 hover:border-primary/40 hover:bg-primary/5 transition-colors">
             <span class="flex items-center gap-2 font-label-md text-label-md text-on-surface">
