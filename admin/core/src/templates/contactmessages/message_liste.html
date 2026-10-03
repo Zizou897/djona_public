@@ -1,0 +1,84 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Messages de contact — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Messages' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='messages' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+
+<div class="reveal mb-8" style="animation-delay:.05s">
+    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Page Contact</span>
+    <h1 class="font-display-lg text-display-lg text-primary">Messages de contact</h1>
+    <p class="text-sm text-on-surface-variant mt-2">{{ nb_total }} message{{ nb_total|pluralize }} reçu{{ nb_total|pluralize }} via le formulaire public.</p>
+</div>
+
+<div class="reveal flex flex-wrap gap-2 mb-6" style="animation-delay:.1s">
+    <a href="{% url 'contact_message_liste' %}" class="px-4 py-2 rounded-full text-sm font-semibold {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}">Tous ({{ nb_total }})</a>
+    {% for s in statuts %}
+    <a href="?statut={{ s.value }}" class="px-4 py-2 rounded-full text-sm font-semibold {% if statut_actif == s.value %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}">{{ s.label }} ({{ s.count }})</a>
+    {% endfor %}
+</div>
+
+<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
+<div class="hidden lg:block overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Reçu le</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Expéditeur</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Objet</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Message</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+{% for m in messages_contact %}
+<tr class="hover:bg-surface transition-colors">
+<td class="px-6 py-4 font-label-md text-label-md whitespace-nowrap">{{ m.created_at|date:'d/m/Y' }}<span class="block text-[11px] font-normal text-on-surface-variant">{{ m.created_at|date:'H:i' }}</span></td>
+<td class="px-6 py-4">{{ m.full_name }}<span class="block text-[11px] text-on-surface-variant">{{ m.phone }}</span></td>
+<td class="px-6 py-4 text-on-surface-variant">{{ m.subject_label }}</td>
+<td class="px-6 py-4 text-on-surface-variant max-w-xs truncate">{{ m.message|truncatechars:70 }}</td>
+<td class="px-6 py-4"><span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {% if m.status == 'nouveau' %}bg-secondary-container text-on-secondary-container{% elif m.status == 'en_traitement' %}bg-primary-fixed text-primary{% else %}bg-surface-container-high text-on-surface{% endif %}">{{ m.get_status_display }}</span></td>
+<td class="px-6 py-4 text-right"><a class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-primary-fixed transition-colors" href="{% url 'contact_message_detail' m.pk %}">Consulter</a></td>
+</tr>
+{% empty %}
+<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="6">Aucun message de contact.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<div class="lg:hidden flex flex-col divide-y divide-surface-container">
+{% for m in messages_contact %}
+<a href="{% url 'contact_message_detail' m.pk %}" class="p-4 flex items-center justify-between gap-3 hover:bg-surface transition-colors">
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface">{{ m.full_name }} · {{ m.get_status_display }}</p>
+<p class="text-sm text-on-surface-variant truncate">{{ m.subject_label }} — {{ m.created_at|date:'d/m/Y H:i' }}</p>
+<p class="text-[11px] text-on-surface-variant truncate">{{ m.message|truncatechars:60 }}</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+{% empty %}
+<div class="p-8 text-center text-on-surface-variant">Aucun message de contact.</div>
+{% endfor %}
+</div>
+</div>
+
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='messages' %}
+</div>
+{% endblock %}

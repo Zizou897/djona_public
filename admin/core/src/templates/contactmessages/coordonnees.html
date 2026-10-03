@@ -1,0 +1,76 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Coordonnées du site — Portail Admin{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-surface font-body-md text-on-surface">
+{% include 'app/includes/header_mobile_admin.html' with page_title='Coordonnées' %}
+{% include 'app/includes/sidebar_admin.html' with active_nav='coordonnees' %}
+<div class="lg:pl-72">
+{% include 'app/includes/topbar_admin.html' %}
+<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-4xl">
+
+<div class="reveal mb-8" style="animation-delay:.05s">
+    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Site public</span>
+    <h1 class="font-display-lg text-display-lg text-primary">Coordonnées du site</h1>
+    <p class="text-sm text-on-surface-variant mt-2">Affichées sur la page Contact du site public. Toute modification est visible immédiatement.</p>
+</div>
+
+<form method="post" class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 flex flex-col gap-8" style="animation-delay:.1s" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="rounded bg-error-container text-on-error-container px-4 py-3">{{ form.non_field_errors }}</div>{% endif %}
+
+    <fieldset class="flex flex-col gap-5">
+        <legend class="flex items-center gap-2 font-headline-md text-[18px] text-primary mb-4">
+            <span class="material-symbols-outlined text-[22px]">call</span> Joindre Djona
+        </legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for field in form %}{% if field.name in 'phone,whatsapp,email' %}
+            <div class="flex flex-col gap-2 {% if field.name == 'email' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}" class="font-label-md text-label-md">{{ field.label }} <span class="text-error">*</span></label>
+                {{ field }}
+                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="text-sm text-error">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}{% endfor %}
+        </div>
+    </fieldset>
+
+    <fieldset class="flex flex-col gap-5">
+        <legend class="flex items-center gap-2 font-headline-md text-[18px] text-primary mb-4">
+            <span class="material-symbols-outlined text-[22px]">location_on</span> Siège social
+        </legend>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for field in form %}{% if field.name in 'address,city' %}
+            <div class="flex flex-col gap-2">
+                <label for="{{ field.id_for_label }}" class="font-label-md text-label-md">{{ field.label }} <span class="text-error">*</span></label>
+                {{ field }}
+                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="text-sm text-error">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}{% endfor %}
+        </div>
+    </fieldset>
+
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-surface-variant">
+        <p class="text-xs text-on-surface-variant">Dernière modification : {{ form.instance.updated_at|date:'d/m/Y à H:i' }}</p>
+        <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">
+            <span class="material-symbols-outlined text-[20px]">save</span> Enregistrer
+        </button>
+    </div>
+</form>
+
+</div>
+</div>
+</main>
+</div>
+{% include 'app/includes/nav_mobile_admin.html' with active_nav='coordonnees' %}
+</div>
+{% endblock %}
