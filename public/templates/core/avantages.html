@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Les avantages d'acheter avec Djona — Djona{% endblock %}
+{% block meta_description %}Djona transforme l'achat automobile en une expérience plus simple, plus transparente et plus sécurisée : accompagnement personnalisé, vérification du véhicule, aide à la négociation et avantages exclusifs après achat.{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# ── Hero ── #}
+  <section class="relative w-full min-h-[50vh] sm:min-h-[55vh] flex items-center justify-center overflow-hidden bg-primary text-on-primary rounded-b-[32px] sm:rounded-b-[40px] shadow-lg -mt-20 pt-20">
+    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
+        <path d="M0 0 L50 100 L0 100 Z" fill="currentColor" opacity="0.5"/>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+    </div>
+
+    <div class="relative z-10 max-w-page w-full px-4 sm:px-container-margin-mobile lg:px-container-margin-desktop text-center flex flex-col items-center py-12 sm:py-16">
+      <span class="font-label-md text-secondary-container tracking-widest uppercase mb-4 animate-slide-up-1">
+        Proposition de valeur client
+      </span>
+      <h1 class="font-display-lg text-2xl sm:text-4xl lg:text-display-lg max-w-4xl mb-6 animate-slide-up-2 leading-tight">
+        Les avantages d'acheter avec Djona
+      </h1>
+      <p class="font-body-lg text-sm sm:text-body-lg animate-slide-up-3 max-w-2xl text-primary-fixed-dim/80 px-2">
+        Chez Djona, nous ne nous contentons pas de mettre en relation un acheteur et un vendeur. Notre ambition est de transformer l'achat automobile en une expérience plus simple, plus transparente et plus sécurisée.
+      </p>
+    </div>
+  </section>
+
+  {# ── 7 avantages ── #}
+  <section class="py-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      {% for item in items %}
+      <div class="reveal bg-surface p-6 sm:p-8 rounded-3xl shadow-signature hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4">
+        <div class="flex items-start gap-4">
+          <span class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-primary-fixed rounded-2xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[24px] sm:text-[28px]" aria-hidden="true">{{ item.icon }}</span>
+          </span>
+          <div>
+            <span class="font-label-sm text-secondary uppercase tracking-widest">{{ forloop.counter }}</span>
+            <h3 class="font-headline-md text-[17px] sm:text-[18px] text-on-background leading-snug">{{ item.title }}</h3>
+          </div>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant">{{ item.text }}</p>
+        {% if item.highlight %}
+        <p class="font-label-md text-label-sm text-primary bg-primary-container/10 px-4 py-2.5 rounded-lg">{{ item.highlight }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ── Comparatif ── #}
+  <section class="py-section-gap bg-surface-container-low w-full">
+    <div class="reveal max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+          <span class="font-label-md text-secondary uppercase tracking-widest">Comparatif</span>
+          <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg text-on-background">Pourquoi choisir Djona plutôt qu'un achat classique ?</h2>
+      </div>
+
+      <div class="max-w-3xl mx-auto bg-surface rounded-3xl shadow-signature overflow-hidden">
+        <div class="grid grid-cols-2">
+          <div class="px-5 sm:px-6 py-4 bg-surface-container-highest">
+            <span class="font-label-md text-label-sm text-on-surface-variant uppercase tracking-wider">Achat classique</span>
+          </div>
+          <div class="px-5 sm:px-6 py-4 bg-primary">
+            <span class="font-label-md text-label-sm text-on-primary uppercase tracking-wider">Achat accompagné Djona</span>
+          </div>
+        </div>
+        {% for classique, djona in comparaison %}
+        <div class="grid grid-cols-2 border-t border-outline-variant/30">
+          <div class="px-5 sm:px-6 py-4 flex items-start gap-2">
+            <span class="material-symbols-outlined text-outline text-[18px] shrink-0" aria-hidden="true">remove</span>
+            <p class="font-body-md text-body-md text-on-surface-variant">{{ classique }}</p>
+          </div>
+          <div class="px-5 sm:px-6 py-4 flex items-start gap-2 bg-primary-container/5">
+            <span class="material-symbols-outlined text-primary text-[18px] shrink-0" aria-hidden="true">check</span>
+            <p class="font-body-md text-body-md text-on-background">{{ djona }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# ── CTA Final ── #}
+  <section class="py-section-gap w-full flex justify-center px-4">
+    <div class="max-w-[800px] w-full bg-primary text-on-primary rounded-[24px] sm:rounded-[32px] p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary-fixed opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" aria-hidden="true"></div>
+      <div class="reveal relative z-10 flex flex-col items-center">
+        <span class="material-symbols-outlined text-secondary-container text-[36px] mb-3" aria-hidden="true">directions_car</span>
+        <h2 class="font-display-lg text-2xl sm:text-[32px] mb-3 leading-tight">Avec Djona, vous n'achetez pas seulement une voiture.<br class="hidden sm:block"> Vous achetez la tranquillité.</h2>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-left my-6 max-w-lg">
+          {% for point in checklist %}
+          <li class="flex items-center gap-2 font-body-md text-body-md text-primary-fixed-dim/90">
+            <span class="material-symbols-outlined text-secondary-container text-[18px] shrink-0" aria-hidden="true">check_circle</span>
+            {{ point }}
+          </li>
+          {% endfor %}
+        </ul>
+        <a href="{% url 'catalog:list' %}"
+           class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-secondary text-on-secondary rounded-xl font-label-md text-label-md uppercase tracking-wider shadow-md hover:-translate-y-1 hover:shadow-lg active:scale-98 transition-all">
+          Je veux acheter avec Djona
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

@@ -122,3 +122,90 @@ class TransportRequest(models.Model):
         last = cls.objects.filter(reference__startswith=prefix).order_by('-reference').values_list('reference', flat=True).first()
         number = int(last.rsplit('-', 1)[1]) + 1 if last else 1
         return f'{prefix}{number:04d}'
+
+
+class ContactMessage(models.Model):
+    """Message envoyé depuis le formulaire de la page Contact. Lu et suivi
+    depuis le back-office (admin/core/src/contact/) — le public ne fait que créer.
+    """
+
+    class Subject(models.TextChoices):
+        BUY = 'achat', 'Acheter un véhicule'
+        SELL = 'vente', 'Vendre mon véhicule'
+        TRANSPORT = 'transport', 'Transport & logistique'
+        PARTNERSHIP = 'partenariat', 'Partenariat'
+        OTHER = 'autre', 'Autre'
+
+    class Status(models.TextChoices):
+        NEW = 'nouveau', 'Nouveau'
+        IN_PROGRESS = 'en_traitement', 'En traitement'
+        DONE = 'traite', 'Traité'
+
+    full_name = models.CharField('nom complet', max_length=150)
+    phone = models.CharField('téléphone', max_length=30)
+    email = models.EmailField('email', blank=True)
+    subject = models.CharField('objet', max_length=20, choices=Subject.choices, default=Subject.BUY)
+    message = models.TextField('message')
+    status = models.CharField('statut', max_length=20, choices=Status.choices, default=Status.NEW)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'message de contact'
+        verbose_name_plural = 'messages de contact'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.full_name} — {self.get_subject_display()}'
+
+
+class SiteContact(models.Model):
+    """Coordonnées officielles affichées sur le site public (page Contact…).
+    Une seule ligne (pk=1), modifiée depuis le back-office
+    (admin/core/src/contactmessages/) ; le public ne fait que lire.
+    """
+
+    phone = models.CharField('téléphone', max_length=30)
+    whatsapp = models.CharField('WhatsApp', max_length=30)
+    email = models.EmailField('email')
+    address = models.CharField('siège social', max_length=255)
+    city = models.CharField('ville', max_length=100)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'coordonnées du site'
+        verbose_name_plural = 'coordonnées du site'
+
+    def __str__(self):
+        return 'Coordonnées du site'
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1, defaults=SITE_CONTACT_DEFAULTS)
+        return obj
+
+    @staticmethod
+    def _digits(value):
+        return ''.join(ch for ch in value if ch.isdigit())
+
+    @property
+    def phone_tel(self):
+        return '+' + self._digits(self.phone)
+
+    @property
+    def whatsapp_url(self):
+        return f'https://wa.me/{self._digits(self.whatsapp)}'
+
+    @property
+    def maps_url(self):
+        from urllib.parse import urlencode
+        return 'https://www.google.com/maps/search/?' + urlencode({'api': 1, 'query': f'{self.address}, {self.city}'})
+
+
+SITE_CONTACT_DEFAULTS = {
+    'phone': '+225 01 41 60 27 53',
+    'whatsapp': '+225 01 41 60 27 53',
+    'email': 'contact@djona.tech',
+    'address': 'Angré 9ème tranche, non loin de CGK',
+    'city': "Abidjan, Côte d'Ivoire",
+}

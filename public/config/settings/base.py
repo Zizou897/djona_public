@@ -110,3 +110,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 from decouple import config as _config  # noqa: E402
 
 TRANSPORT_NOTIFY_EMAILS = [e.strip() for e in _config('TRANSPORT_NOTIFY_EMAILS', default='').split(',') if e.strip()]
+
+# Destinataires des notifications email de nouveau message de contact. Vide = pas d'email.
+CONTACT_NOTIFY_EMAILS = [e.strip() for e in _config('CONTACT_NOTIFY_EMAILS', default='').split(',') if e.strip()]

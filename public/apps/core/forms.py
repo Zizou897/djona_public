@@ -1,7 +1,9 @@
 from django import forms
 from django.utils import timezone
 
-from .models import TransportRequest, TransportVehicleType
+from .models import ContactMessage, TransportRequest, TransportVehicleType
+
+INPUT_CLASS = 'w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all'
 
 
 class NewsletterForm(forms.Form):
@@ -43,7 +45,7 @@ class TransportRequestForm(forms.ModelForm):
         self.fields['loading_date'].widget.attrs['min'] = timezone.localdate().isoformat()
         for field in self.fields.values():
             is_select = isinstance(field.widget, forms.Select)
-            field.widget.attrs['class'] = 'w-full px-4 py-3 rounded bg-surface-container text-on-surface outline-none focus:ring-2 focus:ring-primary transition-all' + (' appearance-none pr-10' if is_select else '')
+            field.widget.attrs['class'] = INPUT_CLASS + (' appearance-none pr-10' if is_select else '')
 
     def clean_loading_date(self):
         value = self.cleaned_data['loading_date']
@@ -58,3 +60,19 @@ class TransportRequestForm(forms.ModelForm):
         if cleaned.get('requester_type') != TransportRequest.RequesterType.COMPANY:
             cleaned['company_name'] = ''
         return cleaned
+
+
+class ContactMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['full_name', 'phone', 'email', 'subject', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['full_name'].widget.attrs.update({'placeholder': 'Ex : Jean Kouadio', 'autocomplete': 'name'})
+        self.fields['phone'].widget = forms.TextInput(attrs={'type': 'tel', 'placeholder': 'Ex : 07 00 00 00 00', 'autocomplete': 'tel'})
+        self.fields['email'].widget.attrs.update({'placeholder': 'jean@email.ci (facultatif)', 'autocomplete': 'email'})
+        self.fields['message'].widget = forms.Textarea(attrs={'rows': 5, 'placeholder': 'Dites-nous comment nous pouvons vous aider…'})
+        for field in self.fields.values():
+            is_select = isinstance(field.widget, forms.Select)
+            field.widget.attrs['class'] = INPUT_CLASS + (' appearance-none pr-10' if is_select else ' resize-none' if isinstance(field.widget, forms.Textarea) else '')

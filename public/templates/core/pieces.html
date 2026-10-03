@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Pièces détachées — Djona{% endblock %}
+{% block meta_description %}L'espace Pièces détachées de Djona est en cours de construction et sera bientôt disponible.{% endblock %}
+{% block styles %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="relative w-full min-h-[75vh] flex items-center overflow-hidden bg-primary text-on-primary -mt-20 pt-20">
+  <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+    <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
+      <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
+      <path d="M0 0 L50 100 L0 100 Z" fill="currentColor" opacity="0.5"/>
+    </svg>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/85 to-transparent"></div>
+  </div>
+  <span class="material-symbols-outlined absolute -right-10 -bottom-16 text-[320px] text-white/[0.05] rotate-[-12deg] select-none pointer-events-none" aria-hidden="true">settings</span>
+
+  <div class="relative z-10 max-w-2xl mx-auto w-full px-container-margin-mobile text-center py-16">
+    <div class="animate-slide-up-1 w-20 h-20 mx-auto mb-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg">
+      <span class="material-symbols-outlined text-[40px]" aria-hidden="true">construction</span>
+    </div>
+    <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary-container mb-4 uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-full">Page en construction</span>
+    <h1 class="animate-slide-up-2 font-display-lg text-3xl sm:text-4xl lg:text-display-lg mb-6 leading-tight">Pièces <span class="text-secondary-container">détachées</span></h1>
+    <p class="animate-slide-up-3 font-body-lg text-sm sm:text-body-lg text-primary-fixed-dim/80 mb-10 max-w-lg mx-auto">
+      Notre espace dédié aux pièces détachées est en cours de construction. Il sera disponible très prochainement.
+    </p>
+
+    <div class="animate-slide-up-4 flex flex-wrap items-center justify-center gap-4">
+      <a href="{% url 'core:home' %}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow-lg hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">home</span>
+        Retour à l'accueil
+      </a>
+      <a href="{% url 'core:contact' %}" class="inline-flex items-center gap-2 px-8 py-3.5 border border-white/30 text-on-primary rounded font-label-md text-label-md uppercase tracking-wide hover:bg-white/10 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">forum</span>
+        Nous contacter
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

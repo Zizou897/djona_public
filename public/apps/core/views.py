@@ -8,13 +8,16 @@ from django.views.decorators.http import require_POST
 
 from apps.catalog.models import Vehicle
 
-from .forms import NewsletterForm, TransportRequestForm
-from .models import NewsletterSubscriber, TransportRequest
+from .forms import ContactMessageForm, NewsletterForm, TransportRequestForm
+from .models import ContactMessage, NewsletterSubscriber, SiteContact, TransportRequest
 
 NEWSLETTER_RATE_LIMIT = 5
 NEWSLETTER_RATE_WINDOW = 600  # secondes (10 min)
 TRANSPORT_RATE_LIMIT = 5
 TRANSPORT_RATE_WINDOW = 3600  # secondes (1 h)
+CONTACT_RATE_LIMIT = 5
+CONTACT_RATE_WINDOW = 3600  # secondes (1 h)
+
 NL = chr(10)
 
 HOME_STATS = [
@@ -67,32 +70,147 @@ def about(request):
     return render(request, 'core/about.html')
 
 
+AVANTAGES_ITEMS = [
+    {
+        'icon': 'support_agent',
+        'title': 'Un accompagnement personnalisé de votre achat',
+        'text': "Acheter un véhicule représente un investissement important. Avec Djona, le client bénéficie d'un accompagnement à chaque étape : analyse du véhicule, compréhension de l'annonce, échanges avec le vendeur et suivi jusqu'à la finalisation de l'achat.",
+        'highlight': 'Votre projet d’achat est suivi par un interlocuteur Djona.',
+    },
+    {
+        'icon': 'fact_check',
+        'title': "Une meilleure visibilité sur l'état réel du véhicule",
+        'text': "Djona accompagne le client afin de mieux comprendre le véhicule qui l'intéresse : vérification des informations annoncées, contrôle des éléments essentiels, identification des points d'attention et aide à la prise de décision.",
+        'highlight': "Objectif : permettre au client d'acheter en connaissance de cause.",
+    },
+    {
+        'icon': 'verified_user',
+        'title': 'Une transaction plus sécurisée',
+        'text': "Avec Djona, l'acheteur bénéficie d'un cadre plus structuré : vendeur identifié, informations mieux suivies, accompagnement dans les échanges et réduction des risques liés aux mauvaises surprises.",
+    },
+    {
+        'icon': 'handshake',
+        'title': 'Un accompagnement dans la négociation',
+        'text': "Djona aide le client à évaluer la cohérence du prix, identifier les arguments de négociation et faciliter les échanges avec le vendeur afin de réaliser un achat au juste prix.",
+    },
+    {
+        'icon': 'redeem',
+        'title': "Des avantages exclusifs après l'achat",
+        'text': "Acheter via Djona permet d'intégrer un écosystème automobile : offres préférentielles sur certains services, réductions possibles sur certaines pièces automobiles, conseils et suivi du véhicule, rappels d'entretien.",
+    },
+    {
+        'icon': 'history',
+        'title': 'Un historique et un suivi du véhicule',
+        'text': "L'achat peut être enregistré dans l'espace personnel Djona : véhicule acheté, date d'acquisition, informations principales, historique des interventions et documents importants.",
+    },
+    {
+        'icon': 'hub',
+        'title': 'Un accès facilité aux solutions automobiles',
+        'text': "À travers son réseau, Djona pourra accompagner ses clients pour l'assurance automobile, le financement, l'entretien, la réparation, les pièces détachées et les services liés au véhicule.",
+    },
+]
+
+AVANTAGES_COMPARAISON = [
+    ('Seul face au vendeur', "Accompagnement d'un interlocuteur Djona"),
+    ('Informations parfois difficiles à vérifier', 'Processus plus structuré'),
+    ('Négociation individuelle', 'Assistance dans les échanges'),
+    ('Risque de mauvaises surprises', 'Meilleure visibilité avant achat'),
+    ('Relation terminée après achat', 'Suivi et avantages dans le temps'),
+]
+
+AVANTAGES_CHECKLIST = [
+    'Un véhicule mieux évalué',
+    'Une transaction plus sereine',
+    'Un accompagnement personnalisé',
+    'Des avantages exclusifs après achat',
+    'Un suivi automobile dans la durée',
+]
+
+
+def avantages(request):
+    """Page « Les avantages d'acheter avec Djona » — proposition de valeur
+    client portée depuis public/Avantages_Acheter_avec_Djona.docx (contenu
+    officiel fourni par l'équipe Djona, pas une maquette)."""
+    context = {
+        'items': AVANTAGES_ITEMS,
+        'comparaison': AVANTAGES_COMPARAISON,
+        'checklist': AVANTAGES_CHECKLIST,
+    }
+    return render(request, 'core/avantages.html', context)
+
+
 
 FAQ_ITEMS = [
     {
         'question': 'Comment Djona vérifie-t-elle les véhicules ?',
-        'answer': "Chaque véhicule listé sur Djona subit une inspection rigoureuse sur 150 points de contrôle par nos techniciens certifiés. Nous vérifions l'historique administratif, l'état mécanique et la carrosserie avant toute mise en ligne.",
+        'answer': "Djona accompagne l'acheteur pour mieux comprendre le véhicule qui l'intéresse : vérification des informations annoncées, contrôle des éléments essentiels et identification des points d'attention, pour acheter en connaissance de cause.",
     },
     {
         'question': 'Le paiement est-il sécurisé ?',
-        'answer': "Absolument. Djona utilise un système de compte séquestre. Les fonds ne sont débloqués au vendeur que lorsque l'acheteur a validé la conformité du véhicule après l'essai final et la vérification des documents.",
+        'answer': "Avec Djona, l'acheteur bénéficie d'un cadre plus structuré : vendeur identifié, informations mieux suivies et accompagnement dans les échanges, pour réduire les risques liés aux mauvaises surprises.",
     },
     {
         'question': 'Quels sont les frais de service Djona ?',
-        'answer': "Notre commission est transparente et varie selon la valeur du véhicule. Elle couvre l'inspection, la sécurisation du paiement et l'assistance administrative pour le transfert de propriété.",
+        'answer': "Le client ne paie pas pour simplement trouver un véhicule : il bénéficie d'un accompagnement qui réduit son risque, améliore sa décision d'achat et crée une relation durable autour de son automobile.",
     },
     {
         'question': 'Puis-je obtenir un financement via Djona ?',
-        'answer': "Oui, nous collaborons avec plusieurs banques partenaires en Côte d'Ivoire pour vous proposer des solutions de crédit automobile adaptées à votre profil directement depuis notre plateforme.",
+        'answer': "À travers son réseau, Djona pourra accompagner ses clients pour l'assurance automobile, le financement, l'entretien et les autres services liés au véhicule.",
     },
 ]
 
 
 def contact(request):
-    """Page contact / support, portée depuis
-    _mockups/01_public/desktop/contact_support_djona/code.html.
-    """
-    return render(request, 'core/contact.html', {'faq_items': FAQ_ITEMS})
+    if request.method == 'POST':
+        form = ContactMessageForm(request.POST)
+        cache_key = f'contact-message:{_client_ip(request)}'
+        attempts = cache.get(cache_key, 0)
+        if attempts >= CONTACT_RATE_LIMIT:
+            messages.error(request, 'Trop de messages envoyés — réessayez plus tard.')
+        elif form.is_valid():
+            cache.set(cache_key, attempts + 1, CONTACT_RATE_WINDOW)
+            contact_message = form.save()
+            _notify_contact_message(contact_message)
+            request.session['contact_sent'] = contact_message.full_name
+            return redirect('core:contact_success')
+    else:
+        form = ContactMessageForm()
+    return render(request, 'core/contact.html', {
+        'form': form,
+        'faq_items': FAQ_ITEMS,
+        'contact': SiteContact.load(),
+    })
+
+
+def contact_success(request):
+    full_name = request.session.pop('contact_sent', None)
+    if not full_name:
+        return redirect('core:contact')
+    return render(request, 'core/contact_success.html', {'full_name': full_name, 'contact': SiteContact.load()})
+
+
+def _notify_contact_message(contact_message):
+    """Ne doit jamais faire échouer l'envoi : le message est déjà enregistré
+    et lisible dans le back-office."""
+    recipients = getattr(settings, 'CONTACT_NOTIFY_EMAILS', [])
+    if not recipients:
+        return
+    body = NL.join([
+        f'Nouveau message de contact — {contact_message.get_subject_display()}',
+        '',
+        f'Nom : {contact_message.full_name}',
+        f'Téléphone : {contact_message.phone}',
+        f'Email : {contact_message.email or "—"}',
+        '',
+        contact_message.message,
+    ])
+    try:
+        send_mail(
+            f'Contact Djona : {contact_message.get_subject_display()} — {contact_message.full_name}',
+            body, None, recipients, fail_silently=True,
+        )
+    except Exception:
+        pass
 
 
 def privacy(request):
@@ -234,6 +352,10 @@ def transport(request):
     else:
         form = TransportRequestForm()
     return render(request, 'core/transport.html', {'form': form})
+
+
+def pieces(request):
+    return render(request, 'core/pieces.html')
 
 
 def transport_success(request):

@@ -17,9 +17,6 @@
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
       <a href="https://vendor.djona.tech/" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2 {{ underline }}">Vendre vos véhicules</a>
-      <a href="{% url 'core:transport' %}"
-         class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:transport' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'core:transport' %}aria-current="page"{% endif %}>Transport</a>
       <a href="{% url 'core:contact' %}"
          class="font-label-md text-label-md py-2 transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary border-b-2 border-secondary font-bold{% else %}{{ underline }} text-on-surface-variant hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>
@@ -27,14 +24,15 @@
     {% endwith %}
 
     <div class="flex items-center gap-2 sm:gap-base">
-      <a href="https://vendor.djona.tech/"
-         class="hidden md:inline-flex px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded hover:bg-primary-fixed transition-colors">
-        Publier mon véhicule
+      <a href="{% url 'core:transport' %}"
+         class="hidden md:inline-flex items-center gap-2 whitespace-nowrap bg-primary text-on-primary px-4 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-label-md shadow-md hover:brightness-125 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">local_shipping</span>
+        Transport &amp; Logistique
       </a>
-      <a href="{% url 'catalog:list' %}"
-         class="print:hidden flex items-center gap-1.5 sm:gap-2 bg-secondary text-on-secondary px-3 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-xs sm:text-label-md shadow-md hover:brightness-110 transition-all">
-        <span class="material-symbols-outlined text-[18px] sm:text-[20px]" aria-hidden="true">search</span>
-        <span>Rechercher</span>
+      <a href="{% url 'core:pieces' %}"
+         class="print:hidden flex items-center gap-1.5 sm:gap-2 whitespace-nowrap bg-secondary text-on-secondary px-3 sm:px-6 py-2 sm:py-2.5 rounded font-label-md text-xs sm:text-label-md shadow-md hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[18px] sm:text-[20px]" aria-hidden="true">build</span>
+        <span>Pièces détachées</span>
       </a>
       <button type="button" id="mobile-nav-toggle" data-open="false"
               class="group lg:hidden relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-primary/15 bg-surface hover:border-secondary/50 hover:bg-surface-container transition-colors shrink-0"
@@ -60,14 +58,16 @@
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'catalog:list' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'catalog:list' %}aria-current="page"{% endif %}>Acheter</a>
       <a href="https://vendor.djona.tech/" class="px-4 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">Vendre vos véhicules</a>
-      <a href="{% url 'core:transport' %}"
-         class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:transport' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
-         {% if request.resolver_match.view_name == 'core:transport' %}aria-current="page"{% endif %}>Transport</a>
       <a href="{% url 'core:contact' %}"
          class="px-4 py-3 rounded font-label-md text-label-md transition-colors {% if request.resolver_match.view_name == 'core:contact' %}text-secondary bg-surface-container font-bold{% else %}text-on-surface-variant hover:bg-surface-container hover:text-primary{% endif %}"
          {% if request.resolver_match.view_name == 'core:contact' %}aria-current="page"{% endif %}>Contacts</a>
-      <a href="https://vendor.djona.tech/" class="mt-2 text-center px-4 py-3 border border-primary text-primary rounded font-label-md text-label-md hover:bg-primary-fixed transition-colors">
-        Publier mon véhicule
+      <a href="{% url 'core:transport' %}" class="mt-2 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-on-primary rounded font-label-md text-label-md hover:brightness-125 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">local_shipping</span>
+        Transport &amp; Logistique
+      </a>
+      <a href="{% url 'core:pieces' %}" class="flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-on-secondary rounded font-label-md text-label-md hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">build</span>
+        Pièces détachées
       </a>
     </nav>
   </div>

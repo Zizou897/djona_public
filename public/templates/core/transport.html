@@ -2,74 +2,205 @@
 {% load static %}
 
 {% block title %}Transport & Logistique — Djona{% endblock %}
-{% block meta_description %}Besoin de transporter vos marchandises ? Djona Group vous met en relation avec ses partenaires transport pour vos opérations en Côte d'Ivoire et à l'international. Envoyez votre demande en quelques minutes.{% endblock %}
+{% block meta_description %}Besoin de transporter vos marchandises ? Djona Group vous accompagne dans la recherche de solutions de transport adaptées, pour vos opérations en Côte d'Ivoire et à l'international.{% endblock %}
 
 {% block content %}
-<div class="relative flex flex-col w-full">
+<div class="flex flex-col w-full">
 
-  <section class="px-container-margin-mobile lg:px-container-margin-desktop pt-section-gap pb-12">
-    <div class="max-w-page mx-auto">
-      <div class="max-w-3xl">
-        <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary mb-4 uppercase tracking-widest bg-secondary-fixed/30 px-3 py-1 rounded-full">Djona Group</span>
-        <h1 class="animate-slide-up-2 font-display-lg text-display-lg text-primary mb-6 leading-tight">Transport &amp; <span class="text-secondary">Logistique</span></h1>
-        <p class="animate-slide-up-3 font-headline-md text-headline-md text-primary mb-4">Besoin de transporter vos marchandises ?</p>
-        <p class="font-body-lg text-body-lg text-on-surface-variant mb-4">
+  {# ── Hero ── #}
+  <section class="relative w-full min-h-[48vh] sm:min-h-[52vh] flex items-center overflow-hidden bg-primary text-on-primary -mt-20 pt-28 pb-16">
+    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
+        <path d="M0 0 L50 100 L0 100 Z" fill="currentColor" opacity="0.5"/>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/85 to-transparent"></div>
+    </div>
+    <span class="material-symbols-outlined absolute -right-10 -bottom-16 text-[320px] text-white/[0.05] rotate-[-6deg] select-none pointer-events-none" aria-hidden="true">local_shipping</span>
+
+    <div class="relative z-10 max-w-page w-full mx-auto px-4 sm:px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="max-w-2xl">
+        <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary-container mb-4 uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-full">Djona Group</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-3xl sm:text-4xl lg:text-display-lg mb-6 leading-tight">Transport &amp; <span class="text-secondary-container">Logistique</span></h1>
+        <p class="animate-slide-up-3 font-body-lg text-sm sm:text-body-lg text-primary-fixed-dim/80 mb-8 max-w-xl">
           Djona Group vous accompagne dans la recherche de solutions de transport adaptées à vos besoins, pour vos opérations en Côte d'Ivoire et à l'international.
         </p>
-        <p class="font-body-lg text-body-lg text-on-surface-variant mb-4">
-          Que vous soyez un particulier ou une entreprise, indiquez-nous votre besoin à travers le formulaire ci-dessous. Notre équipe étudiera votre demande et vous contactera afin de vous proposer une solution adaptée.
-        </p>
-        <p class="font-label-md text-label-md text-primary">Décrivez votre besoin, nous nous occupons du reste.</p>
+        <div class="animate-slide-up-4 flex flex-wrap gap-x-8 gap-y-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-container text-[20px]" aria-hidden="true">flight_takeoff</span>
+            <span class="font-label-md text-label-md text-on-primary/90">Côte d'Ivoire &amp; international</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-container text-[20px]" aria-hidden="true">groups</span>
+            <span class="font-label-md text-label-md text-on-primary/90">Particuliers &amp; entreprises</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-container text-[20px]" aria-hidden="true">support_agent</span>
+            <span class="font-label-md text-label-md text-on-primary/90">Accompagnement sur mesure</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="px-container-margin-mobile lg:px-container-margin-desktop pb-section-gap">
-    <div class="max-w-page mx-auto">
-      <form method="post" action="{% url 'core:transport' %}" id="transport-form" class="max-w-3xl bg-surface-container-lowest rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col gap-10" novalidate>
+  {# ── Comment ça marche ── #}
+  <section class="py-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="reveal grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+      <div class="flex gap-4">
+        <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-[18px]">1</div>
+        <div>
+          <h3 class="font-headline-md text-[17px] text-on-background mb-1">Décrivez votre besoin</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Remplissez le formulaire ci-dessous avec les détails de votre transport.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-[18px]">2</div>
+        <div>
+          <h3 class="font-headline-md text-[17px] text-on-background mb-1">Nous étudions votre demande</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Notre équipe analyse votre besoin pour identifier la solution la plus adaptée.</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="shrink-0 w-11 h-11 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md text-[18px]">3</div>
+        <div>
+          <h3 class="font-headline-md text-[17px] text-on-background mb-1">Vous êtes recontacté</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Nous revenons vers vous afin de vous proposer une solution adaptée.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ── Formulaire + aide ── #}
+  <section class="pb-section-gap max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-section-gap items-start">
+
+      <form method="post" action="{% url 'core:transport' %}" id="transport-form" class="reveal lg:col-span-8 bg-surface-container-lowest rounded-3xl shadow-signature p-6 sm:p-8 flex flex-col gap-10" novalidate>
         {% csrf_token %}
-        <h2 class="font-headline-lg text-headline-lg text-primary -mb-4">Demande de transport</h2>
+        <div>
+          <h2 class="font-headline-lg text-headline-lg text-primary">Demande de transport</h2>
+          <p class="font-body-md text-body-md text-on-surface-variant mt-1">Les champs marqués d'un <span class="text-error">*</span> sont obligatoires.</p>
+        </div>
 
         {% if form.non_field_errors %}
-        <div class="rounded bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>
+        <div class="rounded-lg bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>
         {% endif %}
 
-        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <legend class="font-headline-md text-headline-md text-primary mb-4">Vos informations</legend>
-          {% include 'partials/_transport_field.html' with field=form.last_name %}
-          {% include 'partials/_transport_field.html' with field=form.first_name %}
-          {% include 'partials/_transport_field.html' with field=form.phone %}
-          {% include 'partials/_transport_field.html' with field=form.email %}
-          {% include 'partials/_transport_field.html' with field=form.requester_type is_select=True %}
-          <div id="transport-company-wrapper" {% if form.requester_type.value != 'entreprise' %}hidden{% endif %}>
-            {% include 'partials/_transport_field.html' with field=form.company_name %}
+        {# ── Indicateur d'étapes ── #}
+        <div id="transport-steps-nav" class="flex items-start">
+          <div class="step-item flex flex-col items-center gap-2" data-step-nav="0">
+            <button type="button" class="step-circle w-9 h-9 shrink-0 rounded-full flex items-center justify-center font-label-md text-label-sm bg-primary text-on-primary transition-colors">1</button>
+            <span class="font-label-sm text-label-sm text-center hidden sm:block">Vos informations</span>
+          </div>
+          <div class="step-line flex-1 h-[2px] bg-outline-variant/40 mt-4 sm:mt-[18px]"></div>
+          <div class="step-item flex flex-col items-center gap-2" data-step-nav="1">
+            <button type="button" class="step-circle w-9 h-9 shrink-0 rounded-full flex items-center justify-center font-label-md text-label-sm bg-surface-container text-on-surface-variant transition-colors">2</button>
+            <span class="font-label-sm text-label-sm text-center hidden sm:block">Transport</span>
+          </div>
+          <div class="step-line flex-1 h-[2px] bg-outline-variant/40 mt-4 sm:mt-[18px]"></div>
+          <div class="step-item flex flex-col items-center gap-2" data-step-nav="2">
+            <button type="button" class="step-circle w-9 h-9 shrink-0 rounded-full flex items-center justify-center font-label-md text-label-sm bg-surface-container text-on-surface-variant transition-colors">3</button>
+            <span class="font-label-sm text-label-sm text-center hidden sm:block">Livraison</span>
+          </div>
+          <div class="step-line flex-1 h-[2px] bg-outline-variant/40 mt-4 sm:mt-[18px]"></div>
+          <div class="step-item flex flex-col items-center gap-2" data-step-nav="3">
+            <button type="button" class="step-circle w-9 h-9 shrink-0 rounded-full flex items-center justify-center font-label-md text-label-sm bg-surface-container text-on-surface-variant transition-colors">4</button>
+            <span class="font-label-sm text-label-sm text-center hidden sm:block">Message</span>
+          </div>
+        </div>
+
+        <fieldset class="transport-step flex flex-col gap-6" data-step="0">
+          <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
+            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">person</span>
+            </span>
+            Vos informations
+          </legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% include 'partials/_transport_field.html' with field=form.last_name %}
+            {% include 'partials/_transport_field.html' with field=form.first_name %}
+            {% include 'partials/_transport_field.html' with field=form.phone %}
+            {% include 'partials/_transport_field.html' with field=form.email %}
+            {% include 'partials/_transport_field.html' with field=form.requester_type is_select=True %}
+            <div id="transport-company-wrapper" {% if form.requester_type.value != 'entreprise' %}hidden{% endif %}>
+              {% include 'partials/_transport_field.html' with field=form.company_name %}
+            </div>
           </div>
         </fieldset>
 
-        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <legend class="font-headline-md text-headline-md text-primary mb-4">Le transport</legend>
-          {% include 'partials/_transport_field.html' with field=form.vehicle_type is_select=True %}
-          {% include 'partials/_transport_field.html' with field=form.quantity is_select=True %}
+        <fieldset class="transport-step flex flex-col gap-6" data-step="1" style="display:none">
+          <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
+            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_shipping</span>
+            </span>
+            Le transport
+          </legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% include 'partials/_transport_field.html' with field=form.vehicle_type is_select=True %}
+            {% include 'partials/_transport_field.html' with field=form.quantity is_select=True %}
+          </div>
         </fieldset>
 
-        <fieldset class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <legend class="font-headline-md text-headline-md text-primary mb-4">Chargement et livraison</legend>
-          {% include 'partials/_transport_field.html' with field=form.loading_date %}
-          {% include 'partials/_transport_field.html' with field=form.loading_place %}
-          {% include 'partials/_transport_field.html' with field=form.delivery_place extra_class='md:col-span-2' %}
+        <fieldset class="transport-step flex flex-col gap-6" data-step="2" style="display:none">
+          <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
+            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">pin_drop</span>
+            </span>
+            Chargement et livraison
+          </legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% include 'partials/_transport_field.html' with field=form.loading_date %}
+            {% include 'partials/_transport_field.html' with field=form.loading_place %}
+            {% include 'partials/_transport_field.html' with field=form.delivery_place extra_class='md:col-span-2' %}
+          </div>
         </fieldset>
 
-        <fieldset class="grid grid-cols-1 gap-6">
-          <legend class="font-headline-md text-headline-md text-primary mb-4">Informations complémentaires</legend>
+        <fieldset class="transport-step flex flex-col gap-6" data-step="3" style="display:none">
+          <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2">
+            <span class="w-8 h-8 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">notes</span>
+            </span>
+            Informations complémentaires
+          </legend>
           {% include 'partials/_transport_field.html' with field=form.message %}
         </fieldset>
 
-        <div>
-          <button type="submit" class="w-full sm:w-auto px-10 py-4 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-98 transition-all">
-            Envoyer ma demande
+        <div class="flex items-center justify-between pt-6 border-t border-outline-variant/30">
+          <button type="button" id="transport-prev" class="invisible inline-flex items-center gap-2 px-6 py-3 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
+            Précédent
+          </button>
+          <span id="transport-step-label" class="hidden sm:block font-label-sm text-label-sm text-on-surface-variant"></span>
+          <button type="button" id="transport-next" class="group inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all">
+            Suivant
+            <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="submit" id="transport-submit" style="display:none" class="group inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-98 transition-all">
+            <span>Envoyer ma demande</span>
+            <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
           </button>
         </div>
       </form>
+
+      {# ── Colonne latérale ── #}
+      <div class="reveal lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
+        <div class="bg-tertiary text-on-tertiary p-6 rounded-3xl flex flex-col gap-2">
+          <span class="material-symbols-outlined text-secondary-fixed text-[28px] mb-2" aria-hidden="true">tips_and_updates</span>
+          <h3 class="font-headline-md text-[17px]">Décrivez votre besoin, nous nous occupons du reste.</h3>
+          <p class="font-body-md text-body-md opacity-80">Que vous soyez un particulier ou une entreprise, indiquez-nous votre besoin : notre équipe étudiera votre demande et vous contactera pour vous proposer une solution adaptée.</p>
+        </div>
+
+        <div class="bg-surface p-6 rounded-3xl shadow-signature flex flex-col gap-4">
+          <h3 class="font-headline-md text-[17px] text-on-background">Une question avant d'envoyer votre demande ?</h3>
+          <a href="{% url 'core:contact' %}" class="group flex items-center justify-between gap-2 px-4 py-3 rounded border border-outline-variant/50 hover:border-primary/40 hover:bg-primary/5 transition-colors">
+            <span class="flex items-center gap-2 font-label-md text-label-md text-on-surface">
+              <span class="material-symbols-outlined text-primary text-[20px]" aria-hidden="true">forum</span>
+              Contacter l'équipe Djona
+            </span>
+            <span class="material-symbols-outlined text-on-surface-variant text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -78,4 +209,5 @@
 
 {% block scripts %}
 <script src="{% static 'js/transport.js' %}" defer></script>
+<script src="{% static 'js/transport-wizard.js' %}" defer></script>
 {% endblock %}

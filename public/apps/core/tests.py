@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import TransportRequest, TransportVehicleType
+from .models import ContactMessage, SiteContact, TransportRequest, TransportVehicleType
 
 
 class TransportRequestTests(TestCase):
@@ -77,3 +77,68 @@ class TransportRequestTests(TestCase):
     def test_success_page_without_reference_redirects(self):
         response = self.client.get(reverse('core:transport_success'))
         self.assertRedirects(response, self.url)
+
+
+class ContactMessageTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.url = reverse('core:contact')
+
+    def payload(self, **overrides):
+        data = {
+            'full_name': 'Jean Kouadio',
+            'phone': '0700000000',
+            'email': '',
+            'subject': 'achat',
+            'message': 'Je cherche un SUV.',
+        }
+        data.update(overrides)
+        return data
+
+    def test_page_shows_official_contact_details(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, '+225 01 41 60 27 53')
+        self.assertContains(response, 'contact@djona.tech')
+        self.assertContains(response, 'https://wa.me/2250141602753')
+        self.assertNotContains(response, '0102030405')
+
+    @override_settings(CONTACT_NOTIFY_EMAILS=['equipe@example.com'])
+    def test_valid_submission_saves_and_notifies(self):
+        response = self.client.post(self.url, self.payload(), follow=True)
+        self.assertContains(response, 'Merci Jean Kouadio')
+        msg = ContactMessage.objects.get()
+        self.assertEqual(msg.status, ContactMessage.Status.NEW)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Jean Kouadio', mail.outbox[0].subject)
+
+    def test_missing_required_fields_rejected(self):
+        response = self.client.post(self.url, self.payload(phone='', message=''))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ContactMessage.objects.count(), 0)
+
+    def test_rate_limit(self):
+        for _ in range(5):
+            self.client.post(self.url, self.payload())
+        self.client.post(self.url, self.payload())
+        self.assertEqual(ContactMessage.objects.count(), 5)
+
+    def test_success_page_without_submission_redirects(self):
+        self.assertRedirects(self.client.get(reverse('core:contact_success')), self.url)
+
+
+class SiteContactTests(TestCase):
+    def test_page_reflects_backoffice_changes(self):
+        SiteContact.objects.filter(pk=1).update(
+            phone='+225 07 11 22 33 44', whatsapp='+225 05 55 66 77 88',
+            email='support@djona.tech', address='Cocody Riviera 3', city='Abidjan',
+        )
+        response = self.client.get(reverse('core:contact'))
+        self.assertContains(response, 'tel:+2250711223344')
+        self.assertContains(response, 'https://wa.me/2250555667788')
+        self.assertContains(response, 'support@djona.tech')
+        self.assertContains(response, 'Cocody Riviera 3')
+        self.assertNotContains(response, 'Angré 9ème tranche')
+
+    def test_load_recreates_missing_row(self):
+        SiteContact.objects.all().delete()
+        self.assertEqual(SiteContact.load().email, 'contact@djona.tech')

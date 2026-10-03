@@ -139,16 +139,39 @@
             <div class="relative bg-primary-container/10 p-5 rounded-md border-2 border-primary/20 flex flex-col gap-3">
               <div class="absolute -top-3 left-6 bg-secondary text-on-secondary px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Recommandé</div>
               <div class="flex items-start gap-3">
-                <span class="material-symbols-outlined text-primary mt-1" aria-hidden="true">verified_user</span>
-                <div>
-                  <h3 class="font-label-md text-on-primary-container">Acheter via Djona</h3>
-                  <p class="font-body-md text-label-sm text-on-surface-variant opacity-80">Expertise technique, sécurisation des fonds et mutation incluse.</p>
-                </div>
+                <span class="material-symbols-outlined text-secondary mt-1" aria-hidden="true">star</span>
+                <h3 class="font-label-md text-on-primary-container">Acheter avec Djona</h3>
               </div>
-              <a href="#" class="group w-full bg-secondary text-on-secondary py-4 rounded font-label-md text-label-md shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
-                <span>Démarrer l'achat sécurisé</span>
+              <div>
+                <p class="font-body-md text-label-sm text-on-surface-variant opacity-80 mb-2">Bénéficiez de :</p>
+                <ul class="flex flex-col gap-1.5">
+                  <li class="flex items-center gap-2 font-body-md text-label-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">check</span>
+                    Accompagnement personnalisé
+                  </li>
+                  <li class="flex items-center gap-2 font-body-md text-label-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">check</span>
+                    Vérification du véhicule
+                  </li>
+                  <li class="flex items-center gap-2 font-body-md text-label-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">check</span>
+                    Aide à la négociation
+                  </li>
+                  <li class="flex items-center gap-2 font-body-md text-label-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">check</span>
+                    Transaction plus sécurisée
+                  </li>
+                  <li class="flex items-center gap-2 font-body-md text-label-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">check</span>
+                    Avantages exclusifs après achat
+                  </li>
+                </ul>
+              </div>
+              <button type="button" onclick="ouvrirModalInteret()" class="group w-full bg-secondary text-on-secondary py-4 rounded font-label-md text-label-md shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                <span>Je veux acheter avec Djona</span>
                 <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
-              </a>
+              </button>
+              <a href="{% url 'core:avantages' %}" class="text-center font-label-md text-label-sm text-primary hover:underline">En savoir plus sur nos avantages</a>
             </div>
           </div>
         </div>
@@ -178,18 +201,26 @@
           <h4 class="font-headline-md text-[18px]">Pourquoi choisir Djona ?</h4>
           <ul class="flex flex-col gap-3">
             <li class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">check_circle</span>
-              <p class="font-body-md text-label-sm opacity-80">Inspection en 150 points par nos experts.</p>
+              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">fact_check</span>
+              <p class="font-body-md text-label-sm opacity-80">Vérification du véhicule avant votre décision.</p>
             </li>
             <li class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">shield_lock</span>
-              <p class="font-body-md text-label-sm opacity-80">Paiement bloqué jusqu'à la livraison.</p>
+              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">handshake</span>
+              <p class="font-body-md text-label-sm opacity-80">Accompagnement dans la négociation.</p>
             </li>
             <li class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">description</span>
-              <p class="font-body-md text-label-sm opacity-80">Gestion complète de la paperasse administrative.</p>
+              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">history</span>
+              <p class="font-body-md text-label-sm opacity-80">Historique et suivi dans votre espace Djona.</p>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-secondary-fixed" aria-hidden="true">hub</span>
+              <p class="font-body-md text-label-sm opacity-80">Accès facilité à l'assurance et au financement.</p>
             </li>
           </ul>
+          <a href="{% url 'core:avantages' %}" class="text-label-sm font-label-md text-secondary-fixed hover:underline flex items-center gap-1 w-fit">
+            Voir tous les avantages
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+          </a>
         </div>
       </div>
     </div>
@@ -289,7 +320,7 @@
               </div>
               <div class="pb-4">
                 <h4 class="font-label-md text-on-surface">Parcours Direct</h4>
-                <p class="font-body-md text-label-sm text-on-surface-variant opacity-70">Vous gérez tout seul : négociation, vérification mécanique, paiement et mutation. Risques à votre charge.</p>
+                <p class="font-body-md text-label-sm text-on-surface-variant opacity-70">Seul face au vendeur, négociation individuelle, risque de mauvaises surprises.</p>
               </div>
             </div>
             <div class="flex gap-4">
@@ -298,10 +329,10 @@
               </div>
               <div>
                 <h4 class="font-label-md text-secondary">Accompagnement Djona</h4>
-                <p class="font-body-md text-label-sm text-on-surface-variant opacity-70">Nous inspectons l'auto, sécurisons votre argent dans un compte tiers, et nous occupons du transfert de carte grise. 100% Sérénité.</p>
-                <a href="{% url 'core:contact' %}" class="mt-4 flex items-center gap-2 text-primary font-label-sm hover:underline w-fit">
+                <p class="font-body-md text-label-sm text-on-surface-variant opacity-70">Un interlocuteur Djona vous accompagne, pour une meilleure visibilité et un achat plus serein.</p>
+                <a href="{% url 'core:avantages' %}" class="mt-4 flex items-center gap-2 text-primary font-label-sm hover:underline w-fit">
                   <span class="material-symbols-outlined text-[18px]" aria-hidden="true">info</span>
-                  <span>En savoir plus sur nos frais de service</span>
+                  <span>En savoir plus sur nos avantages</span>
                 </a>
               </div>
             </div>
