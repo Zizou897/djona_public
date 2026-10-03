@@ -142,3 +142,22 @@ class SiteContactTests(TestCase):
     def test_load_recreates_missing_row(self):
         SiteContact.objects.all().delete()
         self.assertEqual(SiteContact.load().email, 'contact@djona.tech')
+
+
+class LegalPagesTests(TestCase):
+    def test_pages_render_with_tabs_and_real_contact(self):
+        for name in ('core:terms', 'core:privacy', 'core:seller_terms'):
+            response = self.client.get(reverse(name))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'aria-current="page"')
+            self.assertContains(response, 'contact@djona.tech')
+            self.assertContains(response, '3 octobre 2026')
+
+    def test_unverified_claims_removed(self):
+        privacy = self.client.get(reverse('core:privacy')).content.decode()
+        self.assertNotIn('privacy@djona-auto.ci', privacy)
+        self.assertNotIn('Palmeraie', privacy)
+        sellers = self.client.get(reverse('core:seller_terms')).content.decode()
+        self.assertNotIn('Séquestre', sellers)
+        self.assertNotIn('experts mécaniques certifiés', sellers)
+        self.assertIn('Au moins 3 photos', sellers)

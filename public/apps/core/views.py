@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib import messages
 from django.core.cache import cache
 from django.conf import settings
@@ -213,25 +215,55 @@ def _notify_contact_message(contact_message):
         pass
 
 
+LEGAL_UPDATED = date(2026, 10, 3)
+
+LEGAL_DOCS = {
+    'terms': {
+        'url_name': 'core:terms', 'short': 'CGU', 'icon': 'gavel',
+        'sections': [
+            ('definitions', 'Définitions'), ('objet', 'Objet'), ('acces', 'Accès au site'),
+            ('responsabilites', 'Responsabilités'), ('propriete', 'Propriété intellectuelle'),
+            ('donnees', 'Données personnelles'),
+        ],
+    },
+    'privacy': {
+        'url_name': 'core:privacy', 'short': 'Confidentialité', 'icon': 'shield_lock',
+        'sections': [
+            ('collecte', 'Collecte des données'), ('utilisation', 'Utilisation des données'),
+            ('partage', 'Partage des données'), ('securite', 'Sécurité'),
+            ('droits', 'Vos droits'), ('cookies', 'Cookies'),
+        ],
+    },
+    'seller_terms': {
+        'url_name': 'core:seller_terms', 'short': 'Conditions vendeurs', 'mobile': 'Vendeurs', 'icon': 'storefront',
+        'sections': [
+            ('objet', 'Objet'), ('inscription', 'Inscription'), ('publication', 'Règles de publication'),
+            ('acheter-avec-djona', 'Acheter avec Djona'), ('responsabilites', 'Responsabilités'),
+        ],
+    },
+}
+
+
+def _render_legal(request, key):
+    return render(request, f'core/{key}.html', {
+        'legal_key': key,
+        'legal_docs': [{'key': k, **v} for k, v in LEGAL_DOCS.items()],
+        'sections': LEGAL_DOCS[key]['sections'],
+        'legal_updated': LEGAL_UPDATED,
+        'contact': SiteContact.load(),
+    })
+
+
 def privacy(request):
-    """Politique de confidentialité, portée depuis
-    _mockups/01_public/desktop/conditions/screen.png (pas de code.html source).
-    """
-    return render(request, 'core/privacy.html')
+    return _render_legal(request, 'privacy')
 
 
 def terms(request):
-    """Conditions Générales d'Utilisation, portée depuis
-    _mockups/01_public/desktop/conditions/code.html (source fournie par l'utilisateur).
-    """
-    return render(request, 'core/terms.html')
+    return _render_legal(request, 'terms')
 
 
 def seller_terms(request):
-    """Conditions Particulières Vendeurs, portée depuis une maquette fournie
-    directement par l'utilisateur (source non stockée dans _mockups/).
-    """
-    return render(request, 'core/seller_terms.html')
+    return _render_legal(request, 'seller_terms')
 
 
 def robots_txt(request):

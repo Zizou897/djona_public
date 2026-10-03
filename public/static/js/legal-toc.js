@@ -12,13 +12,13 @@
   const setActive = (id) => {
     const linksArray = Array.from(links);
     linksArray.forEach((link) => {
-      link.classList.remove('text-primary', 'font-bold', 'border-primary', 'bg-surface-container-low');
+      link.classList.remove('text-primary', 'font-semibold', 'border-secondary');
       link.classList.add('border-transparent');
     });
     const active = linkByTarget.get(id);
     if (!active) return;
     active.classList.remove('border-transparent');
-    active.classList.add('text-primary', 'font-bold', 'border-primary', 'bg-surface-container-low');
+    active.classList.add('text-primary', 'font-semibold', 'border-secondary');
 
     if (progressBar) {
       const index = linksArray.indexOf(active);

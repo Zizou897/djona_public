@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+
+  {# ── Hero ── #}
+  <section class="relative w-full overflow-hidden bg-primary text-on-primary -mt-20 pt-28 print:hidden">
+    <div class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <svg class="w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <path d="M0 100 L100 0 L100 100 Z" fill="currentColor"/>
+        <path d="M0 0 L50 100 L0 100 Z" fill="currentColor" opacity="0.5"/>
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/85 to-transparent"></div>
+    </div>
+    <span class="absolute -right-6 -top-10 font-display-lg text-[340px] leading-none text-white/[0.05] select-none pointer-events-none" aria-hidden="true">§</span>
+
+    <div class="relative z-10 max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <nav class="animate-slide-up-1 flex items-center gap-2 font-label-sm text-label-sm text-on-primary/60 mb-8" aria-label="Fil d'ariane">
+        <a href="{% url 'core:home' %}" class="hover:text-on-primary transition-colors">Accueil</a>
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+        <span>Informations légales</span>
+      </nav>
+
+      <div class="max-w-3xl">
+        <span class="animate-slide-up-1 inline-block font-label-md text-label-md text-secondary-container mb-4 uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-full">{% block legal_kicker %}Informations légales{% endblock %}</span>
+        <h1 class="animate-slide-up-2 font-display-lg text-3xl sm:text-4xl lg:text-display-lg mb-6 leading-tight">{% block legal_title %}{% endblock %}</h1>
+        <p class="animate-slide-up-3 font-body-lg text-sm sm:text-body-lg text-primary-fixed-dim/80 max-w-2xl">{% block legal_intro %}{% endblock %}</p>
+      </div>
+
+      <div class="animate-slide-up-4 mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 font-label-sm text-label-sm text-on-primary/70">
+        <span class="inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-secondary-container" aria-hidden="true">update</span>
+          Dernière mise à jour : {{ legal_updated|date:"j F Y" }}
+        </span>
+        <button type="button" id="js-print-btn" class="inline-flex items-center gap-1.5 hover:text-on-primary transition-colors">
+          <span class="material-symbols-outlined text-[18px] text-secondary-container" aria-hidden="true">print</span>
+          Imprimer / PDF
+        </button>
+      </div>
+
+      {# Onglets entre les documents légaux #}
+      <nav class="animate-slide-up-4 mt-10 -mb-px flex gap-1 overflow-x-auto" aria-label="Documents légaux">
+        {% for d in legal_docs %}
+        <a href="{% url d.url_name %}"
+           class="shrink-0 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-3.5 rounded-t-lg font-label-md text-label-md transition-colors {% if d.key == legal_key %}bg-background text-primary{% else %}text-on-primary/70 hover:text-on-primary hover:bg-white/10{% endif %}"
+           {% if d.key == legal_key %}aria-current="page"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">{{ d.icon }}</span>
+          {% if d.mobile %}<span class="sm:hidden">{{ d.mobile }}</span><span class="hidden sm:inline">{{ d.short }}</span>{% else %}{{ d.short }}{% endif %}
+        </a>
+        {% endfor %}
+      </nav>
+    </div>
+  </section>
+
+  {# En-tête simple pour l'impression #}
+  <div class="hidden print:block mb-8">
+    <p class="text-sm">Djona — Informations légales — mise à jour le {{ legal_updated|date:"j F Y" }}</p>
+  </div>
+
+  {# ── Document ── #}
+  <section class="max-w-page w-full mx-auto px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-gutter items-start">
+
+      {# Sommaire desktop #}
+      <aside class="hidden lg:block lg:col-span-3 sticky top-28 print:hidden">
+        <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-5">Sommaire</p>
+        <nav class="relative flex flex-col" id="toc-nav">
+          <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-surface-container-high" aria-hidden="true">
+            <div class="w-full bg-secondary transition-all duration-300 rounded-full" id="toc-progress" style="height: 0%;"></div>
+          </div>
+          {% for id, title in sections %}
+          <a href="#{{ id }}" data-target="{{ id }}" class="js-toc-link group flex items-baseline gap-3 py-2.5 pl-5 border-l-2 border-transparent font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
+            <span class="font-label-sm text-label-sm text-secondary tabular-nums">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span>{{ title }}</span>
+          </a>
+          {% endfor %}
+        </nav>
+        <a href="{% url 'core:contact' %}" class="mt-8 flex items-center gap-3 p-4 rounded-2xl bg-surface-container-low hover:bg-surface-container transition-colors group">
+          <span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]" aria-hidden="true">help</span></span>
+          <span class="flex-1 font-label-md text-label-md text-on-surface">Une question ?<span class="block font-body-md text-label-sm text-on-surface-variant">Contactez-nous</span></span>
+          <span class="material-symbols-outlined text-on-surface-variant text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+        </a>
+      </aside>
+
+      {# Sommaire mobile #}
+      <details class="lg:hidden group bg-surface-container-lowest rounded-2xl shadow-signature print:hidden">
+        <summary class="flex items-center justify-between p-4 cursor-pointer list-none">
+          <span class="inline-flex items-center gap-2 font-label-md text-label-md text-primary">
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">toc</span> Sommaire
+          </span>
+          <span class="material-symbols-outlined transition duration-300 group-open:-rotate-180 text-primary" aria-hidden="true">expand_more</span>
+        </summary>
+        <div class="px-4 pb-4 flex flex-col">
+          {% for id, title in sections %}
+          <a href="#{{ id }}" class="flex items-baseline gap-3 py-2 font-body-md text-body-md text-on-surface-variant hover:text-primary">
+            <span class="font-label-sm text-label-sm text-secondary tabular-nums">{{ forloop.counter|stringformat:"02d" }}</span>{{ title }}
+          </a>
+          {% endfor %}
+        </div>
+      </details>
+
+      <article class="lg:col-span-9 bg-surface-container-lowest rounded-3xl shadow-signature p-6 sm:p-10 lg:p-14 print:shadow-none print:p-0">
+        <div class="max-w-[72ch] flex flex-col gap-16 font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          {% block legal_body %}{% endblock %}
+        </div>
+
+        <div class="max-w-[72ch] mt-16 pt-10 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6 print:hidden">
+          <div>
+            <p class="font-headline-md text-[17px] text-on-background">Une question sur ce document ?</p>
+            <p class="font-body-md text-label-sm text-on-surface-variant mt-1">
+              <a href="mailto:{{ contact.email }}" class="text-primary hover:underline">{{ contact.email }}</a> · <a href="tel:{{ contact.phone_tel }}" class="text-primary hover:underline">{{ contact.phone }}</a>
+            </p>
+          </div>
+          <a href="{% url 'core:contact' %}" class="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-on-primary rounded font-label-md text-label-md hover:brightness-125 transition-all">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">forum</span>
+            Nous contacter
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/legal-toc.js' %}" defer></script>
+{% endblock %}
