@@ -29,14 +29,6 @@
     </a>
 </div>
 
-{% if messages %}
-<div class="reveal mb-6 flex flex-col gap-2" style="animation-delay:.08s">
-    {% for message in messages %}
-    <div class="px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm font-medium">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-
 <div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
 <div class="hidden lg:block overflow-x-auto">
 <table class="w-full text-left border-collapse">
@@ -67,10 +59,7 @@
 <td class="px-6 py-4 text-right">
 <div class="inline-flex items-center gap-2">
 <a class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors" href="{% url 'partner_modifier' partner.pk %}">Modifier</a>
-<form action="{% url 'partner_supprimer' partner.pk %}" method="post" onsubmit="return confirm('Supprimer définitivement ce partenaire ?');" class="inline">
-{% csrf_token %}
-<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Supprimer</button>
-</form>
+<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'partner_supprimer' partner.pk %}', 'Supprimer ce partenaire ?', '« {{ partner.name|escapejs }} » sera définitivement supprimé. Cette action est irréversible.', 'Supprimer')">Supprimer</button>
 </div>
 </td>
 </tr>
@@ -100,10 +89,7 @@
 </div>
 <div class="flex items-center gap-2">
 <a class="flex-1 text-center px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors" href="{% url 'partner_modifier' partner.pk %}">Modifier</a>
-<form action="{% url 'partner_supprimer' partner.pk %}" method="post" onsubmit="return confirm('Supprimer définitivement ce partenaire ?');" class="flex-1">
-{% csrf_token %}
-<button class="w-full px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Supprimer</button>
-</form>
+<button class="flex-1 px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'partner_supprimer' partner.pk %}', 'Supprimer ce partenaire ?', '« {{ partner.name|escapejs }} » sera définitivement supprimé. Cette action est irréversible.', 'Supprimer')">Supprimer</button>
 </div>
 </div>
 {% empty %}
@@ -118,4 +104,5 @@
 </div>
 {% include 'app/includes/nav_mobile_admin.html' with active_nav='partenaires' %}
 </div>
+{% include 'app/includes/modal_confirmation.html' %}
 {% endblock %}

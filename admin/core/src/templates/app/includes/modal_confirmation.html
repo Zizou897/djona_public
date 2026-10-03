@@ -1,0 +1,33 @@
+<div class="fixed inset-0 z-[110] hidden items-center justify-center bg-on-surface/40 backdrop-blur-sm px-4" id="modal-confirmation">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4">
+        <span class="w-14 h-14 rounded-full bg-error/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-error text-[28px]" id="modal-confirmation-icone">delete</span>
+        </span>
+        <div>
+            <h3 class="font-headline-md text-lg text-on-surface" id="modal-confirmation-titre"></h3>
+            <p class="text-sm text-on-surface-variant mt-1" id="modal-confirmation-message"></p>
+        </div>
+        <form action="" class="flex gap-3 w-full" id="modal-confirmation-form" method="post">
+            {% csrf_token %}
+            <button class="flex-1 px-4 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors" onclick="fermerModalConfirmation()" type="button">Annuler</button>
+            <button class="flex-1 px-4 py-2.5 rounded-lg bg-error text-white text-sm font-semibold hover:bg-error/90 transition-colors" id="modal-confirmation-bouton" type="submit">Confirmer</button>
+        </form>
+    </div>
+</div>
+<script>
+    function ouvrirModalConfirmation(url, titre, message, texteBouton, icone) {
+        document.getElementById('modal-confirmation-form').action = url;
+        document.getElementById('modal-confirmation-titre').textContent = titre;
+        document.getElementById('modal-confirmation-message').textContent = message;
+        document.getElementById('modal-confirmation-bouton').textContent = texteBouton || 'Confirmer';
+        document.getElementById('modal-confirmation-icone').textContent = icone || 'delete';
+        var modal = document.getElementById('modal-confirmation');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function fermerModalConfirmation() {
+        var modal = document.getElementById('modal-confirmation');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+</script>

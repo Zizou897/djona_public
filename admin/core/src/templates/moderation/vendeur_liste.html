@@ -72,10 +72,7 @@
 <button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors" type="submit">Activer</button>
 </form>
 {% else %}
-<form action="{% url 'vendeur_suspendre' vendeur.pk %}" method="post" class="inline">
-{% csrf_token %}
-<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Suspendre</button>
-</form>
+<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'vendeur_suspendre' vendeur.pk %}', 'Suspendre ce vendeur ?', '« {{ vendeur.prenom|escapejs }} {{ vendeur.nom|escapejs }} » ne pourra plus accéder à son compte tant qu\'il ne sera pas réactivé.', 'Suspendre', 'block')">Suspendre</button>
 {% endif %}
 </td>
 </tr>
@@ -127,10 +124,7 @@
 <button class="w-full px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors" type="submit">Activer</button>
 </form>
 {% else %}
-<form action="{% url 'vendeur_suspendre' vendeur.pk %}" method="post">
-{% csrf_token %}
-<button class="w-full px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Suspendre</button>
-</form>
+<button class="w-full px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'vendeur_suspendre' vendeur.pk %}', 'Suspendre ce vendeur ?', '« {{ vendeur.prenom|escapejs }} {{ vendeur.nom|escapejs }} » ne pourra plus accéder à son compte tant qu\'il ne sera pas réactivé.', 'Suspendre', 'block')">Suspendre</button>
 {% endif %}
 </div>
 </div>
@@ -145,4 +139,5 @@
 </div>
 {% include 'app/includes/nav_mobile_admin.html' with active_nav='vendeurs' %}
 </div>
+{% include 'app/includes/modal_confirmation.html' %}
 {% endblock %}

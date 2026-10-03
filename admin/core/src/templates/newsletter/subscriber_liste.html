@@ -29,14 +29,6 @@
     </a>
 </div>
 
-{% if messages %}
-<div class="reveal mb-6 flex flex-col gap-2" style="animation-delay:.08s">
-    {% for message in messages %}
-    <div class="px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm font-medium">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-
 <div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
 <div class="hidden lg:block overflow-x-auto">
 <table class="w-full text-left border-collapse">
@@ -53,10 +45,7 @@
 <td class="px-6 py-4 font-label-md text-label-md">{{ subscriber.email }}</td>
 <td class="px-6 py-4 text-on-surface-variant">{{ subscriber.created_at|date:'d/m/Y H:i' }}</td>
 <td class="px-6 py-4 text-right">
-<form action="{% url 'newsletter_subscriber_supprimer' subscriber.pk %}" method="post" onsubmit="return confirm('Retirer cet abonné de la newsletter ?');" class="inline">
-{% csrf_token %}
-<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="submit">Retirer</button>
-</form>
+<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'newsletter_subscriber_supprimer' subscriber.pk %}', 'Retirer cet abonné ?', '« {{ subscriber.email|escapejs }} » sera retiré de la liste newsletter.', 'Retirer')">Retirer</button>
 </td>
 </tr>
 {% empty %}
@@ -73,10 +62,7 @@
 <p class="font-label-md text-label-md text-on-surface truncate">{{ subscriber.email }}</p>
 <p class="text-[11px] text-on-surface-variant">{{ subscriber.created_at|date:'d/m/Y H:i' }}</p>
 </div>
-<form action="{% url 'newsletter_subscriber_supprimer' subscriber.pk %}" method="post" onsubmit="return confirm('Retirer cet abonné de la newsletter ?');">
-{% csrf_token %}
-<button class="px-3 py-2 rounded-lg border border-error text-error text-xs font-bold hover:bg-error-container/20 transition-colors" type="submit">Retirer</button>
-</form>
+<button class="px-3 py-2 rounded-lg border border-error text-error text-xs font-bold hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'newsletter_subscriber_supprimer' subscriber.pk %}', 'Retirer cet abonné ?', '« {{ subscriber.email|escapejs }} » sera retiré de la liste newsletter.', 'Retirer')">Retirer</button>
 </div>
 {% empty %}
 <div class="p-8 text-center text-on-surface-variant">Aucun abonné pour le moment.</div>
@@ -90,4 +76,5 @@
 </div>
 {% include 'app/includes/nav_mobile_admin.html' with active_nav='newsletter' %}
 </div>
+{% include 'app/includes/modal_confirmation.html' %}
 {% endblock %}
