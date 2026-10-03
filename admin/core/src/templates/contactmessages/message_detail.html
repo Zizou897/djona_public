@@ -1,7 +1,7 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Message de {{ msg.full_name }} — Portail Admin{% endblock %}
+{% block title %}Message de {{ msg.display_name }} — Portail Admin{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
@@ -21,7 +21,7 @@
     <span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux messages
 </a>
 <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">{{ msg.subject_label }}</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ msg.full_name }}</h1>
+<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ msg.display_name }}</h1>
 <p class="text-sm text-on-surface-variant mb-8">Reçu le {{ msg.created_at|date:'d/m/Y à H:i' }}</p>
 
 <form method="post" class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 mb-6 flex flex-col sm:flex-row sm:items-end gap-4">

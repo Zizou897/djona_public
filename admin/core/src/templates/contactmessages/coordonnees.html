@@ -59,6 +59,23 @@
         </div>
     </fieldset>
 
+    <fieldset class="flex flex-col gap-5">
+        <legend class="flex items-center gap-2 font-headline-md text-[18px] text-primary mb-4">
+            <span class="material-symbols-outlined text-[22px]">share</span> Réseaux sociaux
+        </legend>
+        <p class="text-sm text-on-surface-variant -mt-2">Affichés dans le pied de page du site. Un réseau sans lien n'est pas affiché.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for field in form %}{% if field.name in 'facebook_url,instagram_url,tiktok_url,linkedin_url' %}
+            <div class="flex flex-col gap-2">
+                <label for="{{ field.id_for_label }}" class="font-label-md text-label-md">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="text-sm text-error">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}{% endfor %}
+        </div>
+    </fieldset>
+
     <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-surface-variant">
         <p class="text-xs text-on-surface-variant">Dernière modification : {{ form.instance.updated_at|date:'d/m/Y à H:i' }}</p>
         <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">

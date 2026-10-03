@@ -57,3 +57,16 @@ class SiteContactViewTest(TestCase):
         response = self.client.post(self.url, self.payload(email='pas-un-email'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(SiteContactMirror.objects.using('public_db').get(pk=1).email, self.original.email)
+
+    def test_reseaux_sociaux(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(self.url, self.payload(facebook_url='https://www.facebook.com/djonagroup', tiktok_url='https://www.tiktok.com/@djonagroup'))
+        self.assertRedirects(response, self.url)
+        updated = SiteContactMirror.objects.using('public_db').get(pk=1)
+        self.assertEqual(updated.facebook_url, 'https://www.facebook.com/djonagroup')
+        self.assertEqual(updated.instagram_url, '')
+
+    def test_lien_reseau_mauvais_domaine_refuse(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(self.url, self.payload(instagram_url='https://www.facebook.com/djonagroup'))
+        self.assertContains(response, 'Ce lien doit pointer vers instagram.com.')

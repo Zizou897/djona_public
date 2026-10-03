@@ -44,3 +44,16 @@ class ContactMessageViewsTest(TestCase):
         self.client.force_login(self.admin)
         self.client.post(reverse('contact_message_detail', args=[self.msg.pk]), {'statut': 'nimporte'})
         self.assertEqual(ContactMessageMirror.objects.using('public_db').get(pk=self.msg.pk).status, 'nouveau')
+
+    def test_question_sans_nom_affiche_visiteur(self):
+        question = ContactMessageMirror.objects.using('public_db').create(
+            full_name='', phone='+225 0700000000', subject='question',
+            message='Disponible ?', created_at=timezone.now(),
+        )
+        try:
+            self.client.force_login(self.admin)
+            response = self.client.get(reverse('contact_message_detail', args=[question.pk]))
+            self.assertContains(response, 'Visiteur')
+            self.assertContains(response, 'Question (FAQ)')
+        finally:
+            ContactMessageMirror.objects.using('public_db').filter(pk=question.pk).delete()

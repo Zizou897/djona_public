@@ -18,6 +18,7 @@ class ContactMessageMirror(models.Model):
         'transport': 'Transport & logistique',
         'partenariat': 'Partenariat',
         'autre': 'Autre',
+        'question': 'Question (FAQ)',
     }
 
     full_name = models.CharField(max_length=150)
@@ -35,7 +36,11 @@ class ContactMessageMirror(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.full_name} — {self.subject_label}'
+        return f'{self.display_name} — {self.subject_label}'
+
+    @property
+    def display_name(self):
+        return self.full_name or 'Visiteur'
 
     @property
     def subject_label(self):
@@ -53,6 +58,10 @@ class SiteContactMirror(models.Model):
     email = models.EmailField('Email')
     address = models.CharField('Siège social', max_length=255)
     city = models.CharField('Ville', max_length=100)
+    facebook_url = models.URLField('Facebook', blank=True)
+    instagram_url = models.URLField('Instagram', blank=True)
+    tiktok_url = models.URLField('TikTok', blank=True)
+    linkedin_url = models.URLField('LinkedIn', blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
