@@ -134,3 +134,38 @@ class Profil(models.Model):
     def __str__(self):
         return f'Profil de {self.user}'
 
+
+class DemandePassagePro(models.Model):
+    """Demande d'un compte particulier pour devenir professionnel. Le type de
+    compte n'est pas modifiable par le vendeur : c'est l'équipe Djona qui
+    accepte (le compte passe pro, entreprise vérifiée) ou refuse, depuis le
+    back-office (miroir `moderation.DemandePassageProMirror` côté admin)."""
+
+    class Statut(models.TextChoices):
+        EN_ATTENTE = 'en_attente', 'En attente'
+        ACCEPTEE = 'acceptee', 'Acceptée'
+        REFUSEE = 'refusee', 'Refusée'
+
+    utilisateur = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='demandes_passage_pro',
+    )
+    raison_sociale = models.CharField('raison sociale', max_length=150)
+    numero_rccm = models.CharField('numéro RCCM', max_length=50)
+    adresse = models.CharField('adresse du showroom', max_length=255)
+    justificatif_rccm = models.FileField(
+        'justificatif RCCM', upload_to='justificatifs/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],
+    )
+    message = models.TextField(blank=True)
+    statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.EN_ATTENTE, db_index=True)
+    motif_refus = models.TextField('motif du refus', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    traitee_le = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'app_demande_passage_pro'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Passage pro — {self.utilisateur} ({self.get_statut_display()})'
+

@@ -20,13 +20,13 @@ class AnnonceForm(forms.ModelForm):
             'description',
         ]
 
-    def __init__(self, *args, exiger_photos_minimum=False, **kwargs):
-        # True uniquement pour une création envoyée directement en validation
-        # (action=soumettre) — une modification repasse toujours en brouillon
-        # (voir AnnonceUpdateView) et n'a donc pas besoin de ce minimum ici ;
-        # publier un brouillon existant est vérifié séparément dans
-        # AnnoncePublierView, sur les photos déjà enregistrées.
+    def __init__(self, *args, exiger_photos_minimum=False, nb_photos_conservees=0, **kwargs):
+        # exiger_photos_minimum : True quand l'annonce part directement en
+        # validation (action=soumettre), à la création comme à la modification.
+        # nb_photos_conservees : photos déjà enregistrées que la modification
+        # garde — elles comptent dans les bornes MIN_PHOTOS / MAX_PHOTOS.
         self.exiger_photos_minimum = exiger_photos_minimum
+        self.nb_photos_conservees = nb_photos_conservees
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -34,11 +34,12 @@ class AnnonceForm(forms.ModelForm):
         errors = []
 
         photos = self.files.getlist('photos')
-        if self.exiger_photos_minimum and len(photos) < MIN_PHOTOS:
+        total = self.nb_photos_conservees + len(photos)
+        if self.exiger_photos_minimum and total < MIN_PHOTOS:
             errors.append(f"Ajoutez au moins {MIN_PHOTOS} photos pour soumettre votre annonce à validation.")
 
-        if len(photos) > MAX_PHOTOS:
-            errors.append(f"Vous ne pouvez pas ajouter plus de {MAX_PHOTOS} photos.")
+        if total > MAX_PHOTOS:
+            errors.append(f"Une annonce ne peut pas avoir plus de {MAX_PHOTOS} photos.")
         else:
             # AnnoncePhoto est créé directement par la vue via .objects.create(),
             # sans passer par un ModelForm — donc sans la validation Pillow que

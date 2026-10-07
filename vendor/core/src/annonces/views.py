@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -9,7 +9,7 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
-from .forms import MIN_PHOTOS, AnnonceForm
+from .forms import MAX_PHOTOS, MIN_PHOTOS, AnnonceForm
 from .models import Annonce, AnnoncePhoto
 from .sync import trigger_public_sync
 
@@ -36,17 +36,20 @@ class _CompteActifRequisMixin(LoginRequiredMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+LIMITES_PHOTOS = {'min_photos': MIN_PHOTOS, 'max_photos': MAX_PHOTOS}
+
+
 class AnnonceCreateView(_CompteActifRequisMixin, View):
     template_name = 'annonces/annonce_form.html'
 
     def get(self, request):
-        return render(request, self.template_name, {'form': AnnonceForm()})
+        return render(request, self.template_name, {'form': AnnonceForm(), **LIMITES_PHOTOS})
 
     def post(self, request):
         action = request.POST.get('action')
         form = AnnonceForm(request.POST, request.FILES, exiger_photos_minimum=(action == 'soumettre'))
         if not form.is_valid():
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form, **LIMITES_PHOTOS})
 
         with transaction.atomic():
             annonce = form.save(commit=False)
@@ -95,7 +98,7 @@ class MesAnnoncesListView(_CompteActifRequisMixin, ListView):
             annonces = annonces.filter(Q(marque__icontains=recherche) | Q(modele__icontains=recherche))
 
         tri = self.TRIS.get(self.request.GET.get('tri'), self.TRIS['recent'])
-        return annonces.order_by(tri)
+        return annonces.prefetch_related('photos').annotate(nb_photos=Count('photos')).order_by(tri)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -103,7 +106,9 @@ class MesAnnoncesListView(_CompteActifRequisMixin, ListView):
         context['nb_total'] = toutes.count()
         context['nb_publiees'] = toutes.filter(statut=Annonce.Statut.PUBLIEE).count()
         context['nb_en_attente'] = toutes.filter(statut=Annonce.Statut.EN_ATTENTE).count()
+        context['nb_brouillons'] = toutes.filter(statut=Annonce.Statut.BROUILLON).count()
         context['nb_refusees'] = toutes.filter(statut=Annonce.Statut.REFUSEE).count()
+        context['min_photos'] = MIN_PHOTOS
         context['statut_actif'] = self.request.GET.get('statut', '')
         context['recherche'] = self.request.GET.get('q', '')
         context['tri_actif'] = self.request.GET.get('tri', 'recent')
@@ -149,11 +154,20 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
             return None, redirect('mes_annonces')
         return annonce, None
 
+    def render_form(self, request, form, annonce, photos_supprimees=()):
+        return render(request, self.template_name, {
+            'form': form,
+            'annonce': annonce,
+            'photos_existantes': annonce.photos.all(),
+            'photos_supprimees': [str(pk) for pk in photos_supprimees],
+            **LIMITES_PHOTOS,
+        })
+
     def get(self, request, pk):
         annonce, early_return = self.get_annonce_ou_rediriger(request, pk)
         if early_return:
             return early_return
-        return render(request, self.template_name, {'form': AnnonceForm(instance=annonce), 'annonce': annonce})
+        return self.render_form(request, AnnonceForm(instance=annonce), annonce)
 
     def post(self, request, pk):
         annonce, early_return = self.get_annonce_ou_rediriger(request, pk)
@@ -162,21 +176,44 @@ class AnnonceUpdateView(_CompteActifRequisMixin, View):
 
         etait_refusee = annonce.statut == Annonce.Statut.REFUSEE
         etait_publiee = annonce.statut == Annonce.Statut.PUBLIEE
+        soumettre = request.POST.get('action') == 'soumettre'
 
-        form = AnnonceForm(request.POST, request.FILES, instance=annonce)
+        photos_a_supprimer = annonce.photos.filter(pk__in=[
+            valeur for valeur in request.POST.getlist('supprimer_photos') if valeur.isdigit()
+        ])
+        ids_a_supprimer = list(photos_a_supprimer.values_list('pk', flat=True))
+        nb_conservees = annonce.photos.exclude(pk__in=ids_a_supprimer).count()
+
+        form = AnnonceForm(
+            request.POST, request.FILES, instance=annonce,
+            exiger_photos_minimum=soumettre, nb_photos_conservees=nb_conservees,
+        )
         if not form.is_valid():
-            return render(request, self.template_name, {'form': form, 'annonce': annonce})
+            return self.render_form(request, form, annonce, ids_a_supprimer)
 
         with transaction.atomic():
             annonce = form.save(commit=False)
-            annonce.statut = Annonce.Statut.BROUILLON
+            annonce.statut = Annonce.Statut.EN_ATTENTE if soumettre else Annonce.Statut.BROUILLON
             annonce.motif_refus = ''
             annonce.save()
+
+            photos_a_supprimer.delete()
+            ordre = (annonce.photos.aggregate(dernier=Max('ordre'))['dernier'] or 0) + 1
+            for index, photo in enumerate(request.FILES.getlist('photos')):
+                AnnoncePhoto.objects.create(annonce=annonce, image=photo, ordre=ordre + index)
 
         if etait_publiee:
             # Elle disparaît du marketplace immédiatement, sans attendre la
             # prochaine validation admin (qui déclenche aussi une synchro).
             trigger_public_sync.after_response()
+
+        if soumettre:
+            messages.success(
+                request,
+                "Annonce mise à jour et envoyée — elle est en cours de vérification par l'équipe Djona "
+                "pour un délai de 48h maximum.",
+            )
+        elif etait_publiee:
             messages.success(
                 request,
                 "Annonce mise à jour et retirée du marketplace — repassez-la en attente de "

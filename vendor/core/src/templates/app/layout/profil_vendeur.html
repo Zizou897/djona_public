@@ -4,89 +4,23 @@
 {% block title %}Mon profil — Djona Vendeur{% endblock %}
 
 {% block styles %}
-<script src="https://cdn.tailwindcss.com"></script>
-<script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"outline-variant":"#c1c7cf","on-surface-variant":"#41474e","background":"#f8f9f9","surface-container":"#edeeee","surface-container-low":"#f3f4f4","surface-container-lowest":"#ffffff","on-primary":"#ffffff","primary-container":"#1a5276","outline":"#72787f","on-surface":"#191c1c","surface":"#f8f9f9","secondary":"#865300","secondary-container":"#fea520","on-secondary-container":"#694000","primary":"#003b5a","error":"#ba1a1a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"body-md":["Inter"],"headline-lg":["Montserrat"],"headline-md":["Montserrat"]}}}}</script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+{% include 'app/includes/styles_vendeur.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
-    <header class="lg:hidden w-full border-b border-outline-variant/30 bg-surface">
-        <div class="px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img alt="Djona" class="h-8 w-auto object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
-                <span class="font-headline-md text-primary font-bold">Djona Vendeur</span>
-            </div>
-            <div class="flex items-center gap-1">
-                <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors relative" type="button">
-                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-                </button>
-                <form action="{% url 'deconnexion_vendeur' %}" method="post">
-                    {% csrf_token %}
-                    <button class="text-sm font-semibold text-primary hover:underline" type="submit">Déconnexion</button>
-                </form>
-            </div>
-        </div>
-    </header>
+    {% include 'app/includes/sidebar_vendeur.html' with page_active='parametres' %}
 
-    <aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary shadow-xl z-50">
-        <div class="flex items-center gap-3 px-2 pb-6 mb-2 border-b border-on-primary/10">
-            <img alt="Djona" class="h-8 w-8 object-contain rounded-lg" src="{% static 'app/assets/img/djona-logo.png' %}">
-            <span class="font-headline-md text-base tracking-tight">Djona Vendeur</span>
-        </div>
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'tableau_de_bord_vendeur' %}">
-            <span class="material-symbols-outlined text-[20px]">dashboard</span>
-            Tableau de bord
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" href="{% url 'mes_annonces' %}">
-            <span class="material-symbols-outlined text-[20px]">directions_car</span>
-            Mes annonces
-        </a>
-        <div class="mt-auto border-t border-on-primary/10 pt-4">
-            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm bg-secondary-container text-on-secondary-container shadow-sm" href="{% url 'profil_vendeur' %}">
-                <span class="material-symbols-outlined text-[20px]">settings</span>
-                Paramètres
-            </a>
-            <form action="{% url 'deconnexion_vendeur' %}" method="post">
-                {% csrf_token %}
-                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
-                    Déconnexion
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
-        <header class="hidden lg:flex w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-xl">
-            <div class="flex-1 px-6 h-16 flex items-center justify-end gap-3">
-                <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative" type="button">
-                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-                </button>
-                <div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-on-surface">{{ user.prenom }} {{ user.nom }}</p>
-                        <p class="text-[11px] text-on-surface-variant">{{ user.get_type_compte_display }}</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
-                        {% if user.avatar_url %}
-                        <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ user.avatar_url }}">
-                        {% else %}
-                        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-10 flex flex-col gap-8">
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-8">
             <div>
-                <h1 class="font-headline-lg text-2xl text-primary">Paramètres</h1>
+                <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">{% if espace_vendeur.est_pro %}Espace professionnel{% else %}Espace vendeur{% endif %}</span>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Paramètres</h1>
                 <p class="text-sm text-on-surface-variant mt-1">Gérez vos informations, votre sécurité et vos préférences.</p>
             </div>
 
             <form id="password-form" method="post" action="{% url 'profil_vendeur_mot_de_passe' %}">{% csrf_token %}</form>
+            {% if user.type_compte != 'professionnel' %}<form id="demande-pro-form" method="post" action="{% url 'profil_vendeur_demande_pro' %}" enctype="multipart/form-data">{% csrf_token %}</form>{% endif %}
             <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {% csrf_token %}
 
@@ -166,41 +100,12 @@
                                 {% if info_form.telephone.errors %}<p class="text-xs text-error">{{ info_form.telephone.errors.0 }}</p>{% endif %}
                             </div>
                             <div class="flex flex-col gap-1">
-                                <label class="text-sm text-on-surface-variant" for="id_type_compte">Type de compte</label>
-                                <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_type_compte" name="type_compte">
-                                    {% for value, label in info_form.fields.type_compte.choices %}<option value="{{ value }}" {% if value == info_form.type_compte.value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm text-on-surface-variant" for="id_raison_sociale">Raison sociale <span class="text-[11px]">(comptes professionnels)</span></label>
-                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_raison_sociale" name="raison_sociale" type="text" placeholder="Nom de votre entreprise" value="{{ profil_form.raison_sociale.value|default:'' }}">
-                                <p class="text-[11px] text-on-surface-variant">Affichée à la place de votre nom sur votre page vitrine publique.</p>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-sm text-on-surface-variant" for="id_numero_rccm">Numéro RCCM <span class="text-[11px]">(comptes professionnels)</span></label>
-                                    {% if profil.entreprise_verifiee %}
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold"><span class="material-symbols-outlined text-[13px]">verified</span> Entreprise vérifiée</span>
-                                    {% elif profil.justificatif_rccm %}
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[11px] font-bold">Justificatif en attente d'examen</span>
-                                    {% else %}
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold">Entreprise non vérifiée</span>
-                                    {% endif %}
+                                <span class="text-sm text-on-surface-variant">Type de compte</span>
+                                <div class="flex items-center justify-between gap-3 px-4 py-3 bg-surface-container rounded-lg text-on-surface">
+                                    <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-outline">{% if user.type_compte == 'professionnel' %}storefront{% else %}person{% endif %}</span>{{ user.get_type_compte_display }}</span>
+                                    <span class="material-symbols-outlined text-[18px] text-outline" title="Le type de compte ne peut pas être modifié">lock</span>
                                 </div>
-                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_numero_rccm" name="numero_rccm" type="text" placeholder="CI-ABJ-202X-B-XXXXX" value="{{ profil_form.numero_rccm.value|default:'' }}">
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm text-on-surface-variant" for="id_adresse">Adresse du showroom <span class="text-[11px]">(comptes professionnels)</span></label>
-                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_adresse" name="adresse" type="text" placeholder="Boulevard VGE, Marcory, Abidjan" value="{{ profil_form.adresse.value|default:'' }}">
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-sm text-on-surface-variant" for="id_justificatif_rccm">Justificatif RCCM <span class="text-[11px]">(comptes professionnels)</span></label>
-                                {% if profil.justificatif_rccm %}
-                                <a class="text-sm text-primary font-semibold hover:underline mb-1" href="{{ profil.justificatif_rccm.url }}" target="_blank" rel="noopener">Voir le document envoyé</a>
-                                {% endif %}
-                                <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary file:text-on-primary file:text-sm" id="id_justificatif_rccm" name="justificatif_rccm" type="file" accept=".pdf,image/*">
-                                <p class="text-[11px] text-on-surface-variant">Copie du registre de commerce (PDF ou image) — envoyer un nouveau document relance son examen par l'équipe Djona.</p>
-                                {% if profil_form.justificatif_rccm.errors %}<p class="text-[11px] text-error">{{ profil_form.justificatif_rccm.errors.0 }}</p>{% endif %}
+                                <p class="text-[11px] text-on-surface-variant">Défini à l'inscription, il ne peut pas être modifié.</p>
                             </div>
                             <div class="flex flex-col gap-1">
                                 <label class="text-sm text-on-surface-variant" for="id_ville">Ville</label>
@@ -211,6 +116,132 @@
                             </div>
                         </div>
                     </div>
+
+                    {% if user.type_compte != 'professionnel' %}
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8" id="demande-pro">
+                        <div class="flex items-start gap-3">
+                            <span class="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">storefront</span></span>
+                            <div class="flex-1">
+                                <h3 class="font-headline-md text-lg text-primary">Passer à un compte professionnel</h3>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Concession, garage ou revendeur ? Le compte professionnel donne accès à l'espace pro : équipe, suivi des prospects et vitrine au nom de votre entreprise. La demande est examinée par l'équipe Djona.</p>
+                            </div>
+                        </div>
+
+                        {% if derniere_demande.statut == 'en_attente' %}
+                        <div class="mt-6 rounded-xl border border-secondary-container/50 bg-secondary-container/10 p-4 flex flex-col gap-3">
+                            <p class="flex items-center gap-2 text-sm font-semibold text-on-surface">
+                                <span class="material-symbols-outlined text-secondary text-[20px]">hourglass_top</span>
+                                Demande envoyée le {{ derniere_demande.created_at|date:"j F Y" }} — en cours d'examen
+                            </p>
+                            <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                                <div><dt class="text-xs text-on-surface-variant">Raison sociale</dt><dd class="font-medium text-on-surface">{{ derniere_demande.raison_sociale }}</dd></div>
+                                <div><dt class="text-xs text-on-surface-variant">Numéro RCCM</dt><dd class="font-medium text-on-surface">{{ derniere_demande.numero_rccm }}</dd></div>
+                                <div class="sm:col-span-2"><dt class="text-xs text-on-surface-variant">Adresse du showroom</dt><dd class="font-medium text-on-surface">{{ derniere_demande.adresse }}</dd></div>
+                            </dl>
+                            <a class="self-start inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{{ derniere_demande.justificatif_rccm.url }}" rel="noopener" target="_blank"><span class="material-symbols-outlined text-[18px]">description</span>Voir le justificatif envoyé</a>
+                            <p class="text-xs text-on-surface-variant">Vous recevrez la réponse sur cette page. Votre compte reste particulier en attendant.</p>
+                        </div>
+                        {% else %}
+                            {% if derniere_demande.statut == 'refusee' %}
+                            <div class="mt-6 rounded-xl bg-error-container/60 text-on-error-container p-4 text-sm flex items-start gap-2">
+                                <span class="material-symbols-outlined text-[20px] shrink-0">report</span>
+                                <div>
+                                    <p class="font-semibold">Votre demande du {{ derniere_demande.created_at|date:"j F Y" }} a été refusée.</p>
+                                    {% if derniere_demande.motif_refus %}<p class="mt-1">Motif : {{ derniere_demande.motif_refus }}</p>{% endif %}
+                                    <p class="mt-1">Vous pouvez envoyer une nouvelle demande avec des informations corrigées.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <button class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-container transition-colors {% if demande_form.errors %}hidden{% endif %}" id="ouvrir-demande-pro" type="button">
+                                <span class="material-symbols-outlined text-[18px]">send</span>
+                                {% if derniere_demande %}Faire une nouvelle demande{% else %}Faire une demande{% endif %}
+                            </button>
+
+                            <div class="mt-6 flex-col gap-4 {% if demande_form.errors %}flex{% else %}hidden{% endif %}" id="formulaire-demande-pro">
+                                {% if demande_form.non_field_errors %}<p class="text-sm text-error">{{ demande_form.non_field_errors.0 }}</p>{% endif %}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="flex flex-col gap-1 md:col-span-2">
+                                        <label class="text-sm text-on-surface-variant" for="id_demande_raison_sociale">Raison sociale</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" form="demande-pro-form" id="id_demande_raison_sociale" maxlength="150" name="raison_sociale" placeholder="Ex : Ivoire Auto Prestige SARL" required type="text" value="{{ demande_form.raison_sociale.value|default:'' }}">
+                                        {% if demande_form.raison_sociale.errors %}<p class="text-xs text-error">{{ demande_form.raison_sociale.errors.0 }}</p>{% endif %}
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-sm text-on-surface-variant" for="id_demande_numero_rccm">Numéro RCCM</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" form="demande-pro-form" id="id_demande_numero_rccm" maxlength="50" name="numero_rccm" placeholder="CI-ABJ-202X-B-XXXXX" required type="text" value="{{ demande_form.numero_rccm.value|default:'' }}">
+                                        {% if demande_form.numero_rccm.errors %}<p class="text-xs text-error">{{ demande_form.numero_rccm.errors.0 }}</p>{% endif %}
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-sm text-on-surface-variant" for="id_demande_adresse">Adresse du showroom</label>
+                                        <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" form="demande-pro-form" id="id_demande_adresse" maxlength="255" name="adresse" placeholder="Ex : Boulevard VGE, Marcory, Abidjan" required type="text" value="{{ demande_form.adresse.value|default:'' }}">
+                                        {% if demande_form.adresse.errors %}<p class="text-xs text-error">{{ demande_form.adresse.errors.0 }}</p>{% endif %}
+                                    </div>
+                                    <div class="flex flex-col gap-1 md:col-span-2">
+                                        <label class="text-sm text-on-surface-variant" for="id_demande_justificatif">Justificatif RCCM</label>
+                                        <input accept=".pdf,image/*" class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary file:text-on-primary file:text-sm" form="demande-pro-form" id="id_demande_justificatif" name="justificatif_rccm" required type="file">
+                                        <p class="text-[11px] text-on-surface-variant">Copie du registre de commerce — PDF, JPG ou PNG, 5 Mo maximum.</p>
+                                        {% if demande_form.justificatif_rccm.errors %}<p class="text-xs text-error">{{ demande_form.justificatif_rccm.errors.0 }}</p>{% endif %}
+                                    </div>
+                                    <div class="flex flex-col gap-1 md:col-span-2">
+                                        <label class="text-sm text-on-surface-variant" for="id_demande_message">Message à l'équipe Djona <span class="text-[11px]">(facultatif)</span></label>
+                                        <textarea class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" form="demande-pro-form" id="id_demande_message" name="message" placeholder="Ex : activité, nombre de véhicules en stock…" rows="3">{{ demande_form.message.value|default:'' }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                                    <button class="px-5 py-2.5 rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors" id="annuler-demande-pro" type="button">Annuler</button>
+                                    <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-container transition-colors" form="demande-pro-form" type="submit">
+                                        <span class="material-symbols-outlined text-[18px]">send</span>Envoyer la demande
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if user.type_compte == 'professionnel' %}
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8" id="champs-entreprise">
+                        <div class="flex items-start gap-3 mb-6">
+                            <span class="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">storefront</span></span>
+                            <div>
+                                <h3 class="font-headline-md text-lg text-primary">Entreprise</h3>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Le numéro RCCM et le justificatif servent à la vérification de votre entreprise par l'équipe Djona.</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-1 md:col-span-2">
+                                    <label class="text-sm text-on-surface-variant" for="id_raison_sociale">Raison sociale</label>
+                                    <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_raison_sociale" name="raison_sociale" type="text" placeholder="Nom de votre entreprise" value="{{ profil_form.raison_sociale.value|default:profil.raison_sociale|default:'' }}">
+                                    <p class="text-[11px] text-on-surface-variant">Affichée à la place de votre nom sur votre page vitrine publique.</p>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-sm text-on-surface-variant" for="id_numero_rccm">Numéro RCCM</label>
+                                        {% if profil.entreprise_verifiee %}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold"><span class="material-symbols-outlined text-[13px]">verified</span> Entreprise vérifiée</span>
+                                        {% elif profil.justificatif_rccm %}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[11px] font-bold">Justificatif en attente d'examen</span>
+                                        {% else %}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold">Entreprise non vérifiée</span>
+                                        {% endif %}
+                                    </div>
+                                    <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_numero_rccm" name="numero_rccm" type="text" placeholder="CI-ABJ-202X-B-XXXXX" value="{{ profil_form.numero_rccm.value|default:profil.numero_rccm|default:'' }}">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-sm text-on-surface-variant" for="id_adresse">Adresse du showroom</label>
+                                    <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="id_adresse" name="adresse" type="text" placeholder="Boulevard VGE, Marcory, Abidjan" value="{{ profil_form.adresse.value|default:profil.adresse|default:'' }}">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-sm text-on-surface-variant" for="id_justificatif_rccm">Justificatif RCCM</label>
+                                    {% if profil.justificatif_rccm %}
+                                    <a class="text-sm text-primary font-semibold hover:underline mb-1" href="{{ profil.justificatif_rccm.url }}" target="_blank" rel="noopener">Voir le document envoyé</a>
+                                    {% endif %}
+                                    <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary file:text-on-primary file:text-sm" id="id_justificatif_rccm" name="justificatif_rccm" type="file" accept=".pdf,image/*">
+                                    <p class="text-[11px] text-on-surface-variant">Copie du registre de commerce (PDF ou image) — envoyer un nouveau document relance son examen par l'équipe Djona.</p>
+                                    {% if profil_form.justificatif_rccm.errors %}<p class="text-[11px] text-error">{{ profil_form.justificatif_rccm.errors.0 }}</p>{% endif %}
+                                </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 md:p-8">
                         <h3 class="font-headline-md text-lg text-primary mb-6">Sécurité</h3>
@@ -323,5 +354,22 @@ avatarInput.addEventListener('change', function (event) {
   };
   reader.readAsDataURL(file);
 });
+
+(function () {
+  var ouvrir = document.getElementById('ouvrir-demande-pro');
+  var bloc = document.getElementById('formulaire-demande-pro');
+  var annuler = document.getElementById('annuler-demande-pro');
+  if (!ouvrir || !bloc) return;
+  function basculer(afficher) {
+    bloc.classList.toggle('hidden', !afficher);
+    bloc.classList.toggle('flex', afficher);
+    ouvrir.classList.toggle('hidden', afficher);
+    if (afficher) { document.getElementById('id_demande_raison_sociale').focus(); }
+  }
+  ouvrir.addEventListener('click', function () { basculer(true); });
+  annuler.addEventListener('click', function () { basculer(false); });
+  if (!bloc.classList.contains('hidden')) { bloc.scrollIntoView({ block: 'center' }); }
+})();
+
 </script>
 {% endblock %}

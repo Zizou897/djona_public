@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 
 from .forms import ProfilForm, UtilisateurInfoForm
 from .models import Profil
-from moderation.models import AnnonceMirror, CompteVendeur
+from moderation.models import AnnonceMirror, CompteVendeur, DemandePassageProMirror
 
 
 def home(request):
@@ -108,6 +108,9 @@ class AdminDashboardView(StaffRequisMixin, TemplateView):
             'vendeurs_particuliers': vendeurs_particuliers,
             'vendeurs_professionnels': vendeurs_professionnels,
             'vendeurs_total': vendeurs_particuliers + vendeurs_professionnels,
+            'demandes_pro_en_attente': DemandePassageProMirror.objects.using('vendor_db').filter(
+                statut=DemandePassageProMirror.Statut.EN_ATTENTE,
+            ).count(),
             'annonces_en_attente': annonces_en_attente,
             'activites_recentes': activites[:6],
         })

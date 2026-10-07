@@ -1,0 +1,403 @@
+{% load static %}
+{% comment %}
+Formulaire partagé création / modification d'annonce.
+Contexte : form, min_photos, max_photos ; en modification : annonce, photos_existantes, photos_supprimees.
+{% endcomment %}
+<form class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start" enctype="multipart/form-data" id="annonce-form" method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="flex flex-col gap-5 min-w-0">
+
+        <!-- 1. Le véhicule -->
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" aria-labelledby="section-vehicule">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">1</span>
+                <div>
+                    <h2 class="font-headline-md font-semibold text-base text-primary" id="section-vehicule">Le véhicule</h2>
+                    <p class="text-xs text-on-surface-variant">Les informations qui apparaissent dans le titre de l'annonce.</p>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5 {% if form.marque.errors %}field-error{% endif %}">
+                    <label class="text-sm font-semibold text-on-surface" for="id_marque">Marque</label>
+                    <input class="champ w-full px-4 py-3 rounded-lg border {% if form.marque.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="marque" id="id_marque" maxlength="80" name="marque" placeholder="Ex : Toyota" required type="text" value="{{ form.marque.value|default:'' }}">
+                    {% if form.marque.errors %}<p class="text-xs text-error">{{ form.marque.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="flex flex-col gap-1.5 {% if form.modele.errors %}field-error{% endif %}">
+                    <label class="text-sm font-semibold text-on-surface" for="id_modele">Modèle</label>
+                    <input class="champ w-full px-4 py-3 rounded-lg border {% if form.modele.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="modele" id="id_modele" maxlength="80" name="modele" placeholder="Ex : RAV4" required type="text" value="{{ form.modele.value|default:'' }}">
+                    {% if form.modele.errors %}<p class="text-xs text-error">{{ form.modele.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="flex flex-col gap-1.5 {% if form.annee.errors %}field-error{% endif %}">
+                    <label class="text-sm font-semibold text-on-surface" for="id_annee">Année</label>
+                    <input class="champ w-full px-4 py-3 rounded-lg border {% if form.annee.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="annee" id="id_annee" inputmode="numeric" max="{% now 'Y' %}" min="1980" name="annee" placeholder="Ex : 2019" required type="number" value="{{ form.annee.value|default:''|stringformat:'s' }}">
+                    {% if form.annee.errors %}<p class="text-xs text-error">{{ form.annee.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="flex flex-col gap-1.5 {% if form.couleur.errors %}field-error{% endif %}">
+                    <label class="text-sm font-semibold text-on-surface" for="id_couleur">Couleur</label>
+                    <input class="champ w-full px-4 py-3 rounded-lg border {% if form.couleur.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_couleur" maxlength="50" name="couleur" placeholder="Ex : Gris métallisé" required type="text" value="{{ form.couleur.value|default:'' }}">
+                    {% if form.couleur.errors %}<p class="text-xs text-error">{{ form.couleur.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Caractéristiques -->
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" aria-labelledby="section-caracteristiques">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">2</span>
+                <div>
+                    <h2 class="font-headline-md font-semibold text-base text-primary" id="section-caracteristiques">Caractéristiques</h2>
+                    <p class="text-xs text-on-surface-variant">Ce que les acheteurs filtrent en premier.</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-5">
+                <div class="flex flex-col gap-1.5 sm:max-w-xs {% if form.kilometrage.errors %}field-error{% endif %}">
+                    <label class="text-sm font-semibold text-on-surface" for="id_kilometrage">Kilométrage</label>
+                    <div class="relative">
+                        <input class="champ w-full pl-4 pr-12 py-3 rounded-lg border {% if form.kilometrage.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="kilometrage" id="id_kilometrage" inputmode="numeric" min="0" name="kilometrage" placeholder="Ex : 68000" required type="number" value="{{ form.kilometrage.value|default:''|stringformat:'s' }}">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant pointer-events-none">km</span>
+                    </div>
+                    {% if form.kilometrage.errors %}<p class="text-xs text-error">{{ form.kilometrage.errors.0 }}</p>{% endif %}
+                </div>
+
+                <fieldset class="flex flex-col gap-2 {% if form.carburant.errors %}field-error{% endif %}">
+                    <legend class="text-sm font-semibold text-on-surface mb-2">Carburant</legend>
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in form.fields.carburant.choices %}{% if value %}
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only champ" data-apercu="carburant" data-libelle="{{ label }}" name="carburant" {% if forloop.counter == 2 %}required {% endif %}type="radio" value="{{ value }}" {% if form.carburant.value == value %}checked{% endif %}>
+                            <span class="inline-flex items-center px-4 py-2.5 rounded-lg border border-outline-variant text-sm font-medium text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 hover:border-primary transition-colors">{{ label }}</span>
+                        </label>
+                        {% endif %}{% endfor %}
+                    </div>
+                    {% if form.carburant.errors %}<p class="text-xs text-error">{{ form.carburant.errors.0 }}</p>{% endif %}
+                </fieldset>
+
+                <fieldset class="flex flex-col gap-2 {% if form.boite_vitesses.errors %}field-error{% endif %}">
+                    <legend class="text-sm font-semibold text-on-surface mb-2">Boîte de vitesses</legend>
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in form.fields.boite_vitesses.choices %}{% if value %}
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only champ" data-apercu="boite" data-libelle="{{ label }}" name="boite_vitesses" {% if forloop.counter == 2 %}required {% endif %}type="radio" value="{{ value }}" {% if form.boite_vitesses.value == value %}checked{% endif %}>
+                            <span class="inline-flex items-center px-4 py-2.5 rounded-lg border border-outline-variant text-sm font-medium text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 hover:border-primary transition-colors">{{ label }}</span>
+                        </label>
+                        {% endif %}{% endfor %}
+                    </div>
+                    {% if form.boite_vitesses.errors %}<p class="text-xs text-error">{{ form.boite_vitesses.errors.0 }}</p>{% endif %}
+                </fieldset>
+            </div>
+        </section>
+
+        <!-- 3. Prix -->
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" aria-labelledby="section-prix">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">3</span>
+                <div>
+                    <h2 class="font-headline-md font-semibold text-base text-primary" id="section-prix">Prix</h2>
+                    <p class="text-xs text-on-surface-variant">Un prix aligné sur des véhicules comparables se vend plus vite.</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1.5 sm:max-w-sm {% if form.prix.errors %}field-error{% endif %}">
+                <label class="text-sm font-semibold text-on-surface" for="id_prix">Prix de vente</label>
+                <div class="relative">
+                    <input class="champ w-full pl-4 pr-16 py-3 rounded-lg border {% if form.prix.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest text-lg font-semibold focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="prix" id="id_prix" inputmode="numeric" min="0" name="prix" placeholder="Ex : 14500000" required type="number" value="{{ form.prix.value|default:''|stringformat:'s' }}">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-on-surface-variant pointer-events-none">FCFA</span>
+                </div>
+                <p class="text-xs text-on-surface-variant" id="prix-lisible" aria-live="polite"></p>
+                {% if form.prix.errors %}<p class="text-xs text-error">{{ form.prix.errors.0 }}</p>{% endif %}
+            </div>
+        </section>
+
+        <!-- 4. Photos -->
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" aria-labelledby="section-photos" id="section-photos-bloc">
+            <div class="flex items-start justify-between gap-3 mb-5">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">4</span>
+                    <div>
+                        <h2 class="font-headline-md font-semibold text-base text-primary" id="section-photos">Photos</h2>
+                        <p class="text-xs text-on-surface-variant">{{ min_photos }} minimum pour soumettre, {{ max_photos }} maximum — 4 Mo par image.</p>
+                    </div>
+                </div>
+                <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-on-surface-variant" id="photo-compteur" aria-live="polite">0/{{ max_photos }}</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3" id="photo-grille">
+                {% for photo in photos_existantes %}
+                <label class="photo-existante group relative aspect-square rounded-xl overflow-hidden bg-surface-container cursor-pointer" data-url="{{ photo.image.url }}">
+                    <img alt="Photo {{ forloop.counter }}" class="w-full h-full object-cover transition-opacity" src="{{ photo.image.url }}">
+                    <input class="peer sr-only supprimer-photo" name="supprimer_photos" type="checkbox" value="{{ photo.pk }}" {% if photo.pk|stringformat:"s" in photos_supprimees %}checked{% endif %}>
+                    <span class="absolute inset-0 hidden peer-checked:flex flex-col items-center justify-center gap-1 bg-on-surface/70 text-white text-xs font-semibold">
+                        <span class="material-symbols-outlined text-[24px]">delete</span>Sera retirée
+                    </span>
+                    <span class="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-black/60 text-white text-[11px] font-semibold peer-checked:hidden">
+                        <span class="material-symbols-outlined text-[14px]">close</span>Retirer
+                    </span>
+                    <span class="absolute top-2 right-2 hidden peer-checked:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white text-on-surface text-[11px] font-semibold">
+                        <span class="material-symbols-outlined text-[14px]">undo</span>Garder
+                    </span>
+                    <span class="badge-principale absolute bottom-2 left-2 hidden px-2 py-0.5 rounded-md bg-secondary-container text-primary text-[10px] font-bold uppercase tracking-wide">Principale</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl py-8 px-4 text-center cursor-pointer hover:border-primary hover:bg-primary/[0.03] transition-colors" for="id_photos" id="photo-zone">
+                <span class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[26px]">add_photo_alternate</span></span>
+                <span class="text-sm font-semibold text-on-surface">Glissez vos photos ici ou <span class="text-primary">parcourez</span></span>
+                <span class="text-xs text-on-surface-variant">Extérieur (avant, arrière, profil), intérieur et compteur.</span>
+            </label>
+            <input accept="image/*" class="sr-only" id="id_photos" multiple name="photos" type="file">
+            <p class="hidden mt-3 text-xs font-medium text-error" id="photo-erreur" role="alert"></p>
+        </section>
+
+        <!-- 5. Description -->
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" aria-labelledby="section-description">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">5</span>
+                <div>
+                    <h2 class="font-headline-md font-semibold text-base text-primary" id="section-description">Description</h2>
+                    <p class="text-xs text-on-surface-variant">État, entretien, historique, options, défauts éventuels.</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1.5 {% if form.description.errors %}field-error{% endif %}">
+                <label class="sr-only" for="id_description">Description</label>
+                <textarea class="champ w-full px-4 py-3 rounded-lg border {% if form.description.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all leading-relaxed" data-apercu="description" id="id_description" name="description" placeholder="Ex : Véhicule entretenu en concession, carnet à jour, deuxième main. Climatisation, caméra de recul. Petite rayure sur le pare-chocs arrière." required rows="6">{{ form.description.value|default:'' }}</textarea>
+                <div class="flex justify-between gap-3 text-xs text-on-surface-variant">
+                    <span>Une description détaillée inspire confiance aux acheteurs.</span>
+                    <span class="shrink-0" id="description-compteur">0 caractère</span>
+                </div>
+                {% if form.description.errors %}<p class="text-xs text-error">{{ form.description.errors.0 }}</p>{% endif %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Aperçu et publication -->
+    <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" aria-labelledby="titre-apercu">
+            <p class="px-5 pt-4 pb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-on-surface-variant" id="titre-apercu">Aperçu de l'annonce</p>
+            <div class="relative aspect-[16/10] bg-surface-container flex items-center justify-center overflow-hidden">
+                <img alt="" class="hidden absolute inset-0 w-full h-full object-cover" id="apercu-photo">
+                <span class="flex flex-col items-center gap-1 text-outline" id="apercu-sans-photo">
+                    <span class="material-symbols-outlined text-[36px]">no_photography</span>
+                    <span class="text-xs">Photo principale</span>
+                </span>
+            </div>
+            <div class="p-5 flex flex-col gap-2">
+                <p class="font-headline-md font-semibold text-[15px] text-on-surface leading-snug" id="apercu-titre">Marque et modèle</p>
+                <p class="font-headline-lg font-bold text-lg text-primary" id="apercu-prix">— FCFA</p>
+                <div class="flex flex-wrap gap-1.5 text-[11px] text-on-surface-variant" id="apercu-specs"></div>
+            </div>
+        </section>
+
+        <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-4" aria-labelledby="titre-checklist">
+            <h2 class="text-sm font-semibold text-on-surface" id="titre-checklist">Avant de soumettre</h2>
+            <ul class="flex flex-col gap-2.5 text-sm" id="checklist">
+                <li class="flex items-center gap-2.5" data-check="infos"><span class="material-symbols-outlined text-[20px] text-outline">radio_button_unchecked</span>Informations du véhicule</li>
+                <li class="flex items-center gap-2.5" data-check="prix"><span class="material-symbols-outlined text-[20px] text-outline">radio_button_unchecked</span>Prix de vente</li>
+                <li class="flex items-center gap-2.5" data-check="photos"><span class="material-symbols-outlined text-[20px] text-outline">radio_button_unchecked</span><span>Au moins {{ min_photos }} photos</span></li>
+                <li class="flex items-center gap-2.5" data-check="description"><span class="material-symbols-outlined text-[20px] text-outline">radio_button_unchecked</span>Description</li>
+            </ul>
+
+            <div class="flex flex-col gap-2.5 pt-1">
+                <button class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm shadow-sm hover:bg-primary-container transition-colors" name="action" type="submit" value="soumettre">
+                    <span class="material-symbols-outlined text-[18px]">send</span>
+                    {% if annonce %}Enregistrer et soumettre{% else %}Soumettre pour validation{% endif %}
+                </button>
+                <button class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 border border-primary text-primary rounded-lg font-semibold text-sm hover:bg-primary/5 transition-colors" formnovalidate name="action" type="submit" value="enregistrer">
+                    <span class="material-symbols-outlined text-[18px]">save</span>
+                    Enregistrer en brouillon
+                </button>
+                <a class="text-center text-sm font-semibold text-on-surface-variant hover:text-on-surface py-1" href="{% url 'mes_annonces' %}">Annuler</a>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">L'équipe Djona vérifie chaque annonce sous 48h maximum avant sa mise en ligne.</p>
+        </section>
+    </aside>
+</form>
+
+<script>
+(function () {
+    var MIN = {{ min_photos }};
+    var MAX = {{ max_photos }};
+    var form = document.getElementById('annonce-form');
+    var input = document.getElementById('id_photos');
+    var grille = document.getElementById('photo-grille');
+    var zone = document.getElementById('photo-zone');
+    var compteur = document.getElementById('photo-compteur');
+    var erreur = document.getElementById('photo-erreur');
+    var existantes = Array.prototype.slice.call(document.querySelectorAll('.photo-existante'));
+    var nouvelles = [];
+
+    function photosConservees() {
+        return existantes.filter(function (el) { return !el.querySelector('.supprimer-photo').checked; });
+    }
+    function totalPhotos() { return photosConservees().length + nouvelles.length; }
+
+    function syncInput() {
+        var dt = new DataTransfer();
+        nouvelles.forEach(function (f) { dt.items.add(f.fichier); });
+        input.files = dt.files;
+    }
+
+    function afficherErreur(message) {
+        erreur.textContent = message || '';
+        erreur.classList.toggle('hidden', !message);
+    }
+
+    function rendreNouvelles() {
+        grille.querySelectorAll('.photo-nouvelle').forEach(function (el) { el.remove(); });
+        nouvelles.forEach(function (photo, index) {
+            var item = document.createElement('div');
+            item.className = 'photo-nouvelle relative aspect-square rounded-xl overflow-hidden bg-surface-container';
+            var img = document.createElement('img');
+            img.src = photo.url;
+            img.alt = 'Nouvelle photo ' + (index + 1);
+            img.className = 'w-full h-full object-cover';
+            var retirer = document.createElement('button');
+            retirer.type = 'button';
+            retirer.dataset.index = index;
+            retirer.setAttribute('aria-label', 'Retirer cette photo');
+            retirer.className = 'retirer-nouvelle absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-error transition-colors';
+            retirer.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+            var badge = document.createElement('span');
+            badge.className = 'badge-principale absolute bottom-2 left-2 hidden px-2 py-0.5 rounded-md bg-secondary-container text-primary text-[10px] font-bold uppercase tracking-wide';
+            badge.textContent = 'Principale';
+            item.appendChild(img);
+            item.appendChild(retirer);
+            item.appendChild(badge);
+            grille.appendChild(item);
+        });
+        mettreAJour();
+    }
+
+    function ajouterFichiers(fichiers) {
+        var place = MAX - totalPhotos();
+        var images = Array.prototype.filter.call(fichiers, function (f) { return f.type.indexOf('image/') === 0; });
+        if (images.length > place) {
+            afficherErreur('Une annonce peut avoir ' + MAX + ' photos au maximum — ' + (images.length - Math.max(place, 0)) + ' photo(s) ignorée(s).');
+        } else {
+            afficherErreur('');
+        }
+        images.slice(0, Math.max(place, 0)).forEach(function (f) {
+            nouvelles.push({ fichier: f, url: URL.createObjectURL(f) });
+        });
+        syncInput();
+        rendreNouvelles();
+    }
+
+    input.addEventListener('change', function () {
+        var choisis = Array.prototype.slice.call(input.files);
+        syncInput();
+        ajouterFichiers(choisis);
+    });
+    ['dragenter', 'dragover'].forEach(function (type) {
+        zone.addEventListener(type, function (e) { e.preventDefault(); zone.classList.add('border-primary', 'bg-primary/[0.03]'); });
+    });
+    ['dragleave', 'drop'].forEach(function (type) {
+        zone.addEventListener(type, function (e) { e.preventDefault(); zone.classList.remove('border-primary', 'bg-primary/[0.03]'); });
+    });
+    zone.addEventListener('drop', function (e) { ajouterFichiers(e.dataTransfer.files); });
+
+    grille.addEventListener('click', function (e) {
+        var bouton = e.target.closest('.retirer-nouvelle');
+        if (!bouton) { return; }
+        var retiree = nouvelles.splice(Number(bouton.dataset.index), 1)[0];
+        URL.revokeObjectURL(retiree.url);
+        syncInput();
+        afficherErreur('');
+        rendreNouvelles();
+    });
+    existantes.forEach(function (el) {
+        el.querySelector('.supprimer-photo').addEventListener('change', function () {
+            if (!this.checked && totalPhotos() > MAX) {
+                this.checked = true;
+                afficherErreur('Retirez d\'abord une nouvelle photo : ' + MAX + ' photos maximum.');
+            }
+            mettreAJour();
+        });
+    });
+
+    var nf = new Intl.NumberFormat('fr-FR');
+    function valeur(nom) {
+        var champ = form.querySelector('[name="' + nom + '"]:checked') || form.querySelector('[name="' + nom + '"]:not([type="radio"])');
+        return champ ? champ.value.trim() : '';
+    }
+    function libelle(nom) {
+        var champ = form.querySelector('[name="' + nom + '"]:checked');
+        return champ ? champ.dataset.libelle : '';
+    }
+    function cocher(cle, ok) {
+        var li = document.querySelector('[data-check="' + cle + '"]');
+        var icone = li.querySelector('.material-symbols-outlined');
+        icone.textContent = ok ? 'check_circle' : 'radio_button_unchecked';
+        icone.classList.toggle('text-green-600', ok);
+        icone.classList.toggle('text-outline', !ok);
+        li.classList.toggle('text-on-surface-variant', !ok);
+    }
+    function puce(icone, texte) {
+        var s = document.createElement('span');
+        s.className = 'inline-flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container';
+        s.innerHTML = '<span class="material-symbols-outlined text-[14px]">' + icone + '</span>';
+        s.appendChild(document.createTextNode(texte));
+        return s;
+    }
+
+    function mettreAJour() {
+        var total = totalPhotos();
+        compteur.textContent = total + '/' + MAX;
+        compteur.className = 'shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ' + (total >= MIN ? 'bg-green-100 text-green-800' : 'bg-surface-container text-on-surface-variant');
+        zone.classList.toggle('hidden', total >= MAX);
+
+        var visibles = photosConservees().concat(Array.prototype.slice.call(grille.querySelectorAll('.photo-nouvelle')));
+        grille.querySelectorAll('.badge-principale').forEach(function (b) { b.classList.add('hidden'); });
+        if (visibles.length) { visibles[0].querySelector('.badge-principale').classList.remove('hidden'); }
+
+        var principale = photosConservees().length ? photosConservees()[0].dataset.url : (nouvelles[0] && nouvelles[0].url);
+        var img = document.getElementById('apercu-photo');
+        img.classList.toggle('hidden', !principale);
+        document.getElementById('apercu-sans-photo').classList.toggle('hidden', !!principale);
+        if (principale) { img.src = principale; }
+
+        var titre = [valeur('marque'), valeur('modele'), valeur('annee')].filter(Boolean).join(' ');
+        document.getElementById('apercu-titre').textContent = titre || 'Marque et modèle';
+        var prix = parseInt(valeur('prix'), 10);
+        document.getElementById('apercu-prix').textContent = prix > 0 ? nf.format(prix) + ' FCFA' : '— FCFA';
+        document.getElementById('prix-lisible').textContent = prix > 0 ? 'Affiché : ' + nf.format(prix) + ' FCFA' : '';
+
+        var specs = document.getElementById('apercu-specs');
+        specs.innerHTML = '';
+        var km = parseInt(valeur('kilometrage'), 10);
+        if (km >= 0) { specs.appendChild(puce('speed', nf.format(km) + ' km')); }
+        if (libelle('carburant')) { specs.appendChild(puce('local_gas_station', libelle('carburant'))); }
+        if (libelle('boite_vitesses')) { specs.appendChild(puce('settings', libelle('boite_vitesses'))); }
+
+        var description = valeur('description');
+        document.getElementById('description-compteur').textContent = description.length + ' caractère' + (description.length > 1 ? 's' : '');
+
+        cocher('infos', ['marque', 'modele', 'annee', 'couleur', 'kilometrage', 'carburant', 'boite_vitesses'].every(function (n) { return valeur(n) !== ''; }));
+        cocher('prix', prix > 0);
+        cocher('photos', total >= MIN);
+        cocher('description', description.length > 0);
+    }
+
+    form.addEventListener('input', mettreAJour);
+    form.addEventListener('change', mettreAJour);
+
+    form.addEventListener('submit', function (e) {
+        var action = e.submitter ? e.submitter.value : '';
+        if (action !== 'soumettre') { return; }
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            form.reportValidity();
+            return;
+        }
+        if (totalPhotos() < MIN) {
+            e.preventDefault();
+            afficherErreur('Ajoutez au moins ' + MIN + ' photos pour soumettre votre annonce (' + totalPhotos() + '/' + MIN + ' actuellement), ou enregistrez-la en brouillon.');
+            document.getElementById('section-photos-bloc').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    var premiereErreur = document.querySelector('.field-error');
+    if (premiereErreur) { premiereErreur.scrollIntoView({ block: 'center' }); }
+    mettreAJour();
+})();
+</script>

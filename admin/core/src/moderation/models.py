@@ -7,7 +7,8 @@ class CompteVendeur(models.Model):
     schéma réel est possédé et migré par le projet vendor.
 
     Usage prévu : LIRE les informations de compte, et METTRE À JOUR les seuls champs
-    de modération (`statut_compte`, `is_active`). Ce modèle ne doit jamais servir à
+    de modération (`statut_compte`, `is_active`) — plus `type_compte`, uniquement à
+    l'acceptation d'une demande de passage pro (DemandeProAccepterView). Ce modèle ne doit jamais servir à
     CRÉER un compte, ni à écrire dans `password` : la création de compte est
     exclusivement gérée par le flux d'inscription du projet vendor, via
     `UtilisateurManager.create_user`, qui normalise l'email et hache le mot de passe.
@@ -61,9 +62,11 @@ class ProfilMirror(models.Model):
     projet.
 
     Usage prévu : LIRE les informations d'entreprise (raison sociale, RCCM,
-    justificatif) pour la revue de vérification, et METTRE À JOUR le seul
-    champ `entreprise_verifiee`. Jamais utilisé pour créer un profil — c'est
-    fait paresseusement côté vendor (ProfilVendeurView.get_or_create).
+    justificatif) pour la revue de vérification, et METTRE À JOUR le champ
+    `entreprise_verifiee`. Exception : à l'acceptation d'une demande de passage
+    pro, les infos entreprise de la demande y sont recopiées (et le profil créé
+    s'il n'existe pas encore — normalement déjà fait côté vendor par
+    ProfilVendeurView.get_or_create).
     """
 
     user = models.OneToOneField(
@@ -91,6 +94,41 @@ class ProfilMirror(models.Model):
 
     def __str__(self):
         return f'Profil de {self.user}'
+
+
+class DemandePassageProMirror(models.Model):
+    """Miroir de vendor.app.DemandePassagePro (table app_demande_passage_pro,
+    connexion 'vendor_db'). Jamais migré depuis ce projet.
+
+    La demande est créée par le vendeur (compte particulier) ; ici on la LIT et
+    on METTRE À JOUR seulement `statut`, `motif_refus` et `traitee_le`.
+    """
+
+    class Statut(models.TextChoices):
+        EN_ATTENTE = 'en_attente', 'En attente'
+        ACCEPTEE = 'acceptee', 'Acceptée'
+        REFUSEE = 'refusee', 'Refusée'
+
+    utilisateur = models.ForeignKey(
+        CompteVendeur, on_delete=models.DO_NOTHING, related_name='demandes_passage_pro', db_constraint=False,
+    )
+    raison_sociale = models.CharField(max_length=150)
+    numero_rccm = models.CharField(max_length=50)
+    adresse = models.CharField(max_length=255)
+    justificatif_rccm = models.FileField(upload_to='justificatifs/')
+    message = models.TextField(blank=True)
+    statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.EN_ATTENTE)
+    motif_refus = models.TextField(blank=True)
+    created_at = models.DateTimeField()
+    traitee_le = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'app_demande_passage_pro'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Passage pro — {self.utilisateur} ({self.get_statut_display()})'
 
 
 class AnnonceMirror(models.Model):

@@ -10,5 +10,6 @@ urlpatterns = [
     path('deconnexion/', LogoutView.as_view(), name='deconnexion_vendeur'),
     path('tableau-de-bord/', views.TableauDeBordVendeurView.as_view(), name='tableau_de_bord_vendeur'),
     path('profil/', views.ProfilVendeurView.as_view(), name='profil_vendeur'),
+    path('profil/demande-pro/', views.DemandePassageProView.as_view(), name='profil_vendeur_demande_pro'),
     path('profil/mot-de-passe/', views.ProfilPasswordChangeView.as_view(), name='profil_vendeur_mot_de_passe'),
 ]

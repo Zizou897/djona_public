@@ -1,0 +1,39 @@
+<div aria-labelledby="modal-suppression-titre" aria-modal="true" class="fixed inset-0 z-[110] hidden items-center justify-center bg-on-surface/40 backdrop-blur-sm px-4" id="modal-suppression" role="dialog">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-xl max-w-sm w-full p-6 flex flex-col items-center text-center gap-4">
+        <span class="w-14 h-14 rounded-full bg-error/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-error text-[28px]">delete</span>
+        </span>
+        <div>
+            <h3 class="font-headline-md font-semibold text-lg text-on-surface" id="modal-suppression-titre"></h3>
+            <p class="text-sm text-on-surface-variant mt-1" id="modal-suppression-message"></p>
+        </div>
+        <form action="" class="flex gap-3 w-full" id="modal-suppression-form" method="post">
+            {% csrf_token %}
+            <button class="flex-1 px-4 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors" onclick="fermerModalSuppression()" type="button">Annuler</button>
+            <button class="flex-1 px-4 py-2.5 rounded-lg bg-error text-white text-sm font-semibold hover:bg-error/90 transition-colors" id="modal-suppression-bouton" type="submit">Supprimer</button>
+        </form>
+    </div>
+</div>
+<script>
+    function ouvrirModalSuppression(url, titre, message, texteBouton) {
+        document.getElementById('modal-suppression-form').action = url;
+        document.getElementById('modal-suppression-titre').textContent = titre;
+        document.getElementById('modal-suppression-message').textContent = message;
+        document.getElementById('modal-suppression-bouton').textContent = texteBouton || 'Supprimer';
+        var modal = document.getElementById('modal-suppression');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        modal.querySelector('button[type="button"]').focus();
+    }
+    function fermerModalSuppression() {
+        var modal = document.getElementById('modal-suppression');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') { fermerModalSuppression(); }
+    });
+    document.getElementById('modal-suppression').addEventListener('click', function (event) {
+        if (event.target === this) { fermerModalSuppression(); }
+    });
+</script>

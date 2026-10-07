@@ -103,10 +103,7 @@
                             </select>
                             <input name="notes" type="hidden" value="{{ prospect.notes }}">
                         </form>
-                        <form method="post" action="{% url 'espace_pro_prospect_supprimer' prospect.pk %}" onsubmit="return confirm('Supprimer ce prospect ?');">
-                            {% csrf_token %}
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-error/40 text-error hover:bg-error/5 transition-colors" type="submit">Supprimer</button>
-                        </form>
+                        <button class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-error/40 text-error hover:bg-error/5 transition-colors" onclick="ouvrirModalSuppression('{% url 'espace_pro_prospect_supprimer' prospect.pk %}', 'Supprimer ce prospect ?', '« {{ prospect.nom|escapejs }} » sera définitivement supprimé de vos prospects.')" type="button">Supprimer</button>
                     </div>
                     {% endif %}
                 </div>
@@ -120,4 +117,6 @@
         </main>
     </div>
 </div>
+
+{% include 'app/includes/modal_suppression.html' %}
 {% endblock %}

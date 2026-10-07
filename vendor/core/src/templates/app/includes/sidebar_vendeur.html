@@ -1,0 +1,138 @@
+{% load static %}
+{% comment %}
+Navigation de l'espace vendeur (particulier et pro). À inclure en premier enfant
+du conteneur racine de la page ; la colonne de contenu doit porter `lg:pl-64 lg:pt-16`.
+Paramètre : page_active = dashboard | annonces | creer | prospects | equipe | parametres
+{% endcomment %}
+{% with ev=espace_vendeur %}
+<style>@media (max-width: 1023px) { body { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px)); } }</style>
+
+<!-- En-tête mobile -->
+<header class="lg:hidden sticky top-0 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur">
+    <div class="px-5 h-16 flex items-center justify-between">
+        <a class="flex items-center gap-2" href="{% if ev.est_pro %}{% url 'espace_pro_dashboard' %}{% else %}{% url 'tableau_de_bord_vendeur' %}{% endif %}">
+            <img alt="" width="40" height="40" class="h-8 w-8 rounded-sm object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <img alt="Djona Group" width="644" height="240" class="h-5 w-auto object-contain translate-y-0.5" src="{% static 'app/assets/img/djona-group-logo.png' %}">
+        </a>
+        <div class="flex items-center gap-1">
+            <a aria-label="Paramètres" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors {% if page_active == 'parametres' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'profil_vendeur' %}">
+                <span class="material-symbols-outlined">settings</span>
+            </a>
+            <form action="{% url 'deconnexion_vendeur' %}" method="post">
+                {% csrf_token %}
+                <button aria-label="Déconnexion" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors" type="submit">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- Barre latérale desktop -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary z-50">
+    <div class="flex flex-col gap-2 px-2 pt-2 pb-6 mb-2 border-b border-on-primary/10">
+        <div class="flex items-center gap-2.5">
+            <img alt="" width="40" height="40" class="h-9 w-9 rounded-sm object-cover ring-1 ring-white/20" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <img alt="Djona Group" width="721" height="240" class="h-6 w-auto object-contain translate-y-1" src="{% static 'app/assets/img/djona-group-logo-white.png' %}">
+        </div>
+        <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary-container">{% if ev.est_pro %}Espace professionnel{% else %}Espace vendeur{% endif %}</span>
+    </div>
+
+    <nav aria-label="Navigation principale" class="flex flex-col gap-1">
+        <a {% if page_active == 'dashboard' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'dashboard' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% if ev.est_pro %}{% url 'espace_pro_dashboard' %}{% else %}{% url 'tableau_de_bord_vendeur' %}{% endif %}">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+            Tableau de bord
+        </a>
+        <a {% if page_active == 'annonces' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'annonces' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'mes_annonces' %}">
+            <span class="material-symbols-outlined text-[20px]">directions_car</span>
+            {% if ev.est_pro %}Mon stock{% else %}Mes annonces{% endif %}
+        </a>
+        {% if not ev.lecture_seule %}
+        <a {% if page_active == 'creer' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'creer' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'annonce_creer' %}">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+            Ajouter un véhicule
+        </a>
+        {% endif %}
+        {% if ev.est_pro %}
+        <a {% if page_active == 'prospects' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'prospects' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'espace_pro_prospects' %}">
+            <span class="material-symbols-outlined text-[20px]">contacts</span>
+            Prospects
+        </a>
+        <a {% if page_active == 'equipe' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'equipe' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'espace_pro_equipe' %}">
+            <span class="material-symbols-outlined text-[20px]">groups</span>
+            Équipe
+        </a>
+        {% endif %}
+    </nav>
+
+    <div class="mt-auto border-t border-on-primary/10 pt-4 flex flex-col gap-1">
+        <a {% if page_active == 'parametres' %}aria-current="page" {% endif %}class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all {% if page_active == 'parametres' %}font-bold bg-secondary-container text-on-secondary-container shadow-sm{% else %}font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary{% endif %}" href="{% url 'profil_vendeur' %}">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Paramètres
+        </a>
+        <form action="{% url 'deconnexion_vendeur' %}" method="post">
+            {% csrf_token %}
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all" type="submit">
+                <span class="material-symbols-outlined text-[20px]">logout</span>
+                Déconnexion
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- Barre supérieure desktop -->
+<div class="hidden lg:flex fixed top-0 left-64 right-0 h-16 z-40 border-b border-outline-variant/30 bg-surface/85 backdrop-blur-xl items-center justify-between px-8">
+    <p class="text-sm text-on-surface-variant first-letter:uppercase">{% now "l j F Y" %}</p>
+    <a class="flex items-center gap-3 hover:opacity-80 transition-opacity" href="{% url 'profil_vendeur' %}">
+        <div class="text-right">
+            <p class="text-sm font-semibold text-on-surface">{{ user.prenom }} {{ user.nom }}</p>
+            <p class="text-[11px] text-on-surface-variant">
+                {% if ev.est_membre %}{{ ev.role_libelle }} — {{ ev.compte_pro_nom }}{% elif ev.est_pro %}Compte professionnel{% else %}{{ user.get_type_compte_display }}{% endif %}
+            </p>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center overflow-hidden text-on-primary text-xs font-bold">
+            {% if user.avatar_url %}
+            <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ user.avatar_url }}">
+            {% else %}
+            {{ user.prenom|slice:":1"|upper }}{{ user.nom|slice:":1"|upper }}
+            {% endif %}
+        </div>
+    </a>
+</div>
+
+<!-- Navigation basse mobile -->
+<nav aria-label="Navigation principale" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest border-t border-outline-variant/40 pb-[env(safe-area-inset-bottom)]">
+    <div class="h-[4.25rem] flex items-stretch justify-around px-2">
+        <a {% if page_active == 'dashboard' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'dashboard' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% if ev.est_pro %}{% url 'espace_pro_dashboard' %}{% else %}{% url 'tableau_de_bord_vendeur' %}{% endif %}">
+            <span class="material-symbols-outlined text-[22px]">dashboard</span>
+            Accueil
+        </a>
+        <a {% if page_active == 'annonces' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'annonces' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'mes_annonces' %}">
+            <span class="material-symbols-outlined text-[22px]">directions_car</span>
+            {% if ev.est_pro %}Stock{% else %}Annonces{% endif %}
+        </a>
+        {% if not ev.lecture_seule %}
+        <a aria-label="Ajouter un véhicule" class="flex-1 flex items-center justify-center" href="{% url 'annonce_creer' %}">
+            <span class="w-12 h-12 -mt-5 rounded-2xl {% if page_active == 'creer' %}bg-primary-container{% else %}bg-primary{% endif %} text-on-primary shadow-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-[26px]">add</span>
+            </span>
+        </a>
+        {% endif %}
+        {% if ev.est_pro %}
+        <a {% if page_active == 'prospects' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'prospects' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'espace_pro_prospects' %}">
+            <span class="material-symbols-outlined text-[22px]">contacts</span>
+            Prospects
+        </a>
+        <a {% if page_active == 'equipe' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'equipe' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'espace_pro_equipe' %}">
+            <span class="material-symbols-outlined text-[22px]">groups</span>
+            Équipe
+        </a>
+        {% else %}
+        <a {% if page_active == 'parametres' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'parametres' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'profil_vendeur' %}">
+            <span class="material-symbols-outlined text-[22px]">person</span>
+            Profil
+        </a>
+        {% endif %}
+    </div>
+</nav>
+{% endwith %}

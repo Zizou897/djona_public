@@ -156,7 +156,7 @@ class InscriptionViewTest(TestCase):
     def test_get_renders_form(self):
         response = self.client.get(reverse('inscription_vendeur'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Rejoignez Djona')
+        self.assertContains(response, 'Créez votre compte')
 
     def test_post_valid_data_creates_and_logs_in_user(self):
         response = self.client.post(reverse('inscription_vendeur'), {
@@ -193,7 +193,7 @@ class ConnexionViewTest(TestCase):
     def test_get_renders_form(self):
         response = self.client.get(reverse('connexion_vendeur'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Bienvenue')
+        self.assertContains(response, 'Bon retour')
 
     def test_valid_login_redirects_to_dashboard(self):
         response = self.client.post(reverse('connexion_vendeur'), {
@@ -223,7 +223,7 @@ class TableauDeBordVendeurViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse('tableau_de_bord_vendeur'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'en cours de validation')
+        self.assertContains(response, 'en cours de vérification')
         self.assertNotContains(response, 'Mes annonces')
 
     def test_compte_suspendu_montre_message_suspension(self):
@@ -248,7 +248,7 @@ class TableauDeBordVendeurViewTest(TestCase):
         response = self.client.get(reverse('tableau_de_bord_vendeur'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Bonjour, Ange')
-        self.assertContains(response, 'Créer votre première annonce')
+        self.assertContains(response, 'Créer ma première annonce')
 
     def annonce_data(self, vendeur, **overrides):
         data = {
@@ -267,7 +267,7 @@ class TableauDeBordVendeurViewTest(TestCase):
         )
         self.client.force_login(user)
         response = self.client.get(reverse('tableau_de_bord_vendeur'))
-        self.assertContains(response, 'Créez votre première annonce')
+        self.assertContains(response, 'Vendez votre véhicule en trois étapes')
         self.assertEqual(response.context['nb_annonces'], 0)
 
     def test_compte_actif_avec_annonces_affiche_les_compteurs_et_recentes(self):
@@ -287,7 +287,7 @@ class TableauDeBordVendeurViewTest(TestCase):
         self.assertEqual(response.context['nb_publiees'], 1)
         self.assertEqual(response.context['nb_refusees'], 1)
         self.assertContains(response, 'Yaris')
-        self.assertContains(response, 'Voir tout')
+        self.assertContains(response, 'Activité récente')
 
     def test_compte_actif_annonces_recentes_scopees_au_vendeur(self):
         user = Utilisateur.objects.create_user(

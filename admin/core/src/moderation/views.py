@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import redirect_to_login
+from django.db import transaction
+from django.db.models import Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -9,7 +11,9 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
 from .forms import AnnonceAdminForm
-from .models import AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, ProfilMirror, VehicleMirror
+from .models import (
+    AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, DemandePassageProMirror, ProfilMirror, VehicleMirror,
+)
 from .sync import trigger_public_sync
 
 SYSTEM_VENDOR_EMAIL = 'officiel@djona.tech'
@@ -356,3 +360,110 @@ class AnnonceCreateAdminView(_StaffRequiredMixin, View):
         trigger_public_sync.after_response()
         messages.success(request, 'Annonce créée et publiée sur le marketplace.')
         return redirect('annonce_moderation_liste')
+
+
+class DemandeProListView(_StaffRequiredMixin, View):
+    """Demandes de passage en compte professionnel envoyées par des vendeurs
+    particuliers — en attente d'abord, puis les plus récentes."""
+    template_name = 'moderation/demande_pro_liste.html'
+    STATUTS = {choix[0] for choix in DemandePassageProMirror.Statut.choices}
+
+    def get(self, request):
+        toutes = DemandePassageProMirror.objects.using('vendor_db')
+        statut = request.GET.get('statut', '')
+        demandes = toutes.filter(statut=statut) if statut in self.STATUTS else toutes
+        demandes = demandes.select_related('utilisateur').annotate(
+            priorite=Case(
+                When(statut=DemandePassageProMirror.Statut.EN_ATTENTE, then=Value(0)),
+                default=Value(1), output_field=IntegerField(),
+            ),
+        ).order_by('priorite', '-created_at')
+        compteurs = {
+            valeur: toutes.filter(statut=valeur).count() for valeur in self.STATUTS
+        }
+        return render(request, self.template_name, {
+            'demandes': demandes,
+            'statut_actif': statut if statut in self.STATUTS else '',
+            'nb_total': toutes.count(),
+            'nb_en_attente': compteurs[DemandePassageProMirror.Statut.EN_ATTENTE],
+            'nb_acceptees': compteurs[DemandePassageProMirror.Statut.ACCEPTEE],
+            'nb_refusees': compteurs[DemandePassageProMirror.Statut.REFUSEE],
+        })
+
+
+class DemandeProDetailView(_StaffRequiredMixin, View):
+    template_name = 'moderation/demande_pro_detail.html'
+
+    def get(self, request, pk):
+        demande = get_object_or_404(
+            DemandePassageProMirror.objects.using('vendor_db').select_related('utilisateur'), pk=pk,
+        )
+        autres_demandes = (
+            DemandePassageProMirror.objects.using('vendor_db')
+            .filter(utilisateur_id=demande.utilisateur_id).exclude(pk=demande.pk)
+        )
+        return render(request, self.template_name, {'demande': demande, 'autres_demandes': autres_demandes})
+
+
+class _DemandeProTraitementMixin(_StaffRequiredMixin):
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def demande_en_attente(self, request, pk):
+        demande = get_object_or_404(DemandePassageProMirror.objects.using('vendor_db'), pk=pk)
+        if demande.statut != DemandePassageProMirror.Statut.EN_ATTENTE:
+            messages.info(request, 'Cette demande a déjà été traitée.')
+            return None
+        return demande
+
+
+class DemandeProAccepterView(_DemandeProTraitementMixin, View):
+    """Le compte passe professionnel et l'entreprise est marquée vérifiée en
+    une seule action : l'équipe a examiné le RCCM pour accepter la demande."""
+
+    def post(self, request, pk):
+        demande = self.demande_en_attente(request, pk)
+        if demande is None:
+            return redirect('demande_pro_detail', pk=pk)
+
+        with transaction.atomic(using='vendor_db'):
+            compte = CompteVendeur.objects.using('vendor_db').select_for_update().get(pk=demande.utilisateur_id)
+            compte.type_compte = CompteVendeur.TypeCompte.PROFESSIONNEL
+            compte.save(using='vendor_db', update_fields=['type_compte'])
+
+            profil, _ = ProfilMirror.objects.using('vendor_db').get_or_create(user_id=compte.pk)
+            profil.raison_sociale = demande.raison_sociale
+            profil.numero_rccm = demande.numero_rccm
+            profil.adresse = demande.adresse
+            profil.justificatif_rccm.name = demande.justificatif_rccm.name
+            profil.entreprise_verifiee = True
+            profil.save(using='vendor_db', update_fields=[
+                'raison_sociale', 'numero_rccm', 'adresse', 'justificatif_rccm', 'entreprise_verifiee',
+            ])
+
+            demande.statut = DemandePassageProMirror.Statut.ACCEPTEE
+            demande.traitee_le = timezone.now()
+            demande.save(using='vendor_db', update_fields=['statut', 'traitee_le'])
+
+        messages.success(request, f'{compte.prenom} {compte.nom} est maintenant un compte professionnel vérifié.')
+        return redirect('demande_pro_liste')
+
+
+class DemandeProRefuserView(_DemandeProTraitementMixin, View):
+    def post(self, request, pk):
+        demande = self.demande_en_attente(request, pk)
+        if demande is None:
+            return redirect('demande_pro_detail', pk=pk)
+
+        motif = request.POST.get('motif_refus', '').strip()
+        if not motif:
+            messages.error(request, 'Indiquez le motif du refus : il sera affiché au vendeur.')
+            return redirect('demande_pro_detail', pk=pk)
+
+        demande.statut = DemandePassageProMirror.Statut.REFUSEE
+        demande.motif_refus = motif
+        demande.traitee_le = timezone.now()
+        demande.save(using='vendor_db', update_fields=['statut', 'motif_refus', 'traitee_le'])
+        messages.success(request, 'Demande refusée — le vendeur verra le motif dans ses paramètres.')
+        return redirect('demande_pro_liste')

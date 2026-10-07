@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Profil, Utilisateur, telephone_validator
+from .models import DemandePassagePro, Profil, Utilisateur, telephone_validator
 
 
 class InscriptionForm(forms.ModelForm):
@@ -92,12 +92,6 @@ class UtilisateurInfoForm(forms.Form):
         validators=[telephone_validator],
         label='Numéro de téléphone',
     )
-    type_compte = forms.ChoiceField(
-        choices=Utilisateur.TypeCompte.choices,
-        label='Type de compte',
-        required=False,
-    )
-
     def __init__(self, *args, user=None, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
@@ -118,9 +112,9 @@ class UtilisateurInfoForm(forms.Form):
         user.nom = nom
         user.email = self.cleaned_data['email']
         user.telephone = self.cleaned_data['telephone']
-        if self.cleaned_data.get('type_compte'):
-            user.type_compte = self.cleaned_data['type_compte']
-        user.save(update_fields=['prenom', 'nom', 'email', 'telephone', 'type_compte'])
+        # Le type de compte (particulier / professionnel) est fixé à l'inscription
+        # et ne se modifie pas depuis le profil.
+        user.save(update_fields=['prenom', 'nom', 'email', 'telephone'])
 
 
 class ProfilForm(forms.ModelForm):
@@ -131,14 +125,19 @@ class ProfilForm(forms.ModelForm):
             'two_factor_enabled', 'langue', 'notif_email', 'notif_whatsapp',
         ]
 
-    def __init__(self, *args, **kwargs):
+    CHAMPS_ENTREPRISE = ('raison_sociale', 'numero_rccm', 'justificatif_rccm', 'adresse')
+
+    def __init__(self, *args, inclure_entreprise=True, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['langue'].required = False
         self.fields['ville'].required = False
-        self.fields['raison_sociale'].required = False
-        self.fields['numero_rccm'].required = False
-        self.fields['adresse'].required = False
-        self.fields['justificatif_rccm'].required = False
+        for champ in self.CHAMPS_ENTREPRISE:
+            if inclure_entreprise:
+                self.fields[champ].required = False
+            else:
+                # Compte particulier : les infos entreprise ne sont ni affichées
+                # ni acceptées, même si elles sont envoyées dans la requête.
+                del self.fields[champ]
 
     def clean_langue(self):
         return self.cleaned_data.get('langue') or Profil.Langue.FRANCAIS
@@ -154,3 +153,18 @@ class ProfilForm(forms.ModelForm):
             profil.save()
         return profil
 
+
+
+MAX_JUSTIFICATIF_SIZE = 5 * 1024 * 1024
+
+
+class DemandePassageProForm(forms.ModelForm):
+    class Meta:
+        model = DemandePassagePro
+        fields = ['raison_sociale', 'numero_rccm', 'adresse', 'justificatif_rccm', 'message']
+
+    def clean_justificatif_rccm(self):
+        fichier = self.cleaned_data.get('justificatif_rccm')
+        if fichier and fichier.size > MAX_JUSTIFICATIF_SIZE:
+            raise forms.ValidationError('Le justificatif doit faire 5 Mo maximum.')
+        return fichier

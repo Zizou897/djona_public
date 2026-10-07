@@ -14,6 +14,9 @@
 <a {% if active_nav == 'vendeurs' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'vendeur_liste' %}">
 <span class="material-symbols-outlined mr-4">group</span><span class="font-label-md text-label-md">Vendeurs</span>
 </a>
+<a {% if active_nav == 'demandes_pro' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'demande_pro_liste' %}">
+<span class="material-symbols-outlined mr-4">storefront</span><span class="font-label-md text-label-md">Demandes pro</span>
+</a>
 <a {% if active_nav == 'partenaires' %}aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all bg-secondary-container text-on-secondary-container font-bold shadow-sm"{% else %}class="flex items-center px-4 py-3 rounded-lg text-on-primary/70 hover:bg-primary-container hover:text-on-primary transition-all"{% endif %} href="{% url 'partner_liste' %}">
 <span class="material-symbols-outlined mr-4">handshake</span><span class="font-label-md text-label-md">Partenaires</span>
 </a>

@@ -230,6 +230,26 @@ class MesAnnoncesListViewTest(TestCase):
         prix = [a.prix for a in response.context['annonces']]
         self.assertEqual(prix, sorted(prix))
 
+    def test_membre_lecture_seule_ne_voit_pas_les_actions(self):
+        from pro.models import MembreEquipe
+
+        titulaire = Utilisateur.objects.create_user(
+            email='pro@exemple.ci', password='MotDePasse1', nom='Auto', prenom='Ivoire', telephone='0102030408',
+            statut_compte=Utilisateur.StatutCompte.ACTIF, type_compte=Utilisateur.TypeCompte.PROFESSIONNEL,
+        )
+        membre = Utilisateur.objects.create_user(
+            email='membre@exemple.ci', password='MotDePasse1', nom='Bamba', prenom='Issa', telephone='0102030409',
+            statut_compte=Utilisateur.StatutCompte.ACTIF,
+        )
+        MembreEquipe.objects.create(compte_pro=titulaire, membre=membre, role=MembreEquipe.Role.LECTURE_SEULE)
+        annonce = self.create_annonce(titulaire, statut=Annonce.Statut.PUBLIEE)
+        self.client.force_login(membre)
+        response = self.client.get(reverse('mes_annonces'))
+        self.assertContains(response, 'lecture seule')
+        self.assertNotContains(response, reverse('annonce_creer'))
+        self.assertNotContains(response, reverse('annonce_supprimer', args=[annonce.pk]))
+        self.assertNotContains(response, reverse('annonce_modifier', args=[annonce.pk]))
+
 
 class AnnonceUpdateViewTest(TestCase):
     def setUp(self):
@@ -274,10 +294,84 @@ class AnnonceUpdateViewTest(TestCase):
         response = self.client.get(reverse('annonce_modifier', args=[annonce.pk]))
         self.assertRedirects(response, reverse('mes_annonces'))
 
-    def test_publiee_non_modifiable(self):
+    def test_publiee_modifiable_avec_avertissement(self):
         annonce = self.create_annonce(statut=Annonce.Statut.PUBLIEE)
         response = self.client.get(reverse('annonce_modifier', args=[annonce.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'retire de la marketplace')
+
+    def ajouter_photos(self, annonce, nombre):
+        return [
+            AnnoncePhoto.objects.create(
+                annonce=annonce, ordre=i,
+                image=SimpleUploadedFile(f'existante{i}.png', PNG_1PX, content_type='image/png'),
+            )
+            for i in range(nombre)
+        ]
+
+    def donnees_formulaire(self, **overrides):
+        data = {
+            'marque': 'Toyota', 'modele': 'Corolla', 'annee': 2019, 'prix': 8500000,
+            'kilometrage': 45000, 'carburant': Annonce.Carburant.ESSENCE,
+            'boite_vitesses': Annonce.BoiteVitesses.AUTOMATIQUE, 'couleur': 'Gris',
+            'description': 'Très bon état.',
+        }
+        data.update(overrides)
+        return data
+
+    def test_edition_ajoute_des_photos_et_soumet(self):
+        annonce = self.create_annonce()
+        self.ajouter_photos(annonce, 1)
+        nouvelles = [SimpleUploadedFile(f'nouvelle{i}.png', PNG_1PX, content_type='image/png') for i in range(2)]
+        response = self.client.post(
+            reverse('annonce_modifier', args=[annonce.pk]),
+            self.donnees_formulaire(action='soumettre', photos=nouvelles),
+        )
         self.assertRedirects(response, reverse('mes_annonces'))
+        annonce.refresh_from_db()
+        self.assertEqual(annonce.statut, Annonce.Statut.EN_ATTENTE)
+        self.assertEqual(annonce.photos.count(), 3)
+
+    def test_soumettre_en_edition_sans_assez_de_photos_est_refuse(self):
+        annonce = self.create_annonce()
+        self.ajouter_photos(annonce, 1)
+        response = self.client.post(
+            reverse('annonce_modifier', args=[annonce.pk]), self.donnees_formulaire(action='soumettre'),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Ajoutez au moins 3 photos')
+        annonce.refresh_from_db()
+        self.assertEqual(annonce.statut, Annonce.Statut.BROUILLON)
+
+    def test_edition_retire_les_photos_cochees(self):
+        annonce = self.create_annonce()
+        gardee, retiree = self.ajouter_photos(annonce, 2)
+        response = self.client.post(
+            reverse('annonce_modifier', args=[annonce.pk]),
+            self.donnees_formulaire(supprimer_photos=[retiree.pk]),
+        )
+        self.assertRedirects(response, reverse('mes_annonces'))
+        self.assertEqual(list(annonce.photos.values_list('pk', flat=True)), [gardee.pk])
+
+    def test_edition_refuse_plus_de_4_photos_au_total(self):
+        annonce = self.create_annonce()
+        self.ajouter_photos(annonce, 3)
+        nouvelles = [SimpleUploadedFile(f'nouvelle{i}.png', PNG_1PX, content_type='image/png') for i in range(2)]
+        response = self.client.post(
+            reverse('annonce_modifier', args=[annonce.pk]), self.donnees_formulaire(photos=nouvelles),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(annonce.photos.count(), 3)
+
+    def test_edition_ignore_la_suppression_dune_photo_dune_autre_annonce(self):
+        annonce = self.create_annonce()
+        autre = self.create_annonce(vendeur=self.autre_vendeur)
+        (photo_autre,) = self.ajouter_photos(autre, 1)
+        self.client.post(
+            reverse('annonce_modifier', args=[annonce.pk]),
+            self.donnees_formulaire(supprimer_photos=[photo_autre.pk]),
+        )
+        self.assertTrue(AnnoncePhoto.objects.filter(pk=photo_autre.pk).exists())
 
     def test_annonce_dun_autre_vendeur_renvoie_404(self):
         annonce = self.create_annonce(vendeur=self.autre_vendeur)
