@@ -163,6 +163,18 @@ class AnnonceMirror(models.Model):
         VEHICULE_INTERDIT = 'vehicule_interdit', 'Véhicule interdit'
         SUSPICION_FRAUDE = 'suspicion_fraude', 'Suspicion de fraude'
 
+    class Etat(models.TextChoices):
+        NEUF = 'neuf', 'Neuf'
+        OCCASION = 'occasion', 'Occasion'
+
+    # Mêmes valeurs que vendor.app.Profil.Ville.
+    class Ville(models.TextChoices):
+        ABIDJAN_COCODY = 'abidjan_cocody', 'Abidjan, Cocody'
+        ABIDJAN_MARCORY = 'abidjan_marcory', 'Abidjan, Marcory'
+        ABIDJAN_KOUMASSI = 'abidjan_koumassi', 'Abidjan, Koumassi'
+        YAMOUSSOUKRO = 'yamoussoukro', 'Yamoussoukro'
+        BOUAKE = 'bouake', 'Bouaké'
+
     vendeur = models.ForeignKey(
         CompteVendeur, on_delete=models.DO_NOTHING, related_name='annonces', db_constraint=False,
     )
@@ -174,6 +186,8 @@ class AnnonceMirror(models.Model):
     carburant = models.CharField(max_length=20, choices=Carburant.choices)
     boite_vitesses = models.CharField(max_length=20, choices=BoiteVitesses.choices)
     couleur = models.CharField(max_length=50)
+    etat = models.CharField('état', max_length=20, choices=Etat.choices, blank=True)
+    ville = models.CharField('ville du véhicule', max_length=30, choices=Ville.choices, blank=True)
     description = models.TextField()
     statut = models.CharField(max_length=20, choices=Statut.choices)
     motif_refus = models.CharField(max_length=30, choices=MotifRefus.choices, blank=True)

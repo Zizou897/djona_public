@@ -15,8 +15,13 @@ class AnnonceAdminForm(forms.ModelForm):
         fields = [
             'marque', 'modele', 'annee', 'prix',
             'kilometrage', 'carburant', 'boite_vitesses', 'couleur',
-            'description',
+            'etat', 'ville', 'description',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['etat'].required = True
+        self.fields['ville'].required = True
 
     def clean(self):
         cleaned_data = super().clean()

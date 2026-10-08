@@ -77,6 +77,14 @@
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Couleur</p>
 <p class="font-label-md text-label-md text-on-surface">{{ annonce.couleur }}</p>
 </div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">État</p>
+<p class="font-label-md text-label-md {% if annonce.etat %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_etat_display|default:"Non renseigné" }}</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Ville</p>
+<p class="font-label-md text-label-md {% if annonce.ville %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_ville_display|default:"Non renseignée" }}</p>
+</div>
 </div>
 
 <p class="font-body-md text-on-surface-variant mb-8">{{ annonce.description }}</p>

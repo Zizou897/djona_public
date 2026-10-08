@@ -120,6 +120,7 @@ class VendeurValiderEntrepriseView(_StaffRequiredMixin, View):
         profil = get_object_or_404(ProfilMirror.objects.using('vendor_db'), user_id=pk)
         profil.entreprise_verifiee = True
         profil.save(using='vendor_db', update_fields=['entreprise_verifiee'])
+        trigger_public_sync.after_response()
         messages.success(request, 'Entreprise vérifiée.')
         return redirect('vendeur_liste')
 
@@ -139,6 +140,7 @@ class VendeurRefuserEntrepriseView(_StaffRequiredMixin, View):
         profil.entreprise_verifiee = False
         profil.justificatif_rccm.delete(save=False)
         profil.save(using='vendor_db', update_fields=['entreprise_verifiee', 'justificatif_rccm'])
+        trigger_public_sync.after_response()
         messages.success(request, 'Vérification refusée — le vendeur doit envoyer un nouveau justificatif.')
         return redirect('vendeur_liste')
 
@@ -446,6 +448,7 @@ class DemandeProAccepterView(_DemandeProTraitementMixin, View):
             demande.traitee_le = timezone.now()
             demande.save(using='vendor_db', update_fields=['statut', 'traitee_le'])
 
+        trigger_public_sync.after_response()
         messages.success(request, f'{compte.prenom} {compte.nom} est maintenant un compte professionnel vérifié.')
         return redirect('demande_pro_liste')
 
