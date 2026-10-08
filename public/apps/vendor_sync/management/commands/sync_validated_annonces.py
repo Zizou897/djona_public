@@ -8,10 +8,8 @@ from django.core.management.base import BaseCommand
 from apps.catalog.models import Seller, Vehicle, VehicleImage
 from apps.vendor_sync.models import AnnonceMirror, AnnoncePhotoMirror, ProfilMirror
 
-# Le schéma `annonces` (djona_vendor) n'a pas encore de champ ville/état — voir
-# discussion avec le projet vendor. Valeurs par défaut en attendant.
-DEFAULT_CITY = 'Abidjan'
-DEFAULT_CONDITION = Vehicle.Condition.OCCASION
+# Libellés lisibles des villes vendor (mêmes valeurs que vendor.app.Profil.Ville).
+CITY_LABELS = dict(Seller.Ville.choices)
 
 VENDOR_MEDIA_ROOT = config('VENDOR_MEDIA_ROOT', default='')
 
@@ -49,8 +47,8 @@ class Command(BaseCommand):
                     'fuel_type': annonce.carburant,
                     'transmission': annonce.boite_vitesses,
                     'description': description,
-                    'city': DEFAULT_CITY,
-                    'condition': DEFAULT_CONDITION,
+                    'city': CITY_LABELS.get(annonce.ville, ''),
+                    'condition': annonce.etat if annonce.etat in Vehicle.Condition.values else '',
                     'seller': seller,
                 },
             )
@@ -76,6 +74,7 @@ class Command(BaseCommand):
     def _sync_seller(self, vendeur):
         profil = ProfilMirror.objects.using('vendor_db').filter(user_id=vendeur.pk).first()
 
+        is_pro = vendeur.type_compte == Seller.TypeCompte.PROFESSIONNEL
         seller, _ = Seller.objects.update_or_create(
             source_vendeur_id=vendeur.pk,
             defaults={
@@ -85,6 +84,8 @@ class Command(BaseCommand):
                 'type_compte': vendeur.type_compte,
                 'company_name': profil.raison_sociale if profil else '',
                 'city': profil.ville if profil else '',
+                'showroom_address': profil.adresse if (profil and is_pro) else '',
+                'is_verified_company': bool(profil and is_pro and profil.entreprise_verifiee),
                 'member_since': vendeur.date_joined,
             },
         )

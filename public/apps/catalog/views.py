@@ -115,7 +115,7 @@ def vehicle_list(request):
         'base_qs': base_qs.urlencode(),
         'total_count': paginator.count,
         'brands': Vehicle.objects.filter(publish=True).values_list('brand', flat=True).distinct().order_by('brand'),
-        'cities': Vehicle.objects.filter(publish=True).values_list('city', flat=True).distinct().order_by('city'),
+        'cities': Vehicle.objects.filter(publish=True).exclude(city='').values_list('city', flat=True).distinct().order_by('city'),
         'selected_brands': request.GET.getlist('brand'),
         'selected_transmissions': request.GET.getlist('transmission'),
         'selected_conditions': request.GET.getlist('condition'),
@@ -283,7 +283,7 @@ def vehicle_compare(request):
         {'key': 'transmission', 'label': 'Transmission',   'icon': 'settings',          'unit': '',     'tooltip': 'Type de boîte de vitesses (automatique ou manuelle).', 'format': 'choice'},
         {'key': 'condition',    'label': 'État',           'icon': 'new_releases',      'unit': '',     'tooltip': 'État général du véhicule : Neuf (jamais immatriculé) ou Occasion.', 'format': 'choice'},
         {'key': 'city',         'label': 'Localisation',   'icon': 'location_on',       'unit': '',     'tooltip': 'Ville où se trouve le véhicule pour la remise en main propre.', 'format': 'plain'},
-        {'key': 'is_verified',  'label': 'Inspecté Djona', 'icon': 'verified',          'unit': '',     'tooltip': 'Véhicule inspecté sur 150 points de contrôle par un expert certifié Djona.', 'format': 'bool'},
+        {'key': 'is_verified',  'label': 'Inspecté Djona', 'icon': 'verified',          'unit': '',     'tooltip': "Véhicule marqué comme inspecté par l'équipe Djona.", 'format': 'bool'},
     ]
 
     # Determiner le "Choix de l'Expert" : vehicule avec le meilleur score composite

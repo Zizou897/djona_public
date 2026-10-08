@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA | Djona{% endblock %}
-{% block meta_description %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}, {{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.price }} FCFA à {{ vehicle.city }}. Véhicule {{ vehicle.get_condition_display|lower }}{% if vehicle.is_verified %} inspecté et vérifié par Djona{% endif %}.{% endblock %}
+{% block meta_description %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}, {{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.price }} FCFA{% if vehicle.city %} à {{ vehicle.city }}{% endif %}.{% if vehicle.condition %} Véhicule {{ vehicle.get_condition_display|lower }}.{% endif %}{% endblock %}
 
 {% block og_extra %}
 {% with main_image=vehicle.images.first %}
@@ -10,11 +10,11 @@
 <meta property="og:site_name" content="Djona">
 <meta property="og:locale" content="fr_CI">
 <meta property="og:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA">
-<meta property="og:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.city }}.">
+<meta property="og:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}.{% if vehicle.city %} À {{ vehicle.city }}.{% endif %}">
 <meta property="og:image" content="{% if main_image %}{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endif %}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA">
-<meta name="twitter:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.city }}.">
+<meta name="twitter:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}.{% if vehicle.city %} À {{ vehicle.city }}.{% endif %}">
 <meta name="twitter:image" content="{% if main_image %}{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endif %}">
 {% endwith %}
 {% endblock %}
@@ -39,18 +39,18 @@
   },
   "vehicleTransmission": "{{ vehicle.get_transmission_display|escapejs }}",
   "fuelType": "{{ vehicle.get_fuel_type_display|escapejs }}",
-  "itemCondition": "{% if vehicle.condition == 'neuf' %}https://schema.org/NewCondition{% else %}https://schema.org/UsedCondition{% endif %}",
+  {% if vehicle.condition %}"itemCondition": "{% if vehicle.condition == 'neuf' %}https://schema.org/NewCondition{% else %}https://schema.org/UsedCondition{% endif %}",{% endif %}
   {% if main_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url|escapejs }}",{% endif %}
   "offers": {
     "@type": "Offer",
     "price": {{ vehicle.price|stringformat:"d" }},
     "priceCurrency": "XOF",
     "availability": "https://schema.org/InStock",
-    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"{% if vehicle.city %},
     "areaServed": {
       "@type": "City",
       "name": "{{ vehicle.city|escapejs }}"
-    }
+    }{% endif %}
   }
 }
 </script>
@@ -152,8 +152,8 @@
                 <li class="flex items-center gap-1.5 pl-3"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">speed</span>{{ vehicle.mileage }} km</li>
               </ul>
               <ul class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 border-t border-outline-variant/40 text-label-sm">
-                <li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">sell</span>{{ vehicle.get_condition_display }}</li>
-                <li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>{{ vehicle.city }}</li>
+                {% if vehicle.condition %}<li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">sell</span>{{ vehicle.get_condition_display }}</li>{% endif %}
+                {% if vehicle.city %}<li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>{{ vehicle.city }}</li>{% endif %}
                 {% if vehicle.seller %}
                 <li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">{% if vehicle.seller.is_professional %}storefront{% else %}person{% endif %}</span>{% if vehicle.seller.is_professional %}Professionnel{% else %}Particulier{% endif %}</li>
                 {% endif %}
@@ -276,12 +276,12 @@
         <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
           <span class="material-symbols-outlined text-primary" aria-hidden="true">sell</span>
           <span class="text-label-sm text-on-surface-variant">État</span>
-          <span class="font-label-md text-label-md text-on-background">{{ vehicle.get_condition_display }}</span>
+          <span class="font-label-md text-label-md {% if vehicle.condition %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ vehicle.get_condition_display|default:"Non précisé" }}</span>
         </div>
         <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
           <span class="material-symbols-outlined text-primary" aria-hidden="true">location_on</span>
           <span class="text-label-sm text-on-surface-variant">Localisation</span>
-          <span class="font-label-md text-label-md text-on-background">{{ vehicle.city }}</span>
+          <span class="font-label-md text-label-md {% if vehicle.city %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ vehicle.city|default:"Non précisée" }}</span>
         </div>
       </div>
     </div>
@@ -295,8 +295,8 @@
         <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">directions_car</span><dt class="flex-1 text-on-surface-variant">Marque</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.brand }}</dd></div>
         <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">badge</span><dt class="flex-1 text-on-surface-variant">Modèle</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.model_name }}</dd></div>
         <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">calendar_month</span><dt class="flex-1 text-on-surface-variant">Année</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.year|stringformat:"d" }}</dd></div>
-        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">sell</span><dt class="flex-1 text-on-surface-variant">État</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.get_condition_display }}</dd></div>
-        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">location_on</span><dt class="flex-1 text-on-surface-variant">Ville</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.city }}</dd></div>
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">sell</span><dt class="flex-1 text-on-surface-variant">État</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.get_condition_display|default:"Non précisé" }}</dd></div>
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">location_on</span><dt class="flex-1 text-on-surface-variant">Ville</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.city|default:"Non précisée" }}</dd></div>
         <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">event</span><dt class="flex-1 text-on-surface-variant">Publiée le</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ vehicle.created_at|date:"j F Y" }}</dd></div>
       </dl>
     </div>

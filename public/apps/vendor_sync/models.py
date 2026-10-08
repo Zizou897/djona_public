@@ -33,6 +33,8 @@ class ProfilMirror(models.Model):
     ville = models.CharField(max_length=30, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     raison_sociale = models.CharField(max_length=150, blank=True)
+    adresse = models.CharField(max_length=255, blank=True)
+    entreprise_verifiee = models.BooleanField(default=False)
 
     class Meta:
         managed = False
@@ -65,6 +67,8 @@ class AnnonceMirror(models.Model):
     carburant = models.CharField(max_length=20)
     boite_vitesses = models.CharField(max_length=20)
     couleur = models.CharField(max_length=50)
+    etat = models.CharField(max_length=20, blank=True)
+    ville = models.CharField(max_length=30, blank=True)
     description = models.TextField()
     statut = models.CharField(max_length=20, choices=Statut.choices)
     created_at = models.DateTimeField()

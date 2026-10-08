@@ -22,7 +22,9 @@ avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) 
   <a href="{{ vehicle.get_absolute_url }}" class="p-3 flex flex-col flex-1">
     <div class="flex justify-between items-start gap-2 mb-1">
       <h3 class="font-headline-md text-[13px] leading-tight text-on-surface group-hover:text-primary transition-colors">{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}</h3>
+      {% if vehicle.condition %}
       <span class="px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-[9px] uppercase shrink-0">{{ vehicle.get_condition_display }}</span>
+      {% endif %}
     </div>
     <div class="flex items-center gap-2 text-outline mb-2">
       <div class="flex items-center gap-0.5">

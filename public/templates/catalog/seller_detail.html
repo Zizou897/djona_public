@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}{{ seller.display_name }} — Vendeur Djona{% endblock %}
-{% block meta_description %}{% if seller.is_professional %}{{ seller.display_name }}, concessionnaire professionnel sur Djona{% else %}{{ seller.display_name }}, vendeur particulier sur Djona{% endif %} — {{ published_vehicles|length }} véhicule{{ published_vehicles|length|pluralize }} en vente, membre depuis {{ seller.member_since|date:"F Y" }}.{% endblock %}
+{% block meta_description %}{% if seller.is_professional %}{{ seller.display_name }}, vendeur professionnel sur Djona{% else %}{{ seller.display_name }}, vendeur particulier sur Djona{% endif %} — {{ published_vehicles|length }} véhicule{{ published_vehicles|length|pluralize }} en vente, membre depuis {{ seller.member_since|date:"F Y" }}.{% endblock %}
 
 {% block content %}
 <div class="flex flex-col w-full">
@@ -38,10 +38,10 @@
       </div>
 
       <div class="flex-1 text-center sm:text-left pb-1">
-        {% if seller.is_professional %}
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wide mb-2">
+        {% if seller.is_verified_company %}
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wide mb-2" title="Justificatif d'entreprise (RCCM) contrôlé par l'équipe Djona">
           <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
-          Vendeur Certifié Djona
+          Entreprise vérifiée
         </span>
         {% endif %}
         <h1 class="font-display-lg text-headline-lg text-on-background">{{ seller.display_name }}</h1>
@@ -49,6 +49,12 @@
         <p class="inline-flex items-center gap-1 mt-1 font-body-md text-on-surface-variant">
           <span class="material-symbols-outlined text-[18px]" aria-hidden="true">location_on</span>
           {{ seller.get_city_display }}
+        </p>
+        {% endif %}
+        {% if seller.showroom_address %}
+        <p class="inline-flex items-center gap-1 mt-1 font-body-md text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">store</span>
+          Showroom : {{ seller.showroom_address }}
         </p>
         {% endif %}
         {% if seller.phone %}
@@ -92,11 +98,11 @@
       <div>
         <div class="flex items-center gap-2 text-secondary mb-3">
           <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
-          <span class="font-label-md text-label-md uppercase tracking-wider">À propos du concessionnaire</span>
+          <span class="font-label-md text-label-md uppercase tracking-wider">À propos du vendeur</span>
         </div>
         <div class="bg-surface-container-low border-l-4 border-secondary rounded-md p-6">
           <p class="font-body-md text-body-md text-on-surface-variant">
-            {{ seller.display_name }} est un vendeur professionnel vérifié par Djona. Chaque véhicule publié sur cette page passe par notre processus d'inspection avant mise en vente, pour garantir la transparence et la sécurité de votre achat.
+            {{ seller.display_name }} est un vendeur professionnel sur Djona{% if seller.is_verified_company %}, dont le justificatif d'entreprise (RCCM) a été contrôlé par l'équipe Djona{% endif %}. Ses annonces sont examinées par l'équipe Djona avant leur mise en ligne.
           </p>
         </div>
       </div>
@@ -168,7 +174,7 @@
           </li>
           <li class="flex items-start gap-3">
             <span class="material-symbols-outlined text-tertiary-fixed" aria-hidden="true">check_circle</span>
-            <p class="font-body-md text-label-sm opacity-80">Accompagnement jusqu'à l'immatriculation</p>
+            <p class="font-body-md text-label-sm opacity-80">Accompagnement dans la négociation</p>
           </li>
         </ul>
       </div>

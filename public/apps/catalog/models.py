@@ -42,6 +42,11 @@ class Seller(models.Model):
     company_name = models.CharField('raison sociale', max_length=150, blank=True)
     city = models.CharField('ville', max_length=30, choices=Ville.choices, blank=True)
     logo = models.ImageField('logo', upload_to='sellers/', max_length=255, blank=True, null=True)
+    showroom_address = models.CharField('adresse du showroom', max_length=255, blank=True)
+    is_verified_company = models.BooleanField(
+        'entreprise vérifiée', default=False,
+        help_text="Justificatif RCCM validé par l'équipe Djona (copié depuis vendor.Profil.entreprise_verifiee).",
+    )
     member_since = models.DateTimeField('membre depuis')
     slug = models.SlugField('slug', max_length=180, unique=True, blank=True)
 
@@ -99,8 +104,10 @@ class Vehicle(Convention):
     mileage = models.PositiveIntegerField('kilométrage (km)')
     fuel_type = models.CharField('carburant', max_length=20, choices=FuelType.choices, default=FuelType.ESSENCE)
     transmission = models.CharField('transmission', max_length=20, choices=Transmission.choices, default=Transmission.AUTOMATIQUE)
-    city = models.CharField('ville', max_length=120)
-    condition = models.CharField('état', max_length=20, choices=Condition.choices, default=Condition.OCCASION)
+    # Vides tant que le vendeur ne les a pas renseignés (annonces antérieures à
+    # l'ajout de ces champs côté vendor) : ne jamais afficher une valeur inventée.
+    city = models.CharField('ville', max_length=120, blank=True)
+    condition = models.CharField('état', max_length=20, choices=Condition.choices, blank=True)
     slug = models.SlugField('slug', max_length=160, unique=True, blank=True)
     is_verified = models.BooleanField('inspecté par Djona', default=False)
     source_annonce_id = models.PositiveIntegerField(

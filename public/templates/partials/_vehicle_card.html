@@ -16,9 +16,11 @@ Carte véhicule "vitrine" (accueil) — attend une variable `vehicle` (instance 
     </div>
     {% endif %}
 
+    {% if vehicle.condition %}
     <div class="absolute bottom-3 right-3 bg-primary/80 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[11px]">
       {{ vehicle.get_condition_display }}
     </div>
+    {% endif %}
   </div>
 
   <div class="p-4 flex flex-col flex-grow">
@@ -28,7 +30,7 @@ Carte véhicule "vitrine" (accueil) — attend une variable `vehicle` (instance 
     </div>
     <div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-[11px] mb-3">
       <span class="material-symbols-outlined text-[14px]" aria-hidden="true">location_on</span>
-      {{ vehicle.city }}
+      {{ vehicle.city|default:"Ville non précisée" }}
     </div>
     <div class="grid grid-cols-3 gap-1 border-t border-surface-variant pt-3">
       <div class="flex flex-col items-center gap-0.5">

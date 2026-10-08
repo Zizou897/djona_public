@@ -92,9 +92,11 @@
               <h3 class="font-headline-md text-[18px] text-on-surface group-hover:text-primary transition-colors truncate">
                 {{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}
               </h3>
+              {% if vehicle.condition %}
               <span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-[10px] uppercase shrink-0 ml-2">
                 {{ vehicle.get_condition_display }}
               </span>
+              {% endif %}
             </div>
 
             <div class="flex items-center gap-4 text-outline mb-4">

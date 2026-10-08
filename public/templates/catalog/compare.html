@@ -231,14 +231,14 @@
               <span class="font-label-md text-label-md text-on-surface capitalize">
                 {% if criterion.key == 'fuel_type' %}{{ vehicle.get_fuel_type_display }}
                 {% elif criterion.key == 'transmission' %}{{ vehicle.get_transmission_display }}
-                {% elif criterion.key == 'condition' %}{{ vehicle.get_condition_display }}
+                {% elif criterion.key == 'condition' %}{{ vehicle.get_condition_display|default:"Non précisé" }}
                 {% else %}—{% endif %}
               </span>
 
             {% else %}
               <span class="font-label-md text-label-md text-on-surface">
                 {% if criterion.key == 'year' %}{{ vehicle.year }}
-                {% elif criterion.key == 'city' %}{{ vehicle.city }}
+                {% elif criterion.key == 'city' %}{{ vehicle.city|default:"Non précisée" }}
                 {% else %}—{% endif %}
               </span>
             {% endif %}
