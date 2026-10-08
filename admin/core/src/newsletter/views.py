@@ -18,11 +18,16 @@ class NewsletterSubscriberListView(StaffRequisMixin, ListView):
     context_object_name = 'subscribers'
 
     def get_queryset(self):
-        return NewsletterSubscriberMirror.objects.using('public_db').filter(is_active=True)
+        abonnes = NewsletterSubscriberMirror.objects.using('public_db').filter(is_active=True)
+        recherche = self.request.GET.get('q', '').strip()
+        if recherche:
+            abonnes = abonnes.filter(email__icontains=recherche)
+        return abonnes
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['nb_total'] = len(context['subscribers'])
+        context['nb_total'] = NewsletterSubscriberMirror.objects.using('public_db').filter(is_active=True).count()
+        context['recherche'] = self.request.GET.get('q', '')
         return context
 
 

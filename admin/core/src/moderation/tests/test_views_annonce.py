@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.template.defaultfilters import floatformat
 from django.test import TestCase
 from django.urls import reverse
 
@@ -50,12 +51,18 @@ class AnnonceModerationListViewTest(TestCase):
         response = self.client.get(reverse('annonce_moderation_liste'))
         self.assertRedirects(response, f"{reverse('connexion_admin')}?next={reverse('annonce_moderation_liste')}")
 
-    def test_liste_seulement_les_annonces_en_attente(self):
+    def test_onglet_a_valider_ne_montre_que_les_annonces_en_attente(self):
         self.client.force_login(self.admin)
-        response = self.client.get(reverse('annonce_moderation_liste'))
+        response = self.client.get(reverse('annonce_moderation_liste'), {'statut': 'en_attente'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Corolla')
         self.assertNotContains(response, 'Civic')
+
+    def test_liste_par_defaut_montre_tous_les_statuts(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('annonce_moderation_liste'))
+        self.assertContains(response, 'Corolla')
+        self.assertContains(response, 'Civic')
 
     def test_detail_affiche_les_infos_completes(self):
         self.client.force_login(self.admin)
@@ -63,7 +70,7 @@ class AnnonceModerationListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Toyota')
         self.assertContains(response, 'Ange')
-        self.assertContains(response, '8500000')
+        self.assertContains(response, floatformat(8500000, '0g'))
 
     def test_detail_affiche_carburant_et_boite_vitesses_lisibles(self):
         self.client.force_login(self.admin)

@@ -4,6 +4,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, redirect_to_login
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView
@@ -14,7 +15,9 @@ from moderation.models import AnnonceMirror, CompteVendeur, DemandePassageProMir
 
 
 def home(request):
-    return render(request, 'app/layout/index.html', {})
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('dashboard_admin')
+    return redirect('connexion_admin')
 
 
 class AdminLoginView(LoginView):
@@ -47,6 +50,37 @@ class StaffRequisMixin(LoginRequiredMixin, UserPassesTestMixin):
         )
 
 
+class CompteursAdminView(StaffRequisMixin, View):
+    """Compteurs « à traiter » de la navigation, chargés en JS après l'affichage
+    de la page — pour ne pas interroger vendor_db/public_db sur chaque rendu."""
+
+    def get(self, request):
+        from contactmessages.models import ContactMessageMirror
+        from transport.models import TransportRequestMirror
+
+        requetes = {
+            'annonces': lambda: AnnonceMirror.objects.using('vendor_db').filter(
+                statut=AnnonceMirror.Statut.EN_ATTENTE).count(),
+            'vendeurs': lambda: CompteVendeur.objects.using('vendor_db').filter(
+                statut_compte=CompteVendeur.StatutCompte.EN_ATTENTE).count(),
+            'demandes_pro': lambda: DemandePassageProMirror.objects.using('vendor_db').filter(
+                statut=DemandePassageProMirror.Statut.EN_ATTENTE).count(),
+            'messages': lambda: ContactMessageMirror.objects.using('public_db').filter(
+                status=ContactMessageMirror.Status.NEW).count(),
+            'transport': lambda: TransportRequestMirror.objects.using('public_db').filter(
+                status=TransportRequestMirror.Status.NEW).count(),
+        }
+        compteurs = {}
+        for cle, compter in requetes.items():
+            # Une base externe indisponible (ex. dev SQLite sans vendor_db/public_db)
+            # ne doit pas empêcher d'afficher les autres compteurs.
+            try:
+                compteurs[cle] = compter()
+            except Exception:
+                continue
+        return JsonResponse(compteurs)
+
+
 class AdminDashboardView(StaffRequisMixin, TemplateView):
     template_name = 'app/layout/dashboard_admin.html'
 
@@ -71,6 +105,7 @@ class AdminDashboardView(StaffRequisMixin, TemplateView):
             AnnonceMirror.objects.using('vendor_db')
             .filter(statut=AnnonceMirror.Statut.EN_ATTENTE)
             .select_related('vendeur')
+            .prefetch_related('photos')
             .order_by('-created_at')[:5]
         )
 
@@ -108,6 +143,9 @@ class AdminDashboardView(StaffRequisMixin, TemplateView):
             'vendeurs_particuliers': vendeurs_particuliers,
             'vendeurs_professionnels': vendeurs_professionnels,
             'vendeurs_total': vendeurs_particuliers + vendeurs_professionnels,
+            'vendeurs_en_attente': CompteVendeur.objects.using('vendor_db').filter(
+                statut_compte=CompteVendeur.StatutCompte.EN_ATTENTE,
+            ).count(),
             'demandes_pro_en_attente': DemandePassageProMirror.objects.using('vendor_db').filter(
                 statut=DemandePassageProMirror.Statut.EN_ATTENTE,
             ).count(),

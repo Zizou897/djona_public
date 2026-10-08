@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
@@ -19,6 +19,12 @@ class ContactMessageListView(StaffRequisMixin, ListView):
         statut = self.request.GET.get('statut')
         if statut in ContactMessageMirror.Status.values:
             qs = qs.filter(status=statut)
+        recherche = self.request.GET.get('q', '').strip()
+        if recherche:
+            qs = qs.filter(
+                Q(full_name__icontains=recherche) | Q(phone__icontains=recherche)
+                | Q(email__icontains=recherche) | Q(message__icontains=recherche)
+            )
         return qs
 
     def get_context_data(self, **kwargs):
@@ -30,6 +36,7 @@ class ContactMessageListView(StaffRequisMixin, ListView):
             for value, label in ContactMessageMirror.Status.choices
         ]
         context['statut_actif'] = self.request.GET.get('statut', '')
+        context['recherche'] = self.request.GET.get('q', '')
         context['nb_total'] = sum(counts.values())
         return context
 

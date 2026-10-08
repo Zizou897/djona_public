@@ -1,100 +1,71 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Demandes de compte professionnel — Portail Admin{% endblock %}
+{% block title %}Demandes de compte pro — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Demandes pro' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='demandes_pro' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='demandes_pro' %}
 
-<div class="reveal mb-8" style="animation-delay:.05s">
-    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Communauté</span>
-    <h1 class="font-display-lg text-display-lg text-primary">Demandes de compte professionnel</h1>
-    <p class="text-sm text-on-surface-variant mt-2">Vendeurs particuliers qui demandent à passer en compte professionnel. Accepter la demande passe le compte en professionnel et marque l'entreprise comme vérifiée.</p>
-</div>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Modération</span>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Demandes de compte professionnel</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Vendeurs particuliers qui demandent à passer professionnel. Accepter passe le compte en professionnel et marque l'entreprise comme vérifiée.</p>
+            </div>
 
-<div class="reveal flex flex-wrap items-center gap-2 mb-6" style="animation-delay:.1s">
-    <a class="px-4 py-2 rounded-lg font-label-md text-label-md transition-colors {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="{% url 'demande_pro_liste' %}">Toutes ({{ nb_total }})</a>
-    <a class="px-4 py-2 rounded-lg font-label-md text-label-md transition-colors {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=en_attente">En attente ({{ nb_en_attente }})</a>
-    <a class="px-4 py-2 rounded-lg font-label-md text-label-md transition-colors {% if statut_actif == 'acceptee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=acceptee">Acceptées ({{ nb_acceptees }})</a>
-    <a class="px-4 py-2 rounded-lg font-label-md text-label-md transition-colors {% if statut_actif == 'refusee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=refusee">Refusées ({{ nb_refusees }})</a>
-</div>
+            <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" style="animation-delay:.1s">
+                <nav aria-label="Statut" class="flex gap-1 px-3 pt-2 overflow-x-auto border-b border-outline-variant/30">
+                    <a {% if not statut_actif %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if not statut_actif %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="{% url 'demande_pro_liste' %}">Toutes <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_total }}</span></a>
+                    <a {% if statut_actif == 'en_attente' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=en_attente">À examiner <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% elif nb_en_attente %}bg-secondary-container text-primary{% else %}bg-surface-container{% endif %}">{{ nb_en_attente }}</span></a>
+                    <a {% if statut_actif == 'acceptee' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'acceptee' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=acceptee">Acceptées <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'acceptee' %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_acceptees }}</span></a>
+                    <a {% if statut_actif == 'refusee' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'refusee' %}border-error text-error{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=refusee">Refusées <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'refusee' %}bg-error text-white{% else %}bg-surface-container{% endif %}">{{ nb_refusees }}</span></a>
+                </nav>
 
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
-<div class="hidden lg:block overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-surface-variant">
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Vendeur</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Entreprise</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">RCCM</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Envoyée le</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container">
-{% for demande in demandes %}
-<tr class="hover:bg-surface transition-colors">
-<td class="px-6 py-4">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ demande.utilisateur.prenom|first|upper }}{{ demande.utilisateur.nom|first|upper }}</div>
-<div class="min-w-0"><p class="font-label-md text-label-md">{{ demande.utilisateur.prenom }} {{ demande.utilisateur.nom }}</p><p class="text-[11px] text-on-surface-variant">{{ demande.utilisateur.email }}</p></div>
-</div>
-</td>
-<td class="px-6 py-4 font-label-md text-label-md">{{ demande.raison_sociale }}</td>
-<td class="px-6 py-4 text-on-surface-variant">{{ demande.numero_rccm }}</td>
-<td class="px-6 py-4 text-on-surface-variant font-label-md text-label-md">{{ demande.created_at|date:'d/m/Y H:i' }}</td>
-<td class="px-6 py-4">
-{% if demande.statut == 'en_attente' %}<span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-{% elif demande.statut == 'acceptee' %}<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-tighter">Acceptée</span>
-{% else %}<span class="px-3 py-1 rounded-full bg-error-container text-error text-[12px] font-bold uppercase tracking-tighter">Refusée</span>{% endif %}
-</td>
-<td class="px-6 py-4 text-right">
-<a class="inline-flex px-4 py-2 rounded-lg {% if demande.statut == 'en_attente' %}bg-primary text-on-primary hover:bg-primary-container{% else %}border border-primary text-primary hover:bg-primary/5{% endif %} font-label-md text-label-md transition-colors" href="{% url 'demande_pro_detail' demande.pk %}">{% if demande.statut == 'en_attente' %}Examiner{% else %}Voir{% endif %}</a>
-</td>
-</tr>
-{% empty %}
-<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="6">Aucune demande pour le moment.</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-<!-- Cartes : mobile/tablette uniquement (< lg) -->
-<div class="lg:hidden flex flex-col divide-y divide-surface-container">
-{% for demande in demandes %}
-<a class="p-4 flex flex-col gap-2 hover:bg-surface transition-colors" href="{% url 'demande_pro_detail' demande.pk %}">
-<div class="flex items-start justify-between gap-3">
-<div class="min-w-0">
-<p class="font-label-md text-label-md text-on-surface truncate">{{ demande.raison_sociale }}</p>
-<p class="text-[11px] text-on-surface-variant truncate">{{ demande.utilisateur.prenom }} {{ demande.utilisateur.nom }} · {{ demande.utilisateur.email }}</p>
-</div>
-{% if demande.statut == 'en_attente' %}<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-{% elif demande.statut == 'acceptee' %}<span class="flex-none px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-tighter">Acceptée</span>
-{% else %}<span class="flex-none px-3 py-1 rounded-full bg-error-container text-error text-[12px] font-bold uppercase tracking-tighter">Refusée</span>{% endif %}
-</div>
-<p class="text-[13px] text-on-surface-variant">RCCM {{ demande.numero_rccm }} · {{ demande.created_at|date:'d/m/Y' }}</p>
-</a>
-{% empty %}
-<div class="p-8 text-center text-on-surface-variant">Aucune demande pour le moment.</div>
-{% endfor %}
-</div>
-</div>
-
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='vendeurs' %}
+                <ul class="divide-y divide-outline-variant/30">
+                    {% for demande in demandes %}
+                    <li>
+                        <a class="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-5 hover:bg-surface-container-low transition-colors" href="{% url 'demande_pro_detail' demande.pk %}">
+                            <div class="flex items-center gap-3 min-w-0 md:w-72 md:shrink-0">
+                                <span class="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]">storefront</span></span>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-on-surface truncate">{{ demande.raison_sociale }}</p>
+                                    <p class="text-xs text-on-surface-variant truncate">RCCM {{ demande.numero_rccm }}</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant">
+                                <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">person</span>{{ demande.utilisateur.prenom }} {{ demande.utilisateur.nom }}</span>
+                                <span class="inline-flex items-center gap-1 truncate"><span class="material-symbols-outlined text-[16px] text-outline">mail</span>{{ demande.utilisateur.email }}</span>
+                                <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>{{ demande.created_at|date:'d/m/Y à H:i' }}</span>
+                            </div>
+                            <div class="flex items-center gap-3 md:shrink-0">
+                                {% if demande.statut == 'en_attente' %}
+                                <span class="px-2.5 py-0.5 rounded-full bg-secondary-container/25 text-secondary text-[11px] font-bold">À examiner</span>
+                                <span class="ml-auto md:ml-0 inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold">Examiner<span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+                                {% elif demande.statut == 'acceptee' %}
+                                <span class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold">Acceptée</span>
+                                <span class="ml-auto md:ml-0 material-symbols-outlined text-outline">chevron_right</span>
+                                {% else %}
+                                <span class="px-2.5 py-0.5 rounded-full bg-error-container text-error text-[11px] font-bold">Refusée</span>
+                                <span class="ml-auto md:ml-0 material-symbols-outlined text-outline">chevron_right</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="py-14 px-6 text-center flex flex-col items-center gap-3">
+                        <span class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[28px]">inbox</span></span>
+                        <p class="text-sm font-semibold text-on-surface">Aucune demande{% if statut_actif %} dans cette catégorie{% endif %}.</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
+    </div>
 </div>
 {% endblock %}

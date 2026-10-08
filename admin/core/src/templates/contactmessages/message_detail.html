@@ -1,50 +1,64 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Message de {{ msg.display_name }} — Portail Admin{% endblock %}
+{% block title %}Message de {{ msg.display_name }} — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Messages' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='messages' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-4xl">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='messages' %}
 
-<a href="{% url 'contact_message_liste' %}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-4">
-    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux messages
-</a>
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">{{ msg.subject_label }}</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ msg.display_name }}</h1>
-<p class="text-sm text-on-surface-variant mb-8">Reçu le {{ msg.created_at|date:'d/m/Y à H:i' }}</p>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'contact_message_liste' %}">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>Messages
+                </a>
+                <span class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">{{ msg.subject_label }}</span>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">{{ msg.display_name }}</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Reçu le {{ msg.created_at|date:'d/m/Y à H:i' }}</p>
+            </div>
 
-<form method="post" class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 mb-6 flex flex-col sm:flex-row sm:items-end gap-4">
-    {% csrf_token %}
-    <div class="flex flex-col gap-2 flex-1">
-        <label for="statut" class="font-label-md text-label-md">Statut du message</label>
-        <select id="statut" name="statut" class="px-4 py-3 rounded bg-surface-container outline-none focus:ring-2 focus:ring-primary">
-            {% for value, label in statuts %}<option value="{{ value }}" {% if msg.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-        </select>
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+                <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.1s">
+                    <h2 class="font-headline-md font-semibold text-base text-primary mb-3">Message</h2>
+                    <p class="text-sm text-on-surface leading-relaxed whitespace-pre-line">{{ msg.message }}</p>
+                </section>
+
+                <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.12s">
+                        <p class="text-sm font-semibold text-on-surface mb-3">Statut</p>
+                        <form class="flex flex-col gap-2" method="post">
+                            {% csrf_token %}
+                            {% for value, label in statuts %}
+                            <button class="w-full inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors {% if msg.status == value %}bg-primary text-on-primary{% else %}border border-outline-variant text-on-surface-variant hover:bg-surface-container{% endif %}" name="statut" {% if msg.status == value %}aria-pressed="true"{% endif %} type="submit" value="{{ value }}">
+                                <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">{% if value == 'nouveau' %}fiber_new{% elif value == 'en_traitement' %}pending{% else %}task_alt{% endif %}</span>{{ label }}</span>
+                                {% if msg.status == value %}<span class="material-symbols-outlined text-[18px]">check</span>{% endif %}
+                            </button>
+                            {% endfor %}
+                        </form>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-3" style="animation-delay:.14s">
+                        <p class="text-sm font-semibold text-on-surface">Contacter</p>
+                        <a class="w-full inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/5 transition-colors" href="tel:{{ msg.phone }}">
+                            <span class="material-symbols-outlined text-[18px]">call</span>{{ msg.phone }}
+                        </a>
+                        {% if msg.email %}
+                        <a class="w-full inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/5 transition-colors break-all" href="mailto:{{ msg.email }}?subject={{ msg.subject_label|urlencode }}%20—%20Djona">
+                            <span class="material-symbols-outlined text-[18px]">reply</span>Répondre par email
+                        </a>
+                        <p class="text-xs text-on-surface-variant break-all">{{ msg.email }}</p>
+                        {% else %}
+                        <p class="text-xs text-on-surface-variant">Pas d'adresse email fournie.</p>
+                        {% endif %}
+                    </section>
+                </aside>
+            </div>
+        </main>
     </div>
-    <button type="submit" class="px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">Mettre à jour</button>
-</form>
-
-<dl class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
-    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Téléphone</dt><dd class="font-label-md text-label-md"><a class="text-primary hover:underline" href="tel:{{ msg.phone }}">{{ msg.phone }}</a></dd></div>
-    <div><dt class="text-xs uppercase tracking-wider text-on-surface-variant">Email</dt><dd class="font-label-md text-label-md">{% if msg.email %}<a class="text-primary hover:underline" href="mailto:{{ msg.email }}">{{ msg.email }}</a>{% else %}—{% endif %}</dd></div>
-    <div class="sm:col-span-2"><dt class="text-xs uppercase tracking-wider text-on-surface-variant mb-1">Message</dt><dd class="whitespace-pre-line">{{ msg.message }}</dd></div>
-</dl>
-
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='messages' %}
 </div>
 {% endblock %}

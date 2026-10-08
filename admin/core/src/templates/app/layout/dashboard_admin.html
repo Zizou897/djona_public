@@ -1,183 +1,148 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Dashboard — Portail Admin{% endblock %}
+{% block title %}Tableau de bord — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Dashboard' %}
-<!-- Sidebar desktop (lg+) -->
-{% include 'app/includes/sidebar_admin.html' with active_nav='dashboard' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter px-container-margin-mobile md:px-container-margin-desktop py-base">
-<div class="reveal bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] flex flex-col gap-4 group hover:-translate-y-1 transition-all duration-300" style="animation-delay:.05s">
-<div class="flex items-center justify-between">
-<div class="p-3 bg-primary-fixed rounded-lg text-on-primary-fixed-variant">
-<span class="material-symbols-outlined text-[28px]">directions_car</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Total Annonces</span>
-</div>
-<div>
-<h2 class="font-display-lg text-display-lg text-primary leading-none">{{ annonces_total }}</h2>
-<div class="flex gap-4 mt-2">
-<span class="font-label-md text-label-md text-primary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span> {{ annonces_publiees }} publiées</span>
-<span class="font-label-md text-label-md text-secondary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> {{ annonces_en_attente_total }} en attente</span>
-</div>
-</div>
-</div>
-<div class="reveal bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] flex flex-col gap-4 group hover:-translate-y-1 transition-all duration-300" style="animation-delay:.12s">
-<div class="flex items-center justify-between">
-<div class="p-3 bg-tertiary-fixed rounded-lg text-on-tertiary-fixed">
-<span class="material-symbols-outlined text-[28px]">group</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Communauté</span>
-</div>
-<div>
-<h2 class="font-display-lg text-display-lg text-primary leading-none">{{ vendeurs_total }}</h2>
-<div class="flex gap-4 mt-2 text-on-surface-variant">
-<span class="font-label-md text-label-md">{{ vendeurs_particuliers }} particuliers</span>
-<span class="font-label-md text-label-md">{{ vendeurs_professionnels }} professionnels</span>
-</div>
-{% if demandes_pro_en_attente %}
-<a class="mt-3 inline-flex items-center gap-1.5 font-label-md text-label-md text-secondary hover:underline" href="{% url 'demande_pro_liste' %}?statut=en_attente"><span class="material-symbols-outlined text-[18px]">storefront</span>{{ demandes_pro_en_attente }} demande{{ demandes_pro_en_attente|pluralize }} de compte pro en attente</a>
-{% endif %}
-</div>
-</div>
-<div class="reveal bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] flex flex-col gap-4 border-l-4 border-outline-variant/40" style="animation-delay:.19s">
-<div class="flex items-center justify-between">
-<div class="p-3 bg-surface-container rounded-lg text-on-surface-variant">
-<span class="material-symbols-outlined text-[28px]">payments</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Séquestre en cours</span>
-</div>
-<div>
-<h2 class="font-display-lg text-display-lg text-on-surface-variant leading-none">—</h2>
-<p class="font-label-md text-label-md text-on-surface-variant mt-2">Bientôt disponible</p>
-</div>
-</div>
-<div class="reveal bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] flex flex-col gap-4 border-l-4 border-outline-variant/40" style="animation-delay:.26s">
-<div class="flex items-center justify-between">
-<div class="p-3 bg-surface-container rounded-lg text-on-surface-variant">
-<span class="material-symbols-outlined text-[28px]">trending_up</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Revenu (semaine)</span>
-</div>
-<div>
-<h2 class="font-display-lg text-display-lg text-on-surface-variant leading-none">—</h2>
-<p class="font-label-md text-label-md text-on-surface-variant mt-2">Bientôt disponible</p>
-</div>
-</div>
-</section>
-<section class="grid grid-cols-1 xl:grid-cols-12 gap-gutter px-container-margin-mobile md:px-container-margin-desktop pb-section-gap mt-section-gap">
-<div class="reveal xl:col-span-8 min-w-0 bg-surface-container-lowest rounded-2xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.34s">
-<div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-low/50">
-<div>
-<h3 class="font-headline-md text-headline-md text-primary">Validation en attente</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Annonces véhicules récemment soumises</p>
-</div>
-<button class="self-start sm:self-auto px-4 py-2 font-label-md text-label-md border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-2">
-<span class="material-symbols-outlined text-[20px]">filter_list</span> Filtrer
-</button>
-</div>
-<!-- Tableau : desktop uniquement (lg+) -->
-<div class="hidden lg:block overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-surface-variant">
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Vendeur</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Véhicule</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Prix</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container">
-{% for annonce in annonces_en_attente %}
-<tr class="hover:bg-surface transition-colors">
-<td class="px-6 py-4 font-label-md text-label-md whitespace-nowrap">{{ annonce.created_at|date:"d M, H:i" }}</td>
-<td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ annonce.vendeur.prenom|first|upper }}{{ annonce.vendeur.nom|first|upper }}</div><span class="font-label-md text-label-md">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }}</span></div></td>
-<td class="px-6 py-4"><p class="font-label-md text-label-md text-on-surface">{{ annonce.marque }} {{ annonce.modele }} {{ annonce.annee }}</p><p class="text-[11px] text-on-surface-variant">{{ annonce.kilometrage }} km • {{ annonce.get_carburant_display }}</p></td>
-<td class="px-6 py-4 font-label-md text-label-md text-right text-primary">{{ annonce.prix }} CFA</td>
-<td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span></td>
-<td class="px-6 py-4 text-right"><div class="flex justify-end gap-2">
-<form method="post" action="{% url 'annonce_valider' annonce.pk %}" class="inline">{% csrf_token %}<button type="submit" class="p-2 hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg text-primary-container" title="Valider"><span class="material-symbols-outlined text-[20px]">check_circle</span></button></form>
-<form method="post" action="{% url 'annonce_refuser' annonce.pk %}" class="inline">{% csrf_token %}<button type="submit" class="p-2 hover:bg-error-container hover:text-error transition-colors rounded-lg text-on-surface-variant" title="Refuser"><span class="material-symbols-outlined text-[20px]">cancel</span></button></form>
-<a href="{% url 'annonce_moderation_detail' annonce.pk %}" class="p-2 hover:bg-surface-container-high transition-colors rounded-lg text-on-surface-variant" title="Voir le détail"><span class="material-symbols-outlined text-[20px]">visibility</span></a>
-</div></td>
-</tr>
-{% empty %}
-<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="6">Aucune annonce en attente de validation.</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-<!-- Cartes : mobile/tablette uniquement (< lg) -->
-<div class="lg:hidden flex flex-col divide-y divide-surface-container">
-{% for annonce in annonces_en_attente %}
-<div class="p-4 flex flex-col gap-3">
-<div class="flex items-start justify-between gap-3">
-<div class="flex items-center gap-3 min-w-0">
-<div class="w-9 h-9 flex-none rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ annonce.vendeur.prenom|first|upper }}{{ annonce.vendeur.nom|first|upper }}</div>
-<div class="min-w-0">
-<p class="font-label-md text-label-md text-on-surface truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }}</p>
-<p class="text-[11px] text-on-surface-variant">{{ annonce.created_at|date:"d M, H:i" }}</p>
-</div>
-</div>
-<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-</div>
-<div>
-<p class="font-label-md text-label-md text-on-surface">{{ annonce.marque }} {{ annonce.modele }} {{ annonce.annee }}</p>
-<p class="text-[11px] text-on-surface-variant">{{ annonce.kilometrage }} km • {{ annonce.get_carburant_display }}</p>
-</div>
-<div class="flex items-center justify-between">
-<span class="font-label-md text-label-md text-primary">{{ annonce.prix }} CFA</span>
-<div class="flex gap-1">
-<form method="post" action="{% url 'annonce_valider' annonce.pk %}" class="inline">{% csrf_token %}<button type="submit" class="p-2 hover:bg-primary-container hover:text-on-primary transition-colors rounded-lg text-primary-container" title="Valider"><span class="material-symbols-outlined text-[20px]">check_circle</span></button></form>
-<form method="post" action="{% url 'annonce_refuser' annonce.pk %}" class="inline">{% csrf_token %}<button type="submit" class="p-2 hover:bg-error-container hover:text-error transition-colors rounded-lg text-on-surface-variant" title="Refuser"><span class="material-symbols-outlined text-[20px]">cancel</span></button></form>
-<a href="{% url 'annonce_moderation_detail' annonce.pk %}" class="p-2 hover:bg-surface-container-high transition-colors rounded-lg text-on-surface-variant" title="Voir le détail"><span class="material-symbols-outlined text-[20px]">visibility</span></a>
-</div>
-</div>
-</div>
-{% empty %}
-<div class="p-8 text-center text-on-surface-variant">Aucune annonce en attente de validation.</div>
-{% endfor %}
-</div>
-<div class="p-4 border-t border-surface-container flex items-center justify-center">
-<a href="{% url 'annonce_moderation_liste' %}" class="text-primary font-label-md text-label-md hover:underline">Voir toutes les annonces en attente</a>
-</div>
-</div>
-<div class="xl:col-span-4 flex flex-col gap-gutter">
-<div class="reveal bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] flex-1" style="animation-delay:.4s">
-<h3 class="font-headline-md text-headline-md text-primary mb-6">Activité récente</h3>
-<div class="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container">
-{% for evenement in activites_recentes %}
-<div class="relative flex gap-4">
-<div class="relative z-10 w-10 h-10 rounded-full {% if evenement.type == 'inscription' %}bg-primary{% else %}bg-secondary{% endif %} flex items-center justify-center shadow-lg"><span class="material-symbols-outlined {% if evenement.type == 'inscription' %}text-on-primary{% else %}text-on-secondary{% endif %} text-[18px]">{% if evenement.type == 'inscription' %}person_add{% else %}campaign{% endif %}</span></div>
-<div><p class="font-label-md text-label-md text-on-surface">{{ evenement.titre }}</p><p class="font-body-md text-body-md text-on-surface-variant text-[13px]">{{ evenement.description }}</p><span class="text-[11px] font-bold text-secondary uppercase mt-1 block">Il y a {{ evenement.date|timesince }}</span></div>
-</div>
-{% empty %}
-<p class="text-on-surface-variant text-center py-8">Aucune activité récente.</p>
-{% endfor %}
-</div>
-</div>
-</div>
-<div class="reveal bg-surface-container p-6 rounded-2xl text-on-surface-variant relative overflow-hidden" style="animation-delay:.46s">
-<h4 class="font-label-sm text-label-sm uppercase tracking-widest mb-4 opacity-70">Taux de conversion</h4>
-<p class="font-body-md text-body-md">Bientôt disponible — nécessite le module Transactions.</p>
-</div>
-</div>
-</section>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='dashboard' %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='dashboard' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-8">
+
+            <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Tableau de bord</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Bonjour, {{ request.user.first_name|default:request.user.username }}</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Voici ce qui attend l'équipe Djona aujourd'hui.</p>
+                </div>
+                <a class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm shadow-sm hover:bg-primary-container transition-colors" href="{% url 'annonce_creer_admin' %}">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Créer une annonce
+                </a>
+            </div>
+
+            <!-- À traiter -->
+            <section aria-labelledby="titre-a-traiter" class="flex flex-col gap-3">
+                <h2 class="text-sm font-semibold text-on-surface" id="titre-a-traiter">À traiter</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+                    <a class="reveal group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3 {% if annonces_en_attente_total %}ring-1 ring-secondary-container/60{% endif %}" href="{% url 'annonce_moderation_liste' %}?statut=en_attente" style="animation-delay:.08s">
+                        <span class="w-10 h-10 rounded-xl bg-secondary-container/20 flex items-center justify-center"><span class="material-symbols-outlined text-secondary text-[22px]">fact_check</span></span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none">{{ annonces_en_attente_total }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1.5">Annonce{{ annonces_en_attente_total|pluralize }} à valider</p>
+                        </div>
+                    </a>
+                    <a class="reveal group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3" href="{% url 'vendeur_liste' %}?statut=en_attente" style="animation-delay:.12s">
+                        <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">person_add</span></span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none">{{ vendeurs_en_attente }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1.5">Compte{{ vendeurs_en_attente|pluralize }} à activer</p>
+                        </div>
+                    </a>
+                    <a class="reveal group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3" href="{% url 'demande_pro_liste' %}?statut=en_attente" style="animation-delay:.16s">
+                        <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">storefront</span></span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none">{{ demandes_pro_en_attente }}</p>
+                            <p class="text-xs text-on-surface-variant mt-1.5">Demande{{ demandes_pro_en_attente|pluralize }} de compte pro</p>
+                        </div>
+                    </a>
+                    <a class="reveal group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3" href="{% url 'contact_message_liste' %}" style="animation-delay:.2s">
+                        <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">mail</span></span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none" data-compteur-valeur="messages">…</p>
+                            <p class="text-xs text-on-surface-variant mt-1.5">Nouveaux messages</p>
+                        </div>
+                    </a>
+                    <a class="reveal group bg-surface-container-lowest rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3" href="{% url 'transport_demande_liste' %}" style="animation-delay:.24s">
+                        <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">local_shipping</span></span>
+                        <div>
+                            <p class="text-2xl font-bold text-on-surface leading-none" data-compteur-valeur="transport">…</p>
+                            <p class="text-xs text-on-surface-variant mt-1.5">Demandes de transport</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Chiffres clés -->
+            <section aria-label="Chiffres clés" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a class="reveal relative overflow-hidden bg-primary text-on-primary rounded-2xl p-6 flex flex-col justify-between gap-6 hover:bg-primary-container transition-colors" href="{% url 'annonce_moderation_liste' %}" style="animation-delay:.28s">
+                    <span class="material-symbols-outlined absolute -right-6 -bottom-8 text-[150px] text-white/[0.06] select-none pointer-events-none">directions_car</span>
+                    <span class="relative text-xs font-semibold uppercase tracking-[0.15em] text-white/70">Annonces</span>
+                    <div class="relative">
+                        <p class="font-headline-lg font-bold text-4xl leading-none">{{ annonces_total }}</p>
+                        <p class="text-sm text-white/75 mt-2">{{ annonces_publiees }} publiée{{ annonces_publiees|pluralize }} · {{ annonces_en_attente_total }} en attente</p>
+                    </div>
+                </a>
+                <a class="reveal relative overflow-hidden bg-surface-container-lowest rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-6" href="{% url 'vendeur_liste' %}" style="animation-delay:.32s">
+                    <span class="material-symbols-outlined absolute -right-6 -bottom-8 text-[150px] text-primary/[0.05] select-none pointer-events-none">group</span>
+                    <span class="relative text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant">Vendeurs</span>
+                    <div class="relative">
+                        <p class="font-headline-lg font-bold text-4xl text-primary leading-none">{{ vendeurs_total }}</p>
+                        <p class="text-sm text-on-surface-variant mt-2">{{ vendeurs_particuliers }} particulier{{ vendeurs_particuliers|pluralize }} · {{ vendeurs_professionnels }} professionnel{{ vendeurs_professionnels|pluralize }}</p>
+                    </div>
+                </a>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Validation en attente -->
+                <section class="reveal lg:col-span-8 bg-surface-container-lowest rounded-2xl shadow-sm" style="animation-delay:.36s">
+                    <div class="px-6 pt-5 pb-4 flex items-center justify-between border-b border-outline-variant/30">
+                        <h2 class="font-headline-md font-semibold text-base text-primary">Validation en attente</h2>
+                        <a class="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1" href="{% url 'annonce_moderation_liste' %}?statut=en_attente">Tout voir <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                    </div>
+                    <ul class="divide-y divide-outline-variant/30">
+                        {% for annonce in annonces_en_attente %}
+                        <li class="px-5 sm:px-6 py-4 flex items-center gap-4">
+                            <div class="w-16 h-12 shrink-0 rounded-lg bg-surface-container overflow-hidden flex items-center justify-center">
+                                {% with photo=annonce.photos.all.0 %}{% if photo %}<img alt="" class="w-full h-full object-cover" src="{{ photo.image.url }}">{% else %}<span class="material-symbols-outlined text-outline">directions_car</span>{% endif %}{% endwith %}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-on-surface truncate">{{ annonce.marque }} {{ annonce.modele }} <span class="font-normal text-on-surface-variant">{{ annonce.annee|stringformat:"d" }}</span></p>
+                                <p class="text-xs text-on-surface-variant mt-0.5 truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.prix|floatformat:"0g" }} FCFA · il y a {{ annonce.created_at|timesince }}</p>
+                            </div>
+                            <a class="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors" href="{% url 'annonce_moderation_detail' annonce.pk %}">
+                                <span class="material-symbols-outlined text-[16px]">visibility</span>Examiner
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="px-6 py-8 flex items-center gap-4">
+                            <span class="w-12 h-12 shrink-0 rounded-full bg-green-100 flex items-center justify-center"><span class="material-symbols-outlined text-green-700">task_alt</span></span>
+                            <div>
+                                <p class="text-sm font-semibold text-on-surface">Aucune annonce en attente de validation</p>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Toutes les annonces soumises ont été traitées.</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+
+                <!-- Activité récente -->
+                <section class="reveal lg:col-span-4 bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.4s">
+                    <h2 class="font-headline-md font-semibold text-base text-primary mb-5">Activité récente</h2>
+                    <ol class="flex flex-col gap-5 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/50">
+                        {% for evenement in activites_recentes %}
+                        <li class="relative flex gap-3">
+                            <span class="relative z-10 w-9 h-9 shrink-0 rounded-full {% if evenement.type == 'inscription' %}bg-primary text-on-primary{% else %}bg-secondary-container text-primary{% endif %} flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[18px]">{% if evenement.type == 'inscription' %}person_add{% else %}campaign{% endif %}</span>
+                            </span>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-on-surface">{{ evenement.titre }}</p>
+                                <p class="text-xs text-on-surface-variant mt-0.5">{{ evenement.description }}</p>
+                                <p class="text-[11px] text-outline mt-1">Il y a {{ evenement.date|timesince }}</p>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-sm text-on-surface-variant text-center py-6">Aucune activité récente.</li>
+                        {% endfor %}
+                    </ol>
+                </section>
+            </div>
+        </main>
+    </div>
 </div>
 {% endblock %}

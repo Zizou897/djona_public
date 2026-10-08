@@ -57,6 +57,23 @@ class VendeurListViewTest(TestCase):
         content = response.content.decode()
         self.assertLess(content.index('Ange'), content.index('Fatou'))
 
+    def test_filtre_par_statut(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('vendeur_liste'), {'statut': 'en_attente'})
+        self.assertEqual([v.email for v in response.context['vendeurs']], ['attente@exemple.ci'])
+        self.assertEqual(response.context['nb_total'], CompteVendeur.objects.using('vendor_db').count())
+
+    def test_recherche_par_email_ou_nom(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('vendeur_liste'), {'q': 'diallo'})
+        self.assertEqual([v.email for v in response.context['vendeurs']], ['actif@exemple.ci'])
+
+    def test_activer_revient_sur_la_liste_filtree(self):
+        self.client.force_login(self.admin)
+        retour = reverse('vendeur_liste') + '?statut=en_attente'
+        response = self.client.post(reverse('vendeur_activer', args=[self.vendeur_attente.pk]), {'next': retour})
+        self.assertRedirects(response, retour)
+
     def test_activer_change_le_statut(self):
         self.client.force_login(self.admin)
         response = self.client.post(reverse('vendeur_activer', args=[self.vendeur_attente.pk]))

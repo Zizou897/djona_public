@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -21,6 +21,14 @@ class TransportRequestListView(StaffRequisMixin, ListView):
         statut = self.request.GET.get('statut')
         if statut in TransportRequestMirror.Status.values:
             qs = qs.filter(status=statut)
+        recherche = self.request.GET.get('q', '').strip()
+        if recherche:
+            qs = qs.filter(
+                Q(reference__icontains=recherche) | Q(last_name__icontains=recherche)
+                | Q(first_name__icontains=recherche) | Q(company_name__icontains=recherche)
+                | Q(phone__icontains=recherche) | Q(loading_place__icontains=recherche)
+                | Q(delivery_place__icontains=recherche)
+            )
         return qs
 
     def get_context_data(self, **kwargs):
@@ -32,6 +40,7 @@ class TransportRequestListView(StaffRequisMixin, ListView):
             for value, label in TransportRequestMirror.Status.choices
         ]
         context['statut_actif'] = self.request.GET.get('statut', '')
+        context['recherche'] = self.request.GET.get('q', '')
         context['nb_total'] = sum(counts.values())
         return context
 

@@ -32,7 +32,10 @@ class SiteContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'w-full px-4 py-3 rounded bg-surface-container outline-none focus:ring-2 focus:ring-primary'
+            field.widget.attrs['class'] = (
+                'w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest '
+                'focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all'
+            )
 
     def _clean_number(self, name):
         value = self.cleaned_data[name].strip()

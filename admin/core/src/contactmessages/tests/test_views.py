@@ -33,6 +33,11 @@ class ContactMessageViewsTest(TestCase):
         response = self.client.get(reverse('contact_message_liste'), {'statut': 'traite'})
         self.assertNotContains(response, 'Awa Traoré-Test')
 
+    def test_recherche_dans_les_messages(self):
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse('contact_message_liste'), {'q': 'corolla'}), 'Awa Traoré-Test')
+        self.assertNotContains(self.client.get(reverse('contact_message_liste'), {'q': 'introuvable-xyz'}), 'Awa Traoré-Test')
+
     def test_changement_de_statut(self):
         self.client.force_login(self.admin)
         url = reverse('contact_message_detail', args=[self.msg.pk])

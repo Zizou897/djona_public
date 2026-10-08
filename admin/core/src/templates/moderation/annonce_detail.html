@@ -1,146 +1,178 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}{{ annonce.marque }} {{ annonce.modele }} — Portail Admin{% endblock %}
+{% block title %}{{ annonce.marque }} {{ annonce.modele }} — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Validation' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
-<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'annonce_moderation_liste' %}" style="animation-delay:.05s">
-<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour à la liste
-</a>
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='annonces' %}
 
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 lg:p-8" style="animation-delay:.12s">
-<div class="flex items-start justify-between gap-4 mb-6">
-<div>
-<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ annonce.marque }} {{ annonce.modele }} ({{ annonce.annee }})</h1>
-<p class="font-body-md text-on-surface-variant">Proposée par {{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} — {{ annonce.vendeur.email }} — {{ annonce.vendeur.telephone }}</p>
-{% if annonce.statut == 'refusee' and annonce.motif_refus %}
-<p class="text-[13px] text-error font-semibold mt-1">Motif du refus : {{ annonce.get_motif_refus_display }}</p>
-{% endif %}
-</div>
-<div class="flex-none flex flex-col items-end gap-2">
-<span class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tighter
-    {% if annonce.statut == 'publiee' %}bg-primary text-on-primary
-    {% elif annonce.statut == 'en_attente' %}bg-secondary-fixed text-on-secondary-fixed
-    {% elif annonce.statut == 'refusee' %}bg-error text-white
-    {% else %}bg-surface-container text-on-surface-variant{% endif %}">
-    {% if annonce.statut == 'publiee' %}Publiée
-    {% elif annonce.statut == 'en_attente' %}En attente
-    {% elif annonce.statut == 'refusee' %}Refusée
-    {% else %}Brouillon{% endif %}
-</span>
-{% if annonce.statut == 'en_attente' %}
-<span class="px-3 py-1 rounded-full text-[11px] font-bold {% if annonce.sla_depasse %}bg-error-container text-on-error-container{% else %}bg-surface-container text-on-surface-variant{% endif %}">
-    {% if annonce.sla_depasse %}Objectif 24h dépassé — en attente depuis {{ annonce.heures_attente }}h{% else %}En attente depuis {{ annonce.heures_attente }}h{% endif %}
-</span>
-{% endif %}
-</div>
-</div>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'annonce_moderation_liste' %}">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>Annonces
+                </a>
+                <div class="mt-3 flex flex-col md:flex-row md:items-end justify-between gap-3">
+                    <div>
+                        <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary">{{ annonce.marque }} {{ annonce.modele }} <span class="font-semibold text-on-surface-variant">{{ annonce.annee|stringformat:"d" }}</span></h1>
+                        <p class="text-sm text-on-surface-variant mt-1">Déposée le {{ annonce.created_at|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                    <p class="font-headline-lg font-bold text-2xl text-primary">{{ annonce.prix|floatformat:"0g" }} <span class="text-sm font-semibold text-on-surface-variant">FCFA</span></p>
+                </div>
+            </div>
 
-{% if photos %}
-<div class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
-{% for photo in photos %}
-<img alt="Photo {{ forloop.counter }}" class="w-full aspect-square object-cover rounded-lg" src="{{ photo.image.url }}">
-{% endfor %}
-</div>
-{% endif %}
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
+                <div class="flex flex-col gap-6 min-w-0">
+                    <!-- Photos -->
+                    <section aria-label="Photos" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-3" style="animation-delay:.08s">
+                        {% if photos %}
+                        <div class="relative aspect-[16/10] rounded-xl overflow-hidden bg-surface-container">
+                            <img alt="Photo principale" class="w-full h-full object-cover" id="photo-principale" src="{{ photos.0.image.url }}">
+                            <span class="absolute bottom-3 right-3 px-2 py-0.5 rounded-md bg-black/60 text-white text-[11px] font-semibold"><span id="photo-index">1</span>/{{ photos|length }}</span>
+                        </div>
+                        {% if photos|length > 1 %}
+                        <div class="grid grid-cols-4 gap-2 mt-2">
+                            {% for photo in photos %}
+                            <button aria-label="Afficher la photo {{ forloop.counter }}" class="vignette aspect-[4/3] rounded-lg overflow-hidden ring-2 {% if forloop.first %}ring-primary{% else %}ring-transparent hover:ring-outline-variant{% endif %} transition" data-index="{{ forloop.counter }}" data-src="{{ photo.image.url }}" type="button">
+                                <img alt="" class="w-full h-full object-cover" src="{{ photo.image.url }}">
+                            </button>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <div class="aspect-[16/10] rounded-xl bg-surface-container flex flex-col items-center justify-center gap-1 text-outline">
+                            <span class="material-symbols-outlined text-[40px]">no_photography</span>
+                            <span class="text-sm">Aucune photo</span>
+                        </div>
+                        {% endif %}
+                    </section>
 
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Prix</p>
-<p class="font-label-md text-label-md text-primary">{{ annonce.prix }} CFA</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Kilométrage</p>
-<p class="font-label-md text-label-md text-on-surface">{{ annonce.kilometrage }} km</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Carburant</p>
-<p class="font-label-md text-label-md text-on-surface">{{ annonce.get_carburant_display }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Boîte</p>
-<p class="font-label-md text-label-md text-on-surface">{{ annonce.get_boite_vitesses_display }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Couleur</p>
-<p class="font-label-md text-label-md text-on-surface">{{ annonce.couleur }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">État</p>
-<p class="font-label-md text-label-md {% if annonce.etat %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_etat_display|default:"Non renseigné" }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Ville</p>
-<p class="font-label-md text-label-md {% if annonce.ville %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_ville_display|default:"Non renseignée" }}</p>
-</div>
-</div>
+                    <!-- Caractéristiques -->
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.12s">
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-4">Caractéristiques</h2>
+                        <dl class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Année</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ annonce.annee|stringformat:"d" }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Kilométrage</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ annonce.kilometrage|floatformat:"0g" }} km</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Carburant</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ annonce.get_carburant_display }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Boîte</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ annonce.get_boite_vitesses_display }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Couleur</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ annonce.couleur }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">État</dt><dd class="text-sm font-semibold mt-0.5 {% if annonce.etat %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_etat_display|default:"Non renseigné" }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3 col-span-2 sm:col-span-3"><dt class="text-[11px] text-on-surface-variant">Ville</dt><dd class="text-sm font-semibold mt-0.5 {% if annonce.ville %}text-on-surface{% else %}text-error{% endif %}">{{ annonce.get_ville_display|default:"Non renseignée" }}</dd></div>
+                        </dl>
+                        <h2 class="font-headline-md font-semibold text-base text-primary mt-6 mb-2">Description</h2>
+                        <p class="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{{ annonce.description }}</p>
+                    </section>
+                </div>
 
-<p class="font-body-md text-on-surface-variant mb-8">{{ annonce.description }}</p>
+                <!-- Décision -->
+                <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-4" style="animation-delay:.1s">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold
+                                {% if annonce.statut == 'en_attente' %}bg-secondary-container/25 text-secondary
+                                {% elif annonce.statut == 'publiee' %}bg-green-100 text-green-800
+                                {% elif annonce.statut == 'refusee' %}bg-error-container text-error
+                                {% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                                <span class="material-symbols-outlined text-[16px]">{% if annonce.statut == 'en_attente' %}hourglass_top{% elif annonce.statut == 'publiee' %}public{% elif annonce.statut == 'refusee' %}report{% else %}edit_note{% endif %}</span>
+                                {% if annonce.statut == 'en_attente' %}À valider{% else %}{{ annonce.get_statut_display }}{% endif %}
+                            </span>
+                            {% if annonce.statut == 'en_attente' %}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {% if annonce.sla_depasse %}bg-error-container text-on-error-container{% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                                <span class="material-symbols-outlined text-[16px]">schedule</span>{% if annonce.sla_depasse %}Objectif 24h dépassé · {% endif %}{{ annonce.heures_attente }}h
+                            </span>
+                            {% endif %}
+                        </div>
 
-<div class="flex flex-col sm:flex-row gap-3">
-{% if annonce.statut == 'en_attente' %}
-<form action="{% url 'annonce_valider' annonce.pk %}" method="post" class="w-full sm:w-auto">
-{% csrf_token %}
-<button class="w-full sm:w-auto px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" type="submit">
-<span class="material-symbols-outlined text-[20px]">check_circle</span> Publier
-</button>
-</form>
-<a href="{% url 'annonce_modifier_admin' annonce.pk %}" class="w-full sm:w-auto px-6 py-3 border-2 border-primary text-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors">
-<span class="material-symbols-outlined text-[20px]">edit</span> Modifier
-</a>
-<form action="{% url 'annonce_refuser' annonce.pk %}" method="post" class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
-{% csrf_token %}
-<select name="motif" required class="px-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-lg text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-error">
-    <option value="" disabled selected>Motif de refus…</option>
-    {% for value, label in motifs_refus %}
-    <option value="{{ value }}">{{ label }}</option>
-    {% endfor %}
-</select>
-<button class="w-full sm:w-auto px-6 py-3 border-2 border-error text-error rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error-container/20 transition-colors" type="submit">
-<span class="material-symbols-outlined text-[20px]">cancel</span> Refuser
-</button>
-</form>
-{% elif annonce.statut == 'publiee' %}
-    {% if vehicle %}
-        {% if vehicle.publish %}
-        <form action="{% url 'annonce_desactiver_marketplace' annonce.pk %}" method="post" class="w-full sm:w-auto">
-        {% csrf_token %}
-        <button class="w-full sm:w-auto px-6 py-3 border-2 border-error text-error rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error-container/20 transition-colors" type="submit">
-        <span class="material-symbols-outlined text-[20px]">visibility_off</span> Désactiver sur le marketplace
-        </button>
-        </form>
-        <p class="text-[13px] text-on-surface-variant self-center">Visible par les acheteurs.</p>
-        {% else %}
-        <form action="{% url 'annonce_activer_marketplace' annonce.pk %}" method="post" class="w-full sm:w-auto">
-        {% csrf_token %}
-        <button class="w-full sm:w-auto px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" type="submit">
-        <span class="material-symbols-outlined text-[20px]">visibility</span> Activer sur le marketplace
-        </button>
-        </form>
-        <p class="text-[13px] text-on-surface-variant self-center">Masquée du marketplace.</p>
-        {% endif %}
-    {% else %}
-    <p class="text-[13px] text-on-surface-variant">Pas encore synchronisée avec le marketplace.</p>
-    {% endif %}
-{% endif %}
+                        {% if annonce.statut == 'refusee' and annonce.motif_refus %}
+                        <p class="text-sm text-error font-medium flex items-start gap-1.5"><span class="material-symbols-outlined text-[18px] shrink-0">info</span>Motif du refus : {{ annonce.get_motif_refus_display }}</p>
+                        {% endif %}
+
+                        {% if annonce.statut == 'en_attente' %}
+                        <div class="flex flex-col gap-2.5">
+                            <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors" onclick="ouvrirModalConfirmation('{% url 'annonce_valider' annonce.pk %}', 'Publier cette annonce ?', '« {{ annonce.marque|escapejs }} {{ annonce.modele|escapejs }} » sera visible par les acheteurs sur la marketplace.', 'Publier', 'check_circle', 'primaire')" type="button">
+                                <span class="material-symbols-outlined text-[20px]">check_circle</span>Publier sur la marketplace
+                            </button>
+                            <a class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-primary text-primary rounded-lg text-sm font-semibold hover:bg-primary/5 transition-colors" href="{% url 'annonce_modifier_admin' annonce.pk %}">
+                                <span class="material-symbols-outlined text-[20px]">edit</span>Corriger avant de publier
+                            </a>
+                        </div>
+                        <form action="{% url 'annonce_refuser' annonce.pk %}" class="pt-4 border-t border-outline-variant/30 flex flex-col gap-2.5" method="post">
+                            {% csrf_token %}
+                            <label class="text-sm font-semibold text-on-surface" for="motif">Refuser l'annonce</label>
+                            <select class="w-full px-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-sm text-on-surface focus:outline-none focus:border-error focus:ring-2 focus:ring-error/15" id="motif" name="motif" required>
+                                <option disabled selected value="">Choisir un motif…</option>
+                                {% for value, label in motifs_refus %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-error/50 text-error rounded-lg text-sm font-semibold hover:bg-error/5 transition-colors" type="submit">
+                                <span class="material-symbols-outlined text-[18px]">cancel</span>Refuser avec ce motif
+                            </button>
+                            <p class="text-[11px] text-on-surface-variant">Le motif est affiché au vendeur, qui peut corriger et soumettre à nouveau.</p>
+                        </form>
+                        {% elif annonce.statut == 'publiee' %}
+                            {% if vehicle %}
+                            <div class="rounded-xl p-3 text-sm flex items-start gap-2 {% if vehicle.publish %}bg-green-50 text-green-800{% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                                <span class="material-symbols-outlined text-[18px] shrink-0">{% if vehicle.publish %}visibility{% else %}visibility_off{% endif %}</span>
+                                {% if vehicle.publish %}Visible par les acheteurs sur la marketplace.{% else %}Masquée de la marketplace.{% endif %}
+                            </div>
+                            {% if vehicle.publish %}
+                            <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-error/50 text-error rounded-lg text-sm font-semibold hover:bg-error/5 transition-colors" onclick="ouvrirModalConfirmation('{% url 'annonce_desactiver_marketplace' annonce.pk %}', 'Masquer de la marketplace ?', '« {{ annonce.marque|escapejs }} {{ annonce.modele|escapejs }} » ne sera plus visible par les acheteurs. Vous pourrez la réactiver à tout moment.', 'Masquer', 'visibility_off')" type="button">
+                                <span class="material-symbols-outlined text-[20px]">visibility_off</span>Masquer de la marketplace
+                            </button>
+                            {% else %}
+                            <form action="{% url 'annonce_activer_marketplace' annonce.pk %}" method="post">
+                                {% csrf_token %}
+                                <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors" type="submit">
+                                    <span class="material-symbols-outlined text-[20px]">visibility</span>Réactiver sur la marketplace
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% else %}
+                            <p class="text-sm text-on-surface-variant">Pas encore synchronisée avec la marketplace.</p>
+                            {% endif %}
+                        {% endif %}
+                    </section>
+
+                    <!-- Vendeur -->
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.14s">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-3">Vendeur</h2>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 shrink-0 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[13px]">{{ annonce.vendeur.prenom|first|upper }}{{ annonce.vendeur.nom|first|upper }}</div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-on-surface truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }}</p>
+                                <p class="text-xs text-on-surface-variant">{{ annonce.vendeur.get_type_compte_display }}</p>
+                            </div>
+                        </div>
+                        <ul class="mt-4 flex flex-col gap-2 text-sm">
+                            <li><a class="inline-flex items-center gap-2 text-primary hover:underline break-all" href="mailto:{{ annonce.vendeur.email }}"><span class="material-symbols-outlined text-[18px]">mail</span>{{ annonce.vendeur.email }}</a></li>
+                            <li><a class="inline-flex items-center gap-2 text-primary hover:underline" href="tel:{{ annonce.vendeur.telephone }}"><span class="material-symbols-outlined text-[18px]">call</span>{{ annonce.vendeur.telephone }}</a></li>
+                        </ul>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
 </div>
-</div>
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='annonces' %}
-</div>
+{% include 'app/includes/modal_confirmation.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.vignette').forEach(function (vignette) {
+    vignette.addEventListener('click', function () {
+        document.getElementById('photo-principale').src = vignette.dataset.src;
+        document.getElementById('photo-index').textContent = vignette.dataset.index;
+        document.querySelectorAll('.vignette').forEach(function (v) {
+            v.classList.toggle('ring-primary', v === vignette);
+            v.classList.toggle('ring-transparent', v !== vignette);
+        });
+    });
+});
+</script>
 {% endblock %}

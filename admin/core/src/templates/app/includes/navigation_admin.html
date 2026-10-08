@@ -1,0 +1,183 @@
+{% load static %}
+{% comment %}
+Navigation du back-office. À inclure en premier enfant du conteneur racine ;
+la colonne de contenu doit porter `lg:pl-64 lg:pt-16`.
+Paramètre : page_active = dashboard | annonces | vendeurs | demandes_pro | messages | transport
+            | partenaires | coordonnees | newsletter | profil
+Les compteurs « à traiter » (data-compteur) sont chargés après l'affichage via `compteurs_admin`.
+{% endcomment %}
+<style>@media (max-width: 1023px) { body { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px)); } }</style>
+
+{% with lien="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all" actif="font-bold bg-secondary-container text-on-secondary-container shadow-sm" inactif="font-medium text-on-primary/70 hover:bg-primary-container hover:text-on-primary" badge="ml-auto hidden min-w-[1.25rem] h-5 px-1.5 rounded-full bg-secondary-container text-primary text-[11px] font-bold items-center justify-center" %}
+<!-- Barre latérale desktop / tiroir mobile -->
+<div class="fixed inset-0 z-[60] bg-on-surface/40 backdrop-blur-sm hidden lg:hidden" data-nav-fond></div>
+<aside aria-label="Navigation du back-office" class="fixed left-0 top-0 h-full w-64 z-[70] lg:z-50 flex-col bg-primary text-on-primary -translate-x-full lg:translate-x-0 transition-transform duration-200 flex" data-nav-tiroir>
+    <div class="flex items-center justify-between gap-2 px-5 pt-5 pb-5 border-b border-on-primary/10">
+        <a class="flex flex-col gap-2" href="{% url 'dashboard_admin' %}">
+            <span class="flex items-center gap-2.5">
+                <img alt="" width="40" height="40" class="h-9 w-9 rounded-sm object-cover ring-1 ring-white/20" src="{% static 'app/assets/img/djona-logo.png' %}">
+                <img alt="Djona Group" width="721" height="240" class="h-6 w-auto object-contain translate-y-1" src="{% static 'app/assets/img/djona-group-logo-white.png' %}">
+            </span>
+            <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary-container">Back-office</span>
+        </a>
+        <button aria-label="Fermer le menu" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary-container" data-nav-fermer type="button">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-5">
+        <div class="flex flex-col gap-0.5">
+            <a {% if page_active == 'dashboard' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'dashboard' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'dashboard_admin' %}">
+                <span class="material-symbols-outlined text-[20px]">dashboard</span>Tableau de bord
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-0.5">
+            <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-on-primary/45">Modération</p>
+            <a {% if page_active == 'annonces' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'annonces' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'annonce_moderation_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">fact_check</span>Annonces
+                <span class="{{ badge }}" data-compteur="annonces" title="Annonces en attente de validation"></span>
+            </a>
+            <a {% if page_active == 'vendeurs' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'vendeurs' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'vendeur_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">group</span>Vendeurs
+                <span class="{{ badge }}" data-compteur="vendeurs" title="Comptes vendeurs en attente d'activation"></span>
+            </a>
+            <a {% if page_active == 'demandes_pro' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'demandes_pro' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'demande_pro_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">storefront</span>Demandes pro
+                <span class="{{ badge }}" data-compteur="demandes_pro" title="Demandes de compte professionnel en attente"></span>
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-0.5">
+            <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-on-primary/45">Relation client</p>
+            <a {% if page_active == 'messages' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'messages' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'contact_message_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">mail</span>Messages
+                <span class="{{ badge }}" data-compteur="messages" title="Nouveaux messages"></span>
+            </a>
+            <a {% if page_active == 'transport' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'transport' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'transport_demande_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">local_shipping</span>Transport
+                <span class="{{ badge }}" data-compteur="transport" title="Nouvelles demandes de transport"></span>
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-0.5">
+            <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-on-primary/45">Contenu du site</p>
+            <a {% if page_active == 'partenaires' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'partenaires' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'partner_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">handshake</span>Partenaires
+            </a>
+            <a {% if page_active == 'coordonnees' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'coordonnees' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'site_contact_coordonnees' %}">
+                <span class="material-symbols-outlined text-[20px]">contact_phone</span>Coordonnées
+            </a>
+            <a {% if page_active == 'newsletter' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'newsletter' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'newsletter_subscriber_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">forward_to_inbox</span>Newsletter
+            </a>
+        </div>
+    </nav>
+
+    <div class="border-t border-on-primary/10 p-3 flex flex-col gap-0.5">
+        <a {% if page_active == 'profil' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'profil' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'profil_admin' %}">
+            <span class="material-symbols-outlined text-[20px]">settings</span>Mon profil
+        </a>
+        <form action="{% url 'deconnexion_admin' %}" method="post">
+            {% csrf_token %}
+            <button class="w-full {{ lien }} {{ inactif }}" type="submit">
+                <span class="material-symbols-outlined text-[20px]">logout</span>Déconnexion
+            </button>
+        </form>
+    </div>
+</aside>
+{% endwith %}
+
+<!-- Barre supérieure desktop -->
+<div class="hidden lg:flex fixed top-0 left-64 right-0 h-16 z-40 border-b border-outline-variant/30 bg-surface/85 backdrop-blur-xl items-center justify-between px-8">
+    <p class="text-sm text-on-surface-variant first-letter:uppercase">{% now "l j F Y" %}</p>
+    <a class="flex items-center gap-3 hover:opacity-80 transition-opacity" href="{% url 'profil_admin' %}">
+        <div class="text-right">
+            <p class="text-sm font-semibold text-on-surface">{{ request.user.get_full_name|default:request.user.username }}</p>
+            <p class="text-[11px] text-on-surface-variant">{% if request.user.is_superuser %}Super administrateur{% else %}Administrateur{% endif %}</p>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center overflow-hidden text-on-primary">
+            {% if request.user.profil.avatar %}
+            <img alt="Photo de profil" class="w-full h-full object-cover" src="{{ request.user.profil.avatar.url }}">
+            {% else %}
+            <span class="material-symbols-outlined text-[18px]">person</span>
+            {% endif %}
+        </div>
+    </a>
+</div>
+
+<!-- En-tête mobile -->
+<header class="lg:hidden sticky top-0 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur">
+    <div class="px-4 h-16 flex items-center justify-between gap-2">
+        <button aria-label="Ouvrir le menu" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container" data-nav-ouvrir type="button">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <a class="flex items-center gap-2" href="{% url 'dashboard_admin' %}">
+            <img alt="" width="40" height="40" class="h-8 w-8 rounded-sm object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
+            <img alt="Djona Group" width="644" height="240" class="h-5 w-auto object-contain translate-y-0.5" src="{% static 'app/assets/img/djona-group-logo.png' %}">
+        </a>
+        <a aria-label="Mon profil" class="w-10 h-10 flex items-center justify-center rounded-full {% if page_active == 'profil' %}text-primary{% else %}text-on-surface-variant{% endif %} hover:bg-surface-container" href="{% url 'profil_admin' %}">
+            <span class="material-symbols-outlined">account_circle</span>
+        </a>
+    </div>
+</header>
+
+<!-- Navigation basse mobile -->
+<nav aria-label="Navigation rapide" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest border-t border-outline-variant/40 pb-[env(safe-area-inset-bottom)]">
+    <div class="h-[4.25rem] flex items-stretch justify-around px-1">
+        <a {% if page_active == 'dashboard' %}aria-current="page" {% endif %}class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'dashboard' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'dashboard_admin' %}">
+            <span class="material-symbols-outlined text-[22px]">dashboard</span>Accueil
+        </a>
+        <a {% if page_active == 'annonces' %}aria-current="page" {% endif %}class="relative flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'annonces' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'annonce_moderation_liste' %}">
+            <span class="material-symbols-outlined text-[22px]">fact_check</span>Annonces
+            <span class="absolute top-2 left-1/2 ml-2 hidden min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-secondary-container text-primary text-[10px] font-bold items-center justify-center" data-compteur="annonces"></span>
+        </a>
+        <a {% if page_active == 'vendeurs' or page_active == 'demandes_pro' %}aria-current="page" {% endif %}class="relative flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'vendeurs' or page_active == 'demandes_pro' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'vendeur_liste' %}">
+            <span class="material-symbols-outlined text-[22px]">group</span>Vendeurs
+            <span class="absolute top-2 left-1/2 ml-2 hidden min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-secondary-container text-primary text-[10px] font-bold items-center justify-center" data-compteur="vendeurs"></span>
+        </a>
+        <a {% if page_active == 'messages' %}aria-current="page" {% endif %}class="relative flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if page_active == 'messages' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'contact_message_liste' %}">
+            <span class="material-symbols-outlined text-[22px]">mail</span>Messages
+            <span class="absolute top-2 left-1/2 ml-2 hidden min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-secondary-container text-primary text-[10px] font-bold items-center justify-center" data-compteur="messages"></span>
+        </a>
+        <button class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-on-surface-variant" data-nav-ouvrir type="button">
+            <span class="material-symbols-outlined text-[22px]">menu</span>Menu
+        </button>
+    </div>
+</nav>
+
+<script>
+(function () {
+    var tiroir = document.querySelector('[data-nav-tiroir]');
+    var fond = document.querySelector('[data-nav-fond]');
+    function basculer(ouvert) {
+        tiroir.classList.toggle('-translate-x-full', !ouvert);
+        fond.classList.toggle('hidden', !ouvert);
+        document.body.classList.toggle('overflow-hidden', ouvert);
+    }
+    document.querySelectorAll('[data-nav-ouvrir]').forEach(function (b) { b.addEventListener('click', function () { basculer(true); }); });
+    document.querySelectorAll('[data-nav-fermer]').forEach(function (b) { b.addEventListener('click', function () { basculer(false); }); });
+    fond.addEventListener('click', function () { basculer(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { basculer(false); } });
+
+    fetch('{% url "compteurs_admin" %}', { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+        .then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.json(); })
+        .then(function (compteurs) {
+            document.querySelectorAll('[data-compteur-valeur]').forEach(function (el) {
+                var n = compteurs[el.dataset.compteurValeur];
+                el.textContent = typeof n === 'number' ? n : '—';
+            });
+            document.querySelectorAll('[data-compteur]').forEach(function (el) {
+                var n = compteurs[el.dataset.compteur];
+                if (n > 0) {
+                    el.textContent = n > 99 ? '99+' : n;
+                    el.classList.remove('hidden');
+                    el.classList.add('inline-flex');
+                }
+            });
+        })
+        .catch(function () {
+            document.querySelectorAll('[data-compteur-valeur]').forEach(function (el) { el.textContent = '—'; });
+        });
+})();
+</script>

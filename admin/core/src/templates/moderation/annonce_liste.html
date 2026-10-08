@@ -1,106 +1,134 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Annonces — Portail Admin{% endblock %}
+{% block title %}Annonces — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Annonces' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='annonces' %}
 
-<div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" style="animation-delay:.05s">
-    <div>
-        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
-        <h1 class="font-display-lg text-display-lg text-primary">Annonces</h1>
-    </div>
-    <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors" href="{% url 'annonce_creer_admin' %}">
-        <span class="material-symbols-outlined text-[20px]">add</span>
-        Créer une annonce
-    </a>
-</div>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
 
-<div class="reveal grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6" style="animation-delay:.1s">
-    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
-        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_total }}</p>
-        <p class="text-xs text-on-surface-variant mt-1">Total</p>
-    </div>
-    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
-        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_publiees }}</p>
-        <p class="text-xs text-on-surface-variant mt-1">Publiées</p>
-    </div>
-    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
-        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_en_attente }}</p>
-        <p class="text-xs text-on-surface-variant mt-1">En attente</p>
-    </div>
-    <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm">
-        <p class="text-2xl font-bold text-on-surface leading-none">{{ nb_refusees }}</p>
-        <p class="text-xs text-on-surface-variant mt-1">Refusées</p>
-    </div>
-</div>
+            <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Modération</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Annonces</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Validez les annonces soumises par les vendeurs (objectif : moins de 24h) et gérez leur visibilité sur la marketplace.</p>
+                </div>
+                <a class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm shadow-sm hover:bg-primary-container transition-colors" href="{% url 'annonce_creer_admin' %}">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Créer une annonce
+                </a>
+            </div>
 
-<div class="reveal flex flex-col lg:flex-row lg:items-center gap-3 mb-4" style="animation-delay:.14s">
-    <form class="flex-1" method="get">
-        {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
-        <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
-            <input class="w-full pl-11 pr-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" name="q" placeholder="Rechercher par marque, modèle..." type="text" value="{{ recherche }}">
-        </div>
-    </form>
-</div>
+            <!-- Filtres -->
+            <section aria-label="Filtres" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm" style="animation-delay:.1s">
+                {% with base_q=recherche|urlencode %}
+                <nav aria-label="Statut" class="flex gap-1 px-3 pt-2 overflow-x-auto border-b border-outline-variant/30">
+                    <a {% if not statut_actif %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if not statut_actif %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?{% if recherche %}q={{ base_q }}&{% endif %}tri={{ tri_actif }}">Toutes <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_total }}</span></a>
+                    <a {% if statut_actif == 'en_attente' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=en_attente{% if recherche %}&q={{ base_q }}{% endif %}&tri={{ tri_actif }}">À valider <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% elif nb_en_attente %}bg-secondary-container text-primary{% else %}bg-surface-container{% endif %}">{{ nb_en_attente }}</span></a>
+                    <a {% if statut_actif == 'publiee' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'publiee' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=publiee{% if recherche %}&q={{ base_q }}{% endif %}&tri={{ tri_actif }}">Publiées <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'publiee' %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_publiees }}</span></a>
+                    <a {% if statut_actif == 'refusee' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'refusee' %}border-error text-error{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=refusee{% if recherche %}&q={{ base_q }}{% endif %}&tri={{ tri_actif }}">Refusées <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'refusee' %}bg-error text-white{% else %}bg-surface-container{% endif %}">{{ nb_refusees }}</span></a>
+                </nav>
+                {% endwith %}
+                <form class="p-3 flex flex-col sm:flex-row gap-3" method="get" role="search">
+                    {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <label class="relative flex-1">
+                        <span class="sr-only">Rechercher</span>
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">search</span>
+                        <input class="w-full pl-11 pr-10 py-2.5 bg-surface-container-low border border-transparent rounded-lg text-sm focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" name="q" placeholder="Rechercher une marque ou un modèle…" type="search" value="{{ recherche }}">
+                        {% if recherche %}
+                        <a aria-label="Effacer la recherche" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full text-outline hover:bg-surface-container" href="?{% if statut_actif %}statut={{ statut_actif }}&{% endif %}tri={{ tri_actif }}"><span class="material-symbols-outlined text-[18px]">close</span></a>
+                        {% endif %}
+                    </label>
+                    <label class="flex items-center gap-2 text-sm text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px] text-outline">sort</span>
+                        <span class="sr-only">Trier par</span>
+                        <select class="flex-1 sm:flex-none py-2.5 pl-3 pr-8 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" name="tri" onchange="this.form.submit()">
+                            <option value="recent" {% if tri_actif == 'recent' %}selected{% endif %}>Plus récentes</option>
+                            <option value="prix_croissant" {% if tri_actif == 'prix_croissant' %}selected{% endif %}>Prix croissant</option>
+                            <option value="prix_decroissant" {% if tri_actif == 'prix_decroissant' %}selected{% endif %}>Prix décroissant</option>
+                        </select>
+                    </label>
+                </form>
+            </section>
 
-<div class="reveal flex flex-wrap items-center gap-2 mb-6" style="animation-delay:.18s">
-    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?{% if recherche %}q={{ recherche|urlencode }}{% endif %}">Toutes</a>
-    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=en_attente{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">En attente</a>
-    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'publiee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=publiee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Publiées</a>
-    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'refusee' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=refusee{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Refusées</a>
-    <a class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {% if statut_actif == 'brouillon' %}bg-primary text-on-primary{% else %}bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container{% endif %}" href="?statut=brouillon{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Brouillons</a>
-</div>
+            {% if recherche or statut_actif %}
+            <p class="text-sm text-on-surface-variant -mt-2">{{ annonces|length }} résultat{{ annonces|length|pluralize }}{% if recherche %} pour « <span class="font-semibold text-on-surface">{{ recherche }}</span> »{% endif %}</p>
+            {% endif %}
 
-<div class="flex flex-col gap-gutter">
-{% for annonce in annonces %}
-<a class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-5 flex items-center justify-between gap-4 hover:-translate-y-0.5 transition-all" href="{% url 'annonce_moderation_detail' annonce.pk %}" style="animation-delay:{{ forloop.counter|add:"6" }}0ms">
-<div class="flex items-center gap-4 min-w-0">
-<div class="w-10 h-10 flex-none rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ annonce.vendeur.prenom|first|upper }}{{ annonce.vendeur.nom|first|upper }}</div>
-<div class="min-w-0">
-<p class="font-label-md text-label-md text-on-surface truncate">{{ annonce.marque }} {{ annonce.modele }} ({{ annonce.annee }})</p>
-<p class="text-[13px] text-on-surface-variant truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.prix }} CFA</p>
-</div>
-</div>
-<div class="flex-none flex flex-col items-end gap-1.5">
-<span class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tighter
-    {% if annonce.statut == 'publiee' %}bg-primary text-on-primary
-    {% elif annonce.statut == 'en_attente' %}bg-secondary-fixed text-on-secondary-fixed
-    {% elif annonce.statut == 'refusee' %}bg-error text-white
-    {% else %}bg-surface-container text-on-surface-variant{% endif %}">
-    {% if annonce.statut == 'publiee' %}Publiée
-    {% elif annonce.statut == 'en_attente' %}En attente
-    {% elif annonce.statut == 'refusee' %}Refusée
-    {% else %}Brouillon{% endif %}
-</span>
-{% if annonce.statut == 'en_attente' %}
-<span class="text-[11px] font-bold {% if annonce.sla_depasse %}text-error{% else %}text-on-surface-variant{% endif %}">
-    {% if annonce.sla_depasse %}⏱ {{ annonce.heures_attente }}h — délai dépassé{% else %}⏱ {{ annonce.heures_attente }}h{% endif %}
-</span>
-{% endif %}
-</div>
-</a>
-{% empty %}
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] text-center py-16 text-on-surface-variant" style="animation-delay:.14s">Aucune annonce ne correspond à ces filtres.</div>
-{% endfor %}
-</div>
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='annonces' %}
+            <!-- Annonces -->
+            <section aria-label="Annonces" class="flex flex-col gap-3">
+                {% for annonce in annonces %}
+                <article class="reveal group bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col md:flex-row {% if annonce.sla_depasse %}ring-1 ring-error/40{% endif %}" style="animation-delay:{{ forloop.counter|add:"2" }}0ms">
+                    <a class="relative shrink-0 w-full md:w-52 aspect-[2/1] md:aspect-auto md:min-h-[8.5rem] bg-surface-container overflow-hidden" href="{% url 'annonce_moderation_detail' annonce.pk %}" tabindex="-1">
+                        {% with photo=annonce.photos.all.0 %}
+                        {% if photo %}
+                        <img alt="{{ annonce.marque }} {{ annonce.modele }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy" src="{{ photo.image.url }}">
+                        {% else %}
+                        <span class="absolute inset-0 flex flex-col items-center justify-center gap-1 text-outline"><span class="material-symbols-outlined text-[32px]">no_photography</span><span class="text-[11px]">Aucune photo</span></span>
+                        {% endif %}
+                        {% endwith %}
+                    </a>
+
+                    <div class="flex-1 min-w-0 p-4 md:px-5 flex flex-col gap-2">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold
+                                {% if annonce.statut == 'en_attente' %}bg-secondary-container/25 text-secondary
+                                {% elif annonce.statut == 'publiee' %}bg-green-100 text-green-800
+                                {% elif annonce.statut == 'refusee' %}bg-error-container text-error
+                                {% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                                <span class="material-symbols-outlined text-[14px]">{% if annonce.statut == 'en_attente' %}hourglass_top{% elif annonce.statut == 'publiee' %}public{% elif annonce.statut == 'refusee' %}report{% else %}edit_note{% endif %}</span>
+                                {% if annonce.statut == 'en_attente' %}À valider{% else %}{{ annonce.get_statut_display }}{% endif %}
+                            </span>
+                            {% if annonce.statut == 'en_attente' %}
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold {% if annonce.sla_depasse %}text-error{% else %}text-outline{% endif %}">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>{% if annonce.sla_depasse %}24h dépassées — {% endif %}en attente depuis {{ annonce.heures_attente }}h
+                            </span>
+                            {% else %}
+                            <span class="text-[11px] text-outline">Déposée le {{ annonce.created_at|date:"d/m/Y" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-x-4 gap-y-0.5">
+                            <h2 class="font-headline-md font-semibold text-base text-on-surface leading-snug truncate"><a class="hover:text-primary" href="{% url 'annonce_moderation_detail' annonce.pk %}">{{ annonce.marque }} {{ annonce.modele }} <span class="font-normal text-on-surface-variant">{{ annonce.annee|stringformat:"d" }}</span></a></h2>
+                            <p class="shrink-0 font-headline-lg font-bold text-lg text-primary whitespace-nowrap">{{ annonce.prix|floatformat:"0g" }} <span class="text-xs font-semibold text-on-surface-variant">FCFA</span></p>
+                        </div>
+                        <ul class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant">
+                            <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">person</span>{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }}</li>
+                            <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">speed</span>{{ annonce.kilometrage|floatformat:"0g" }} km</li>
+                            <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">local_gas_station</span>{{ annonce.get_carburant_display }}</li>
+                            <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">settings</span>{{ annonce.get_boite_vitesses_display }}</li>
+                        </ul>
+                        {% if annonce.statut == 'refusee' and annonce.motif_refus %}
+                        <p class="text-xs font-medium text-error inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">info</span>Motif : {{ annonce.get_motif_refus_display }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="shrink-0 md:w-44 flex md:flex-col justify-center gap-2 p-4 border-t md:border-t-0 md:border-l border-outline-variant/30">
+                        <a class="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors {% if annonce.statut == 'en_attente' %}bg-primary text-on-primary hover:bg-primary-container{% else %}border border-outline-variant text-on-surface hover:bg-surface-container{% endif %}" href="{% url 'annonce_moderation_detail' annonce.pk %}">
+                            <span class="material-symbols-outlined text-[18px]">{% if annonce.statut == 'en_attente' %}fact_check{% else %}visibility{% endif %}</span>{% if annonce.statut == 'en_attente' %}Examiner{% else %}Voir{% endif %}
+                        </a>
+                        {% if annonce.statut == 'en_attente' %}
+                        <a class="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container transition-colors" href="{% url 'annonce_modifier_admin' annonce.pk %}">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>Corriger
+                        </a>
+                        {% endif %}
+                    </div>
+                </article>
+                {% empty %}
+                <div class="bg-surface-container-lowest rounded-2xl shadow-sm py-14 px-6 text-center flex flex-col items-center gap-3">
+                    <span class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[28px]">{% if recherche or statut_actif %}search_off{% else %}inbox{% endif %}</span></span>
+                    <p class="text-sm font-semibold text-on-surface">{% if recherche or statut_actif %}Aucune annonce ne correspond à ces filtres.{% else %}Aucune annonce pour le moment.{% endif %}</p>
+                    {% if recherche or statut_actif %}<a class="text-sm font-semibold text-primary hover:underline" href="{% url 'annonce_moderation_liste' %}">Réinitialiser les filtres</a>{% endif %}
+                </div>
+                {% endfor %}
+            </section>
+        </main>
+    </div>
 </div>
 {% endblock %}

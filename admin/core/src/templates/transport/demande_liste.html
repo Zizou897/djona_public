@@ -1,90 +1,88 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Transport — Portail Admin{% endblock %}
+{% block title %}Transport — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Transport' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='transport' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='transport' %}
 
-<div class="reveal flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8" style="animation-delay:.05s">
-    <div>
-        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Transport &amp; Logistique</span>
-        <h1 class="font-display-lg text-display-lg text-primary">Demandes de transport</h1>
-        <p class="text-sm text-on-surface-variant mt-2">{{ nb_total }} demande{{ nb_total|pluralize }} reçue{{ nb_total|pluralize }} via le formulaire public.</p>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Relation client</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Demandes de transport</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Demandes envoyées depuis la page Transport &amp; logistique du site.</p>
+                </div>
+                <a class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 border border-primary text-primary rounded-lg font-semibold text-sm hover:bg-primary/5 transition-colors" href="{% url 'transport_type_liste' %}">
+                    <span class="material-symbols-outlined text-[20px]">tune</span>
+                    Types de véhicules
+                </a>
+            </div>
+
+            <section aria-label="Filtres" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm" style="animation-delay:.1s">
+                {% with q=recherche|urlencode %}
+                <nav aria-label="Statut" class="flex gap-1 px-3 pt-2 overflow-x-auto border-b border-outline-variant/30">
+                    <a {% if not statut_actif %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if not statut_actif %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?{% if recherche %}q={{ q }}{% endif %}">Toutes <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_total }}</span></a>
+                    {% for s in statuts %}
+                    <a {% if statut_actif == s.value %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == s.value %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut={{ s.value }}{% if recherche %}&q={{ q }}{% endif %}">{% if s.value == 'nouvelle' %}Nouvelles{% else %}{{ s.label }}{% endif %} <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == s.value %}bg-primary text-on-primary{% elif s.value == 'nouvelle' and s.count %}bg-secondary-container text-primary{% else %}bg-surface-container{% endif %}">{{ s.count }}</span></a>
+                    {% endfor %}
+                </nav>
+                {% endwith %}
+                <form class="p-3" method="get" role="search">
+                    {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <label class="relative block">
+                        <span class="sr-only">Rechercher</span>
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">search</span>
+                        <input class="w-full pl-11 pr-4 py-2.5 bg-surface-container-low border border-transparent rounded-lg text-sm focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" name="q" placeholder="Référence, demandeur, téléphone ou lieu…" type="search" value="{{ recherche }}">
+                    </label>
+                </form>
+            </section>
+
+            <section aria-label="Demandes" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" style="animation-delay:.14s">
+                <ul class="divide-y divide-outline-variant/30">
+                    {% for d in demandes %}
+                    <li>
+                        <a class="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-5 hover:bg-surface-container-low transition-colors {% if d.status == 'nouvelle' %}bg-secondary-container/[0.06]{% endif %}" href="{% url 'transport_demande_detail' d.pk %}">
+                            <div class="flex items-center gap-3 min-w-0 md:w-64 md:shrink-0">
+                                <span class="relative w-10 h-10 shrink-0 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+                                    {% if d.status == 'nouvelle' %}<span class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-secondary-container ring-2 ring-surface-container-lowest"></span>{% endif %}
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-on-surface truncate">{{ d.reference }}</p>
+                                    <p class="text-xs text-on-surface-variant truncate">{{ d.full_name }}{% if d.company_name %} · {{ d.company_name }}{% endif %}</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col gap-1 text-xs text-on-surface-variant">
+                                <p class="inline-flex items-center gap-1.5 text-sm text-on-surface truncate"><span class="truncate">{{ d.loading_place }}</span><span class="material-symbols-outlined text-[16px] text-outline shrink-0">arrow_forward</span><span class="truncate">{{ d.delivery_place }}</span></p>
+                                <p class="flex flex-wrap gap-x-3 gap-y-0.5">
+                                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">directions_car</span>{{ d.quantity }} × {{ d.vehicle_type.name }}</span>
+                                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">event</span>Chargement le {{ d.loading_date|date:'d/m/Y' }}</span>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3 md:shrink-0">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold {% if d.status == 'nouvelle' %}bg-secondary-container/25 text-secondary{% elif d.status == 'en_traitement' %}bg-primary/10 text-primary{% elif d.status == 'traitee' %}bg-green-100 text-green-800{% else %}bg-surface-container text-on-surface-variant{% endif %}">{{ d.get_status_display }}</span>
+                                <span class="text-[11px] text-outline">{{ d.created_at|date:'d/m/Y' }}</span>
+                                <span class="ml-auto md:ml-0 material-symbols-outlined text-outline">chevron_right</span>
+                            </div>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="py-14 px-6 text-center flex flex-col items-center gap-3">
+                        <span class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[28px]">{% if recherche or statut_actif %}search_off{% else %}inbox{% endif %}</span></span>
+                        <p class="text-sm font-semibold text-on-surface">{% if recherche or statut_actif %}Aucune demande ne correspond à ces filtres.{% else %}Aucune demande de transport.{% endif %}</p>
+                        {% if recherche or statut_actif %}<a class="text-sm font-semibold text-primary hover:underline" href="{% url 'transport_demande_liste' %}">Réinitialiser les filtres</a>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
     </div>
-    <a class="shrink-0 inline-flex items-center gap-2 px-5 py-3 border border-primary text-primary rounded-lg font-semibold text-sm hover:bg-primary-fixed transition-colors" href="{% url 'transport_type_liste' %}">
-        <span class="material-symbols-outlined text-[20px]">tune</span>
-        Types de véhicules
-    </a>
-</div>
-
-<div class="reveal flex flex-wrap gap-2 mb-6" style="animation-delay:.1s">
-    <a href="{% url 'transport_demande_liste' %}" class="px-4 py-2 rounded-full text-sm font-semibold {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}">Toutes ({{ nb_total }})</a>
-    {% for s in statuts %}
-    <a href="?statut={{ s.value }}" class="px-4 py-2 rounded-full text-sm font-semibold {% if statut_actif == s.value %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}">{{ s.label }} ({{ s.count }})</a>
-    {% endfor %}
-</div>
-
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
-<div class="hidden lg:block overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-surface-variant">
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">N°</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Demandeur</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Trajet</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Véhicule</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container">
-{% for d in demandes %}
-<tr class="hover:bg-surface transition-colors">
-<td class="px-6 py-4 font-label-md text-label-md">{{ d.reference }}<span class="block text-[11px] font-normal text-on-surface-variant">{{ d.created_at|date:'d/m/Y H:i' }}</span></td>
-<td class="px-6 py-4">{{ d.full_name }}{% if d.company_name %}<span class="block text-[11px] text-on-surface-variant">{{ d.company_name }}</span>{% endif %}</td>
-<td class="px-6 py-4 text-on-surface-variant">{{ d.loading_place }} → {{ d.delivery_place }}<span class="block text-[11px]">Chargement le {{ d.loading_date|date:'d/m/Y' }}</span></td>
-<td class="px-6 py-4 text-on-surface-variant">{{ d.quantity }} × {{ d.vehicle_type.name }}</td>
-<td class="px-6 py-4"><span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {% if d.status == 'nouvelle' %}bg-secondary-container text-on-secondary-container{% elif d.status == 'en_traitement' %}bg-primary-fixed text-primary{% elif d.status == 'traitee' %}bg-surface-container-high text-on-surface{% else %}bg-error-container text-on-error-container{% endif %}">{{ d.get_status_display }}</span></td>
-<td class="px-6 py-4 text-right"><a class="px-4 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-primary-fixed transition-colors" href="{% url 'transport_demande_detail' d.pk %}">Consulter</a></td>
-</tr>
-{% empty %}
-<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="6">Aucune demande de transport.</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-<div class="lg:hidden flex flex-col divide-y divide-surface-container">
-{% for d in demandes %}
-<a href="{% url 'transport_demande_detail' d.pk %}" class="p-4 flex items-center justify-between gap-3 hover:bg-surface transition-colors">
-<div class="min-w-0">
-<p class="font-label-md text-label-md text-on-surface">{{ d.reference }} · {{ d.get_status_display }}</p>
-<p class="text-sm text-on-surface truncate">{{ d.full_name }}</p>
-<p class="text-[11px] text-on-surface-variant truncate">{{ d.loading_place }} → {{ d.delivery_place }}</p>
-</div>
-<span class="material-symbols-outlined text-outline">chevron_right</span>
-</a>
-{% empty %}
-<div class="p-8 text-center text-on-surface-variant">Aucune demande de transport.</div>
-{% endfor %}
-</div>
-</div>
-
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='transport' %}
 </div>
 {% endblock %}

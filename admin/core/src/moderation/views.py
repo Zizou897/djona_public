@@ -2,10 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
-from django.db.models import Case, IntegerField, Value, When
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
@@ -53,8 +54,24 @@ class VendeurListView(_StaffRequiredMixin, ListView):
     model = CompteVendeur
     template_name = 'moderation/vendeur_liste.html'
     context_object_name = 'vendeurs'
+    STATUTS = {choix[0] for choix in CompteVendeur.StatutCompte.choices}
+    TYPES = {choix[0] for choix in CompteVendeur.TypeCompte.choices}
 
     def get_queryset(self):
+        vendeurs = CompteVendeur.objects.using('vendor_db').all()
+        statut = self.request.GET.get('statut')
+        if statut in self.STATUTS:
+            vendeurs = vendeurs.filter(statut_compte=statut)
+        type_compte = self.request.GET.get('type')
+        if type_compte in self.TYPES:
+            vendeurs = vendeurs.filter(type_compte=type_compte)
+        recherche = self.request.GET.get('q', '').strip()
+        if recherche:
+            vendeurs = vendeurs.filter(
+                Q(nom__icontains=recherche) | Q(prenom__icontains=recherche)
+                | Q(email__icontains=recherche) | Q(telephone__icontains=recherche)
+            )
+
         # en_attente affiché en premier (ordre alphabétique du statut : actif < en_attente < suspendu
         # ne convient pas — tri explicite par priorité de traitement).
         statut_order = {
@@ -62,7 +79,7 @@ class VendeurListView(_StaffRequiredMixin, ListView):
             CompteVendeur.StatutCompte.ACTIF: 1,
             CompteVendeur.StatutCompte.SUSPENDU: 2,
         }
-        vendeurs = list(CompteVendeur.objects.using('vendor_db').all())
+        vendeurs = list(vendeurs)
         vendeurs.sort(key=lambda v: (statut_order.get(v.statut_compte, 99), v.nom))
 
         profils = {
@@ -75,9 +92,24 @@ class VendeurListView(_StaffRequiredMixin, ListView):
             vendeur.profil = profils.get(vendeur.pk)
         return vendeurs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tous = CompteVendeur.objects.using('vendor_db')
+        context.update({
+            'nb_total': tous.count(),
+            'nb_en_attente': tous.filter(statut_compte=CompteVendeur.StatutCompte.EN_ATTENTE).count(),
+            'nb_actifs': tous.filter(statut_compte=CompteVendeur.StatutCompte.ACTIF).count(),
+            'nb_suspendus': tous.filter(statut_compte=CompteVendeur.StatutCompte.SUSPENDU).count(),
+            'statut_actif': self.request.GET.get('statut', '') if self.request.GET.get('statut') in self.STATUTS else '',
+            'type_actif': self.request.GET.get('type', '') if self.request.GET.get('type') in self.TYPES else '',
+            'recherche': self.request.GET.get('q', ''),
+        })
+        return context
+
 
 class _VendeurActionView(_StaffRequiredMixin, View):
     nouveau_statut = None
+    message = ''
 
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
@@ -87,15 +119,22 @@ class _VendeurActionView(_StaffRequiredMixin, View):
         vendeur = get_object_or_404(CompteVendeur.objects.using('vendor_db'), pk=pk)
         vendeur.statut_compte = self.nouveau_statut
         vendeur.save(using='vendor_db', update_fields=['statut_compte'])
+        messages.success(request, self.message.format(nom=f'{vendeur.prenom} {vendeur.nom}'))
+        # Revenir sur la liste avec les mêmes filtres que ceux d'où vient l'action.
+        retour = request.POST.get('next', '')
+        if url_has_allowed_host_and_scheme(retour, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+            return redirect(retour)
         return redirect('vendeur_liste')
 
 
 class VendeurActiverView(_VendeurActionView):
     nouveau_statut = CompteVendeur.StatutCompte.ACTIF
+    message = 'Compte de {nom} activé.'
 
 
 class VendeurSuspendreView(_VendeurActionView):
     nouveau_statut = CompteVendeur.StatutCompte.SUSPENDU
+    message = 'Compte de {nom} suspendu.'
 
 
 class VendeurVerificationDetailView(_StaffRequiredMixin, View):
@@ -171,7 +210,7 @@ class AnnonceModerationListView(_StaffRequiredMixin, ListView):
             annonces = annonces.filter(marque__icontains=recherche) | annonces.filter(modele__icontains=recherche)
 
         tri = self.TRIS.get(self.request.GET.get('tri'), self.TRIS['recent'])
-        annonces = list(annonces.order_by(tri))
+        annonces = list(annonces.prefetch_related('photos').order_by(tri))
         now = timezone.now()
         for annonce in annonces:
             _annoter_sla(annonce, now)

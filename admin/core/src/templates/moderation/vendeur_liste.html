@@ -1,143 +1,125 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Vendeurs — Portail Admin{% endblock %}
+{% block title %}Vendeurs — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Vendeurs' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='vendeurs' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap">
-<div class="reveal" style="animation-delay:.05s">
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Communauté</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-8">Vendeurs</h1>
-</div>
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] overflow-hidden" style="animation-delay:.14s">
-<div class="hidden lg:block overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-surface-variant">
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Nom</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Email</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Téléphone</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Type</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Entreprise</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Inscription</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Statut</th>
-<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container">
-{% for vendeur in vendeurs %}
-<tr class="hover:bg-surface transition-colors">
-<td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ vendeur.prenom|first|upper }}{{ vendeur.nom|first|upper }}</div><span class="font-label-md text-label-md">{{ vendeur.prenom }} {{ vendeur.nom }}</span></div></td>
-<td class="px-6 py-4 text-on-surface-variant">{{ vendeur.email }}</td>
-<td class="px-6 py-4 text-on-surface-variant">{{ vendeur.telephone }}</td>
-<td class="px-6 py-4 font-label-md text-label-md">{{ vendeur.get_type_compte_display }}</td>
-<td class="px-6 py-4">
-{% if vendeur.type_compte == 'professionnel' %}
-    {% if vendeur.profil.entreprise_verifiee %}
-    <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold hover:brightness-95" href="{% url 'vendeur_verification' vendeur.pk %}"><span class="material-symbols-outlined text-[13px]">verified</span> Vérifiée</a>
-    {% elif vendeur.profil.justificatif_rccm %}
-    <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[11px] font-bold hover:brightness-95" href="{% url 'vendeur_verification' vendeur.pk %}">À examiner</a>
-    {% else %}
-    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold">Non vérifiée</span>
-    {% endif %}
-{% else %}
-<span class="text-on-surface-variant text-[13px]">—</span>
-{% endif %}
-</td>
-<td class="px-6 py-4 text-on-surface-variant font-label-md text-label-md">{{ vendeur.date_joined|date:'d/m/Y' }}</td>
-<td class="px-6 py-4">
-{% if vendeur.statut_compte == 'en_attente' %}
-<span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-{% elif vendeur.statut_compte == 'actif' %}
-<span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[12px] font-bold uppercase tracking-tighter">Actif</span>
-{% else %}
-<span class="px-3 py-1 rounded-full bg-error-container text-error text-[12px] font-bold uppercase tracking-tighter">Suspendu</span>
-{% endif %}
-</td>
-<td class="px-6 py-4 text-right">
-{% if vendeur.statut_compte != 'actif' %}
-<form action="{% url 'vendeur_activer' vendeur.pk %}" method="post" class="inline">
-{% csrf_token %}
-<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors" type="submit">Activer</button>
-</form>
-{% else %}
-<button class="px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'vendeur_suspendre' vendeur.pk %}', 'Suspendre ce vendeur ?', '« {{ vendeur.prenom|escapejs }} {{ vendeur.nom|escapejs }} » ne pourra plus accéder à son compte tant qu\'il ne sera pas réactivé.', 'Suspendre', 'block')">Suspendre</button>
-{% endif %}
-</td>
-</tr>
-{% empty %}
-<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="8">Aucun vendeur inscrit pour le moment.</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-<!-- Cartes : mobile/tablette uniquement (< lg) -->
-<div class="lg:hidden flex flex-col divide-y divide-surface-container">
-{% for vendeur in vendeurs %}
-<div class="p-4 flex flex-col gap-3">
-<div class="flex items-start justify-between gap-3">
-<div class="flex items-center gap-3 min-w-0">
-<div class="w-9 h-9 flex-none rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[12px]">{{ vendeur.prenom|first|upper }}{{ vendeur.nom|first|upper }}</div>
-<div class="min-w-0">
-<p class="font-label-md text-label-md text-on-surface truncate">{{ vendeur.prenom }} {{ vendeur.nom }}</p>
-<p class="text-[11px] text-on-surface-variant truncate">{{ vendeur.email }}</p>
-</div>
-</div>
-{% if vendeur.statut_compte == 'en_attente' %}
-<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-{% elif vendeur.statut_compte == 'actif' %}
-<span class="flex-none px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[12px] font-bold uppercase tracking-tighter">Actif</span>
-{% else %}
-<span class="flex-none px-3 py-1 rounded-full bg-error-container text-error text-[12px] font-bold uppercase tracking-tighter">Suspendu</span>
-{% endif %}
-</div>
-<div class="flex items-center justify-between text-[13px] text-on-surface-variant">
-<span>{{ vendeur.telephone }}</span>
-<span>{{ vendeur.get_type_compte_display }} · {{ vendeur.date_joined|date:'d/m/Y' }}</span>
-</div>
-{% if vendeur.type_compte == 'professionnel' %}
-<div>
-    {% if vendeur.profil.entreprise_verifiee %}
-    <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold" href="{% url 'vendeur_verification' vendeur.pk %}"><span class="material-symbols-outlined text-[13px]">verified</span> Entreprise vérifiée</a>
-    {% elif vendeur.profil.justificatif_rccm %}
-    <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[11px] font-bold" href="{% url 'vendeur_verification' vendeur.pk %}">Justificatif à examiner</a>
-    {% else %}
-    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold">Entreprise non vérifiée</span>
-    {% endif %}
-</div>
-{% endif %}
-<div>
-{% if vendeur.statut_compte != 'actif' %}
-<form action="{% url 'vendeur_activer' vendeur.pk %}" method="post">
-{% csrf_token %}
-<button class="w-full px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors" type="submit">Activer</button>
-</form>
-{% else %}
-<button class="w-full px-4 py-2 rounded-lg border border-error text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors" type="button" onclick="ouvrirModalConfirmation('{% url 'vendeur_suspendre' vendeur.pk %}', 'Suspendre ce vendeur ?', '« {{ vendeur.prenom|escapejs }} {{ vendeur.nom|escapejs }} » ne pourra plus accéder à son compte tant qu\'il ne sera pas réactivé.', 'Suspendre', 'block')">Suspendre</button>
-{% endif %}
-</div>
-</div>
-{% empty %}
-<div class="p-8 text-center text-on-surface-variant">Aucun vendeur inscrit pour le moment.</div>
-{% endfor %}
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='vendeurs' %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='vendeurs' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+
+            <div class="reveal flex flex-col md:flex-row md:items-end justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Modération</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Vendeurs</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Activez les nouveaux comptes, suspendez-les si besoin et vérifiez les entreprises.</p>
+                </div>
+                <a class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 border border-primary text-primary rounded-lg font-semibold text-sm hover:bg-primary/5 transition-colors" href="{% url 'demande_pro_liste' %}">
+                    <span class="material-symbols-outlined text-[20px]">storefront</span>
+                    Demandes de compte pro
+                </a>
+            </div>
+
+            <!-- Filtres -->
+            <section aria-label="Filtres" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm" style="animation-delay:.1s">
+                {% with q=recherche|urlencode %}
+                <nav aria-label="Statut" class="flex gap-1 px-3 pt-2 overflow-x-auto border-b border-outline-variant/30">
+                    <a {% if not statut_actif %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if not statut_actif %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?{% if recherche %}q={{ q }}&{% endif %}{% if type_actif %}type={{ type_actif }}{% endif %}">Tous <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_total }}</span></a>
+                    <a {% if statut_actif == 'en_attente' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'en_attente' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=en_attente{% if recherche %}&q={{ q }}{% endif %}{% if type_actif %}&type={{ type_actif }}{% endif %}">À activer <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'en_attente' %}bg-primary text-on-primary{% elif nb_en_attente %}bg-secondary-container text-primary{% else %}bg-surface-container{% endif %}">{{ nb_en_attente }}</span></a>
+                    <a {% if statut_actif == 'actif' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'actif' %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=actif{% if recherche %}&q={{ q }}{% endif %}{% if type_actif %}&type={{ type_actif }}{% endif %}">Actifs <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'actif' %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_actifs }}</span></a>
+                    <a {% if statut_actif == 'suspendu' %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == 'suspendu' %}border-error text-error{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut=suspendu{% if recherche %}&q={{ q }}{% endif %}{% if type_actif %}&type={{ type_actif }}{% endif %}">Suspendus <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == 'suspendu' %}bg-error text-white{% else %}bg-surface-container{% endif %}">{{ nb_suspendus }}</span></a>
+                </nav>
+                {% endwith %}
+                <form class="p-3 flex flex-col sm:flex-row gap-3" method="get" role="search">
+                    {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <label class="relative flex-1">
+                        <span class="sr-only">Rechercher</span>
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">search</span>
+                        <input class="w-full pl-11 pr-4 py-2.5 bg-surface-container-low border border-transparent rounded-lg text-sm focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" name="q" placeholder="Nom, email ou téléphone…" type="search" value="{{ recherche }}">
+                    </label>
+                    <label class="flex items-center gap-2 text-sm text-on-surface-variant">
+                        <span class="sr-only">Type de compte</span>
+                        <select class="flex-1 sm:flex-none py-2.5 pl-3 pr-8 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" name="type" onchange="this.form.submit()">
+                            <option value="" {% if not type_actif %}selected{% endif %}>Tous les types</option>
+                            <option value="particulier" {% if type_actif == 'particulier' %}selected{% endif %}>Particuliers</option>
+                            <option value="professionnel" {% if type_actif == 'professionnel' %}selected{% endif %}>Professionnels</option>
+                        </select>
+                    </label>
+                </form>
+            </section>
+
+            {% if recherche or statut_actif or type_actif %}
+            <p class="text-sm text-on-surface-variant -mt-2">{{ vendeurs|length }} résultat{{ vendeurs|length|pluralize }}{% if recherche %} pour « <span class="font-semibold text-on-surface">{{ recherche }}</span> »{% endif %}</p>
+            {% endif %}
+
+            <section aria-label="Vendeurs" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" style="animation-delay:.14s">
+                <ul class="divide-y divide-outline-variant/30">
+                    {% for vendeur in vendeurs %}
+                    <li class="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
+                        <div class="flex items-center gap-3 min-w-0 md:w-72 md:shrink-0">
+                            <div class="w-10 h-10 shrink-0 rounded-full {% if vendeur.type_compte == 'professionnel' %}bg-primary text-on-primary{% else %}bg-primary-fixed-dim text-on-primary-fixed-variant{% endif %} flex items-center justify-center font-bold text-[13px]">{{ vendeur.prenom|first|upper }}{{ vendeur.nom|first|upper }}</div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-on-surface truncate">{{ vendeur.prenom }} {{ vendeur.nom }}</p>
+                                <p class="text-xs text-on-surface-variant truncate">{{ vendeur.email }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-on-surface-variant">
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">call</span>{{ vendeur.telephone }}</span>
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">{% if vendeur.type_compte == 'professionnel' %}storefront{% else %}person{% endif %}</span>{{ vendeur.get_type_compte_display }}</span>
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>Inscrit le {{ vendeur.date_joined|date:'d/m/Y' }}</span>
+                            {% if vendeur.type_compte == 'professionnel' %}
+                                {% if vendeur.profil.entreprise_verifiee %}
+                                <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold hover:brightness-95" href="{% url 'vendeur_verification' vendeur.pk %}"><span class="material-symbols-outlined text-[14px]">verified</span>Entreprise vérifiée</a>
+                                {% elif vendeur.profil.justificatif_rccm %}
+                                <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/25 text-secondary text-[11px] font-bold hover:brightness-95" href="{% url 'vendeur_verification' vendeur.pk %}"><span class="material-symbols-outlined text-[14px]">pending</span>RCCM à examiner</a>
+                                {% else %}
+                                <a class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold hover:brightness-95" href="{% url 'vendeur_verification' vendeur.pk %}">Entreprise non vérifiée</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center gap-3 md:shrink-0">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold
+                                {% if vendeur.statut_compte == 'en_attente' %}bg-secondary-container/25 text-secondary
+                                {% elif vendeur.statut_compte == 'actif' %}bg-green-100 text-green-800
+                                {% else %}bg-error-container text-error{% endif %}">
+                                {% if vendeur.statut_compte == 'en_attente' %}À activer{% else %}{{ vendeur.get_statut_compte_display }}{% endif %}
+                            </span>
+                            <div class="ml-auto md:ml-0 flex items-center gap-2">
+                                {% if vendeur.statut_compte != 'actif' %}
+                                <form action="{% url 'vendeur_activer' vendeur.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                                    <button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors" type="submit">
+                                        <span class="material-symbols-outlined text-[16px]">{% if vendeur.statut_compte == 'suspendu' %}restart_alt{% else %}check_circle{% endif %}</span>{% if vendeur.statut_compte == 'suspendu' %}Réactiver{% else %}Activer{% endif %}
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-error/40 text-error text-xs font-semibold hover:bg-error/5 transition-colors" onclick="ouvrirModalConfirmation('{% url 'vendeur_suspendre' vendeur.pk %}', 'Suspendre ce vendeur ?', '{{ vendeur.prenom|escapejs }} {{ vendeur.nom|escapejs }} ne pourra plus gérer ses annonces tant que son compte ne sera pas réactivé.', 'Suspendre', 'block')" type="button">
+                                    <span class="material-symbols-outlined text-[16px]">block</span>Suspendre
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="py-14 px-6 text-center flex flex-col items-center gap-3">
+                        <span class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[28px]">{% if recherche or statut_actif or type_actif %}search_off{% else %}group{% endif %}</span></span>
+                        <p class="text-sm font-semibold text-on-surface">{% if recherche or statut_actif or type_actif %}Aucun vendeur ne correspond à ces filtres.{% else %}Aucun vendeur inscrit pour le moment.{% endif %}</p>
+                        {% if recherche or statut_actif or type_actif %}<a class="text-sm font-semibold text-primary hover:underline" href="{% url 'vendeur_liste' %}">Réinitialiser les filtres</a>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
+    </div>
 </div>
 {% include 'app/includes/modal_confirmation.html' %}
 {% endblock %}

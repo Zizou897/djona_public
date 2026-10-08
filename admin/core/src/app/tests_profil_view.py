@@ -42,8 +42,8 @@ class ProfilViewAccessTest(TestCase):
 
         response = self.client.get(reverse('profil_admin'))
 
-        self.assertContains(response, 'Gestion du Profil')
-        self.assertContains(response, 'Informations Personnelles')
+        self.assertContains(response, 'Mon profil')
+        self.assertContains(response, 'Informations personnelles')
         self.assertContains(response, 'Sécurité')
         self.assertContains(response, 'Préférences')
 

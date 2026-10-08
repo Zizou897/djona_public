@@ -110,3 +110,40 @@ class AdminDashboardViewDataTest(TestCase):
         # vendeur_pro (27 août) inscrit après l'annonce (26 août) -> doit être en tête
         self.assertEqual(activites[0]['type'], 'inscription')
         self.assertIn('Issa', activites[0]['description'])
+
+
+class AccueilEtCompteursTest(TestCase):
+    databases = {'default', 'vendor_db', 'public_db'}
+
+    def setUp(self):
+        self.staff = User.objects.create_user(username='staff-compteurs', password='motdepasse123', is_staff=True)
+
+    def test_accueil_redirige_vers_la_connexion_si_anonyme(self):
+        self.assertRedirects(self.client.get(reverse('home')), reverse('connexion_admin'), fetch_redirect_response=False)
+
+    def test_accueil_redirige_le_staff_vers_le_tableau_de_bord(self):
+        self.client.force_login(self.staff)
+        self.assertRedirects(self.client.get(reverse('home')), reverse('dashboard_admin'))
+
+    def test_compteurs_requierent_un_compte_staff(self):
+        response = self.client.get(reverse('compteurs_admin'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_compteurs_renvoient_les_elements_a_traiter(self):
+        vendeur = CompteVendeur.objects.using('vendor_db').create(
+            email='compteur@exemple.ci', nom='Kone', prenom='Awa', telephone='0102030405',
+            type_compte=CompteVendeur.TypeCompte.PARTICULIER, statut_compte=CompteVendeur.StatutCompte.EN_ATTENTE,
+            is_active=True, date_joined='2026-08-20T10:00:00Z', password='inutilise',
+        )
+        AnnonceMirror.objects.using('vendor_db').create(
+            vendeur=vendeur, marque='Toyota', modele='Corolla', annee=2019, prix=8500000, kilometrage=45000,
+            carburant='essence', boite_vitesses='automatique', couleur='Gris', description='Test.',
+            statut=AnnonceMirror.Statut.EN_ATTENTE, created_at='2026-08-27T09:00:00Z', update_at='2026-08-27T09:00:00Z',
+        )
+        self.client.force_login(self.staff)
+        compteurs = self.client.get(reverse('compteurs_admin')).json()
+        self.assertEqual(compteurs['annonces'], 1)
+        self.assertEqual(compteurs['vendeurs'], 1)
+        self.assertEqual(compteurs['demandes_pro'], 0)
+        self.assertIn('messages', compteurs)
+        self.assertIn('transport', compteurs)

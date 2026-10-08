@@ -12,7 +12,10 @@ class TransportVehicleTypeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'px-4 py-3 rounded bg-surface-container outline-none focus:ring-2 focus:ring-primary'
+            field.widget.attrs['class'] = (
+                'w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest '
+                'focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all'
+            )
 
     def validate_unique(self):
         # Le contrôle par défaut interrogerait l'alias 'default' au lieu de

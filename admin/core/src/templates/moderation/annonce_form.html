@@ -1,163 +1,124 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Créer une annonce — Portail Admin{% endblock %}
+{% block title %}Créer une annonce — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Créer une annonce' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='annonces' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='annonces' %}
 
-<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'annonce_moderation_liste' %}" style="animation-delay:.05s">
-<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour à la liste
-</a>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'annonce_moderation_liste' %}">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>Annonces
+                </a>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-3">Créer une annonce</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Publiée immédiatement sur la marketplace, sans file de modération, et rattachée au compte vendeur officiel Djona.</p>
+            </div>
 
-<div class="reveal" style="animation-delay:.08s">
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Modération</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-8">Créer une annonce</h1>
-</div>
+            {% if form.non_field_errors %}
+            <div class="flex items-start gap-3 px-4 py-3 rounded-xl bg-error-container text-on-error-container text-sm" role="alert">
+                <span class="material-symbols-outlined text-[20px] shrink-0">error</span>
+                <div class="flex flex-col gap-1">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+            </div>
+            {% endif %}
 
-<p class="reveal text-sm text-on-surface-variant mb-6 -mt-4" style="animation-delay:.1s">
-    Publiée immédiatement sur le marketplace, sans passer par la file de modération — rattachée au compte
-    vendeur système Djona.
-</p>
+            <form class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start" enctype="multipart/form-data" method="post">
+                {% csrf_token %}
+                <div class="flex flex-col gap-5 min-w-0">
+                    {% include 'moderation/_champs_annonce.html' %}
 
-{% if form.non_field_errors %}
-<div class="mb-6 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-sm flex flex-col gap-1">
-    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-</div>
-{% endif %}
+                    <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6">
+                        <div class="flex items-start justify-between gap-3 mb-5">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">4</span>
+                                <div>
+                                    <h2 class="font-headline-md font-semibold text-base text-primary">Photos</h2>
+                                    <p class="text-xs text-on-surface-variant">Jusqu'à 4 photos, 4 Mo maximum chacune.</p>
+                                </div>
+                            </div>
+                            <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-on-surface-variant" id="photo-count">0/4</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3" id="photo-grid"></div>
+                        <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl py-8 px-4 text-center cursor-pointer hover:border-primary hover:bg-primary/[0.03] transition-colors" for="id_photos" id="photo-zone">
+                            <span class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[26px]">add_photo_alternate</span></span>
+                            <span class="text-sm font-semibold text-on-surface">Glissez les photos ici ou <span class="text-primary">parcourez</span></span>
+                        </label>
+                        <input accept="image/*" class="sr-only" id="id_photos" multiple name="photos" type="file">
+                    </section>
+                </div>
 
-<form method="post" enctype="multipart/form-data" class="reveal bg-surface-container-lowest rounded-2xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 md:p-8 flex flex-col gap-4" style="animation-delay:.14s">
-    {% csrf_token %}
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.marque.id_for_label }}">Marque</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.marque.id_for_label }}" name="marque" required type="text" value="{{ form.marque.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.modele.id_for_label }}">Modèle</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.modele.id_for_label }}" name="modele" required type="text" value="{{ form.modele.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.annee.id_for_label }}">Année</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.annee.id_for_label }}" min="1980" name="annee" required type="number" value="{{ form.annee.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.prix.id_for_label }}">Prix (CFA)</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.prix.id_for_label }}" min="0" name="prix" required type="number" value="{{ form.prix.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.kilometrage.id_for_label }}">Kilométrage</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.kilometrage.id_for_label }}" min="0" name="kilometrage" required type="number" value="{{ form.kilometrage.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.couleur.id_for_label }}">Couleur</label>
-            <input class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.couleur.id_for_label }}" name="couleur" required type="text" value="{{ form.couleur.value|default:'' }}">
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.etat.id_for_label }}">État</label>
-            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.etat.id_for_label }}" name="etat" required>
-                <option value="">Choisissez l'état</option>
-                {% for value, label in form.fields.etat.choices %}{% if value %}<option value="{{ value }}" {% if form.etat.value == value %}selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
-            </select>
-            {% for error in form.etat.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.ville.id_for_label }}">Ville du véhicule</label>
-            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.ville.id_for_label }}" name="ville" required>
-                <option value="">Choisissez une ville</option>
-                {% for value, label in form.fields.ville.choices %}{% if value %}<option value="{{ value }}" {% if form.ville.value == value %}selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
-            </select>
-            {% for error in form.ville.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.carburant.id_for_label }}">Carburant</label>
-            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.carburant.id_for_label }}" name="carburant" required>
-                {% for value, label in form.fields.carburant.choices %}<option value="{{ value }}" {% if form.carburant.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-            </select>
-        </div>
-        <div class="flex flex-col gap-1">
-            <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.boite_vitesses.id_for_label }}">Boîte de vitesses</label>
-            <select class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.boite_vitesses.id_for_label }}" name="boite_vitesses" required>
-                {% for value, label in form.fields.boite_vitesses.choices %}<option value="{{ value }}" {% if form.boite_vitesses.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-            </select>
-        </div>
+                <aside class="flex flex-col gap-4 lg:sticky lg:top-24">
+                    <section class="bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-3">
+                        <p class="text-sm font-semibold text-on-surface">Publication</p>
+                        <p class="text-xs text-on-surface-variant leading-relaxed">L'annonce est publiée dès l'enregistrement et synchronisée avec la marketplace.</p>
+                        <button class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary-container transition-colors" type="submit">
+                            <span class="material-symbols-outlined text-[18px]">publish</span>Créer et publier
+                        </button>
+                        <a class="text-center text-sm font-semibold text-on-surface-variant hover:text-on-surface py-1" href="{% url 'annonce_moderation_liste' %}">Annuler</a>
+                    </section>
+                </aside>
+            </form>
+        </main>
     </div>
-
-    <div class="flex flex-col gap-1">
-        <label class="font-label-md text-sm text-on-surface-variant" for="{{ form.description.id_for_label }}">Description</label>
-        <textarea class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="{{ form.description.id_for_label }}" name="description" required rows="4">{{ form.description.value|default:'' }}</textarea>
-    </div>
-
-    <div class="flex flex-col gap-2">
-        <p class="font-label-md text-sm text-on-surface-variant">Photos <span class="text-[13px]">— jusqu'à 4, 4 Mo maximum chacune (<span id="photo-count">0/4</span>)</span></p>
-        <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-lg py-8 cursor-pointer hover:border-primary transition-colors" for="id_photos">
-            <span class="material-symbols-outlined text-primary text-[32px]">add_photo_alternate</span>
-            <span class="font-label-md text-sm text-on-surface-variant">Ajouter des photos</span>
-        </label>
-        <input accept="image/*" class="hidden" id="id_photos" multiple name="photos" type="file">
-        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3" id="photo-grid"></div>
-    </div>
-
-    <button class="self-end px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-sm" type="submit">Créer et publier</button>
-</form>
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='annonces' %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 (function () {
-  var photoInput = document.getElementById('id_photos');
-  var photoGrid = document.getElementById('photo-grid');
-  var photoCount = document.getElementById('photo-count');
-  var photoFiles = [];
+    var MAX = 4;
+    var input = document.getElementById('id_photos');
+    var grille = document.getElementById('photo-grid');
+    var compteur = document.getElementById('photo-count');
+    var zone = document.getElementById('photo-zone');
+    var fichiers = [];
 
-  function renderPhotoGrid() {
-    photoGrid.innerHTML = '';
-    photoFiles.forEach(function (file, index) {
-      var url = URL.createObjectURL(file);
-      var item = document.createElement('div');
-      item.className = 'relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-low';
-      item.innerHTML = '<img src="' + url + '" class="w-full h-full object-cover" alt="Photo ' + (index + 1) + '">' +
-        '<button type="button" data-index="' + index + '" class="remove-photo absolute top-1 right-1 w-6 h-6 rounded-full bg-error text-white flex items-center justify-center">' +
-        '<span class="material-symbols-outlined text-[16px]">close</span></button>';
-      photoGrid.appendChild(item);
+    function rendre() {
+        grille.innerHTML = '';
+        fichiers.forEach(function (fichier, index) {
+            var item = document.createElement('div');
+            item.className = 'relative aspect-square rounded-xl overflow-hidden bg-surface-container';
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(fichier);
+            img.alt = 'Photo ' + (index + 1);
+            img.className = 'w-full h-full object-cover';
+            var bouton = document.createElement('button');
+            bouton.type = 'button';
+            bouton.dataset.index = index;
+            bouton.setAttribute('aria-label', 'Retirer cette photo');
+            bouton.className = 'retirer absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-error transition-colors';
+            bouton.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+            item.appendChild(img);
+            item.appendChild(bouton);
+            grille.appendChild(item);
+        });
+        compteur.textContent = fichiers.length + '/' + MAX;
+        zone.classList.toggle('hidden', fichiers.length >= MAX);
+        var dt = new DataTransfer();
+        fichiers.forEach(function (f) { dt.items.add(f); });
+        input.files = dt.files;
+    }
+    function ajouter(liste) {
+        var images = Array.prototype.filter.call(liste, function (f) { return f.type.indexOf('image/') === 0; });
+        fichiers = fichiers.concat(images.slice(0, Math.max(MAX - fichiers.length, 0)));
+        rendre();
+    }
+    input.addEventListener('change', function () { var choisis = Array.prototype.slice.call(input.files); ajouter(choisis); });
+    ['dragenter', 'dragover'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.add('border-primary'); }); });
+    ['dragleave', 'drop'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.remove('border-primary'); }); });
+    zone.addEventListener('drop', function (e) { ajouter(e.dataTransfer.files); });
+    grille.addEventListener('click', function (e) {
+        var bouton = e.target.closest('.retirer');
+        if (!bouton) return;
+        fichiers.splice(Number(bouton.dataset.index), 1);
+        rendre();
     });
-    photoCount.textContent = photoFiles.length + '/4';
-    var dataTransfer = new DataTransfer();
-    photoFiles.forEach(function (file) { dataTransfer.items.add(file); });
-    photoInput.files = dataTransfer.files;
-  }
-
-  photoInput.addEventListener('change', function () {
-    var incoming = Array.prototype.slice.call(photoInput.files);
-    var room = 4 - photoFiles.length;
-    photoFiles = photoFiles.concat(incoming.slice(0, Math.max(room, 0)));
-    renderPhotoGrid();
-  });
-
-  photoGrid.addEventListener('click', function (event) {
-    var button = event.target.closest('.remove-photo');
-    if (!button) return;
-    photoFiles.splice(Number(button.dataset.index), 1);
-    renderPhotoGrid();
-  });
 })();
 </script>
 {% endblock %}

@@ -1,115 +1,109 @@
 {% extends 'app/base/base.html' %}
 {% load static %}
 
-{% block title %}Demande pro — {{ demande.raison_sociale }} — Portail Admin{% endblock %}
+{% block title %}Demande pro — {{ demande.raison_sociale }} — Back-office Djona{% endblock %}
 
 {% block styles %}
 {% include 'app/includes/styles_admin.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="bg-surface font-body-md text-on-surface">
-{% include 'app/includes/header_mobile_admin.html' with page_title='Demande pro' %}
-{% include 'app/includes/sidebar_admin.html' with active_nav='demandes_pro' %}
-<div class="lg:pl-72">
-{% include 'app/includes/topbar_admin.html' %}
-<main class="relative pt-16 pb-24 lg:pb-0 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
-<div class="px-container-margin-mobile lg:px-container-margin-desktop py-section-gap max-w-3xl">
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='demandes_pro' %}
 
-<a class="reveal inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline mb-6" href="{% url 'demande_pro_liste' %}" style="animation-delay:.05s">
-<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour aux demandes
-</a>
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'demande_pro_liste' %}">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>Demandes de compte pro
+                </a>
+                <div class="mt-3 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Demande de compte professionnel</span>
+                        <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">{{ demande.raison_sociale }}</h1>
+                        <p class="text-sm text-on-surface-variant mt-1">Envoyée le {{ demande.created_at|date:'d/m/Y à H:i' }}</p>
+                    </div>
+                    {% if demande.statut == 'en_attente' %}<span class="self-start sm:self-auto px-3 py-1 rounded-full bg-secondary-container/25 text-secondary text-xs font-bold">À examiner</span>
+                    {% elif demande.statut == 'acceptee' %}<span class="self-start sm:self-auto inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold"><span class="material-symbols-outlined text-[16px]">verified</span>Acceptée</span>
+                    {% else %}<span class="self-start sm:self-auto px-3 py-1 rounded-full bg-error-container text-error text-xs font-bold">Refusée</span>{% endif %}
+                </div>
+            </div>
 
-<div class="reveal bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(26,82,118,0.08)] p-6 lg:p-8" style="animation-delay:.1s">
-<div class="flex items-start justify-between gap-4 mb-6">
-<div>
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Demande de compte professionnel</span>
-<h1 class="font-display-lg text-display-lg text-primary mb-1">{{ demande.raison_sociale }}</h1>
-<p class="font-body-md text-on-surface-variant">Envoyée le {{ demande.created_at|date:'d/m/Y à H:i' }}</p>
-</div>
-{% if demande.statut == 'en_attente' %}<span class="flex-none px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[12px] font-bold uppercase tracking-tighter">En attente</span>
-{% elif demande.statut == 'acceptee' %}<span class="flex-none inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-tighter"><span class="material-symbols-outlined text-[16px]">verified</span> Acceptée</span>
-{% else %}<span class="flex-none px-3 py-1 rounded-full bg-error-container text-error text-[12px] font-bold uppercase tracking-tighter">Refusée</span>{% endif %}
-</div>
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
+                <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-6" style="animation-delay:.1s">
+                    <div>
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-3">Entreprise</h2>
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Raison sociale</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ demande.raison_sociale }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3"><dt class="text-[11px] text-on-surface-variant">Numéro RCCM</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ demande.numero_rccm }}</dd></div>
+                            <div class="bg-surface-container-low rounded-xl p-3 sm:col-span-2"><dt class="text-[11px] text-on-surface-variant">Adresse du showroom</dt><dd class="text-sm font-semibold text-on-surface mt-0.5">{{ demande.adresse }}</dd></div>
+                        </dl>
+                    </div>
+                    {% if demande.message %}
+                    <div>
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-2">Message du vendeur</h2>
+                        <p class="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line bg-surface-container-low rounded-xl p-4">{{ demande.message }}</p>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-3">Justificatif RCCM</h2>
+                        <a class="inline-flex items-center gap-2 px-4 py-3 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/5 transition-colors" href="{{ demande.justificatif_rccm.url }}" rel="noopener" target="_blank">
+                            <span class="material-symbols-outlined text-[20px]">description</span>Ouvrir le document envoyé
+                        </a>
+                    </div>
+                    {% if autres_demandes %}
+                    <div class="pt-5 border-t border-outline-variant/30">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-3">Autres demandes de ce vendeur</h2>
+                        <ul class="flex flex-col gap-2">
+                            {% for autre in autres_demandes %}
+                            <li><a class="text-sm text-primary hover:underline" href="{% url 'demande_pro_detail' autre.pk %}">{{ autre.created_at|date:'d/m/Y' }} — {{ autre.raison_sociale }} ({{ autre.get_statut_display|lower }})</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </section>
 
-<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Vendeur</h2>
-<div class="flex items-center gap-3 mb-6">
-<div class="w-10 h-10 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[13px]">{{ demande.utilisateur.prenom|first|upper }}{{ demande.utilisateur.nom|first|upper }}</div>
-<div>
-<p class="font-label-md text-label-md text-on-surface">{{ demande.utilisateur.prenom }} {{ demande.utilisateur.nom }}</p>
-<p class="text-[13px] text-on-surface-variant">{{ demande.utilisateur.email }} — {{ demande.utilisateur.telephone }} · compte {{ demande.utilisateur.get_type_compte_display|lower }}, inscrit le {{ demande.utilisateur.date_joined|date:'d/m/Y' }}</p>
-</div>
-</div>
+                <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-3" style="animation-delay:.12s">
+                        <p class="text-sm font-semibold text-on-surface">Décision</p>
+                        {% if demande.statut == 'en_attente' %}
+                        <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors" onclick="ouvrirModalConfirmation('{% url 'demande_pro_accepter' demande.pk %}', 'Accepter cette demande ?', '{{ demande.utilisateur.prenom|escapejs }} {{ demande.utilisateur.nom|escapejs }} passera en compte professionnel et « {{ demande.raison_sociale|escapejs }} » sera marquée comme entreprise vérifiée.', 'Accepter', 'verified', 'primaire')" type="button">
+                            <span class="material-symbols-outlined text-[20px]">check_circle</span>Accepter la demande
+                        </button>
+                        <form action="{% url 'demande_pro_refuser' demande.pk %}" class="pt-4 border-t border-outline-variant/30 flex flex-col gap-2.5" method="post">
+                            {% csrf_token %}
+                            <label class="text-sm font-semibold text-on-surface" for="motif_refus">Refuser la demande</label>
+                            <textarea class="w-full px-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-sm focus:outline-none focus:border-error focus:ring-2 focus:ring-error/15" id="motif_refus" name="motif_refus" placeholder="Motif affiché au vendeur — ex : justificatif illisible, RCCM ne correspondant pas à la raison sociale…" required rows="3"></textarea>
+                            <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-error/50 text-error rounded-lg text-sm font-semibold hover:bg-error/5 transition-colors" type="submit">
+                                <span class="material-symbols-outlined text-[18px]">cancel</span>Refuser avec ce motif
+                            </button>
+                        </form>
+                        {% else %}
+                        <p class="text-sm text-on-surface-variant">Traitée le {{ demande.traitee_le|date:'d/m/Y à H:i' }}.</p>
+                        {% if demande.statut == 'refusee' and demande.motif_refus %}
+                        <p class="text-sm text-error bg-error-container/50 rounded-xl p-3"><span class="font-semibold">Motif du refus :</span> {{ demande.motif_refus }}</p>
+                        {% endif %}
+                        {% endif %}
+                    </section>
 
-<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Entreprise</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Raison sociale</p>
-<p class="font-label-md text-label-md text-on-surface">{{ demande.raison_sociale }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Numéro RCCM</p>
-<p class="font-label-md text-label-md text-on-surface">{{ demande.numero_rccm }}</p>
-</div>
-<div class="bg-surface-container-low rounded-lg p-4 md:col-span-2">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Adresse du showroom</p>
-<p class="font-label-md text-label-md text-on-surface">{{ demande.adresse }}</p>
-</div>
-{% if demande.message %}
-<div class="bg-surface-container-low rounded-lg p-4 md:col-span-2">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Message du vendeur</p>
-<p class="text-body-md text-on-surface whitespace-pre-line">{{ demande.message }}</p>
-</div>
-{% endif %}
-</div>
-
-<div class="mb-8">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Justificatif RCCM</p>
-<a href="{{ demande.justificatif_rccm.url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-3 rounded-md border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors">
-<span class="material-symbols-outlined text-[20px]">description</span> Ouvrir le document envoyé
-</a>
-</div>
-
-{% if demande.statut == 'en_attente' %}
-<div class="border-t border-surface-variant pt-6 flex flex-col gap-6">
-<button class="w-full sm:w-auto self-start px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors" onclick="ouvrirModalConfirmation('{% url 'demande_pro_accepter' demande.pk %}', 'Accepter cette demande ?', '{{ demande.utilisateur.prenom|escapejs }} {{ demande.utilisateur.nom|escapejs }} passera en compte professionnel et « {{ demande.raison_sociale|escapejs }} » sera marquée comme entreprise vérifiée.', 'Accepter', 'verified')" type="button">
-<span class="material-symbols-outlined text-[20px]">check_circle</span> Accepter : passer en compte professionnel
-</button>
-
-<form action="{% url 'demande_pro_refuser' demande.pk %}" class="flex flex-col gap-3" method="post">
-{% csrf_token %}
-<label class="font-label-md text-label-md text-on-surface" for="motif_refus">Refuser la demande</label>
-<textarea class="w-full px-4 py-3 bg-surface-container-low rounded-lg text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-primary" id="motif_refus" name="motif_refus" placeholder="Motif affiché au vendeur — ex : justificatif illisible, RCCM ne correspondant pas à la raison sociale…" required rows="3"></textarea>
-<button class="w-full sm:w-auto self-start px-6 py-3 border-2 border-error text-error rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error-container/20 transition-colors" type="submit">
-<span class="material-symbols-outlined text-[20px]">cancel</span> Refuser avec ce motif
-</button>
-</form>
-</div>
-{% else %}
-<div class="border-t border-surface-variant pt-6">
-<p class="text-body-md text-on-surface-variant">Traitée le {{ demande.traitee_le|date:'d/m/Y à H:i' }}.</p>
-{% if demande.statut == 'refusee' and demande.motif_refus %}<p class="text-body-md text-on-surface mt-2"><span class="font-semibold">Motif du refus :</span> {{ demande.motif_refus }}</p>{% endif %}
-</div>
-{% endif %}
-
-{% if autres_demandes %}
-<div class="border-t border-surface-variant pt-6 mt-6">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Autres demandes de ce vendeur</p>
-<ul class="flex flex-col gap-2">
-{% for autre in autres_demandes %}
-<li><a class="text-body-md text-primary hover:underline" href="{% url 'demande_pro_detail' autre.pk %}">{{ autre.created_at|date:'d/m/Y' }} — {{ autre.raison_sociale }} ({{ autre.get_statut_display|lower }})</a></li>
-{% endfor %}
-</ul>
-</div>
-{% endif %}
-</div>
-
-</div>
-</div>
-</main>
-</div>
-{% include 'app/includes/nav_mobile_admin.html' with active_nav='vendeurs' %}
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.14s">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-3">Vendeur</h2>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 shrink-0 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold text-[13px]">{{ demande.utilisateur.prenom|first|upper }}{{ demande.utilisateur.nom|first|upper }}</div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-on-surface truncate">{{ demande.utilisateur.prenom }} {{ demande.utilisateur.nom }}</p>
+                                <p class="text-xs text-on-surface-variant">Compte {{ demande.utilisateur.get_type_compte_display|lower }} · inscrit le {{ demande.utilisateur.date_joined|date:'d/m/Y' }}</p>
+                            </div>
+                        </div>
+                        <ul class="mt-4 flex flex-col gap-2 text-sm">
+                            <li><a class="inline-flex items-center gap-2 text-primary hover:underline break-all" href="mailto:{{ demande.utilisateur.email }}"><span class="material-symbols-outlined text-[18px]">mail</span>{{ demande.utilisateur.email }}</a></li>
+                            <li><a class="inline-flex items-center gap-2 text-primary hover:underline" href="tel:{{ demande.utilisateur.telephone }}"><span class="material-symbols-outlined text-[18px]">call</span>{{ demande.utilisateur.telephone }}</a></li>
+                        </ul>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
 </div>
 {% include 'app/includes/modal_confirmation.html' %}
 {% endblock %}
