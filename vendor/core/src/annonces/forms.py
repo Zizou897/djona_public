@@ -17,7 +17,7 @@ class AnnonceForm(forms.ModelForm):
         fields = [
             'marque', 'modele', 'annee', 'prix',
             'kilometrage', 'carburant', 'boite_vitesses', 'couleur',
-            'description',
+            'etat', 'ville', 'description',
         ]
 
     def __init__(self, *args, exiger_photos_minimum=False, nb_photos_conservees=0, **kwargs):
@@ -28,6 +28,8 @@ class AnnonceForm(forms.ModelForm):
         self.exiger_photos_minimum = exiger_photos_minimum
         self.nb_photos_conservees = nb_photos_conservees
         super().__init__(*args, **kwargs)
+        self.fields['etat'].required = True
+        self.fields['ville'].required = True
 
     def clean(self):
         cleaned_data = super().clean()

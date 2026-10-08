@@ -51,14 +51,40 @@ Contexte : form, min_photos, max_photos ; en modification : annonce, photos_exis
                 </div>
             </div>
             <div class="flex flex-col gap-5">
-                <div class="flex flex-col gap-1.5 sm:max-w-xs {% if form.kilometrage.errors %}field-error{% endif %}">
-                    <label class="text-sm font-semibold text-on-surface" for="id_kilometrage">Kilométrage</label>
-                    <div class="relative">
-                        <input class="champ w-full pl-4 pr-12 py-3 rounded-lg border {% if form.kilometrage.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="kilometrage" id="id_kilometrage" inputmode="numeric" min="0" name="kilometrage" placeholder="Ex : 68000" required type="number" value="{{ form.kilometrage.value|default:''|stringformat:'s' }}">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant pointer-events-none">km</span>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5 {% if form.kilometrage.errors %}field-error{% endif %}">
+                        <label class="text-sm font-semibold text-on-surface" for="id_kilometrage">Kilométrage</label>
+                        <div class="relative">
+                            <input class="champ w-full pl-4 pr-12 py-3 rounded-lg border {% if form.kilometrage.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" data-apercu="kilometrage" id="id_kilometrage" inputmode="numeric" min="0" name="kilometrage" placeholder="Ex : 68000" required type="number" value="{{ form.kilometrage.value|default:''|stringformat:'s' }}">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant pointer-events-none">km</span>
+                        </div>
+                        {% if form.kilometrage.errors %}<p class="text-xs text-error">{{ form.kilometrage.errors.0 }}</p>{% endif %}
                     </div>
-                    {% if form.kilometrage.errors %}<p class="text-xs text-error">{{ form.kilometrage.errors.0 }}</p>{% endif %}
+                    <div class="flex flex-col gap-1.5 {% if form.ville.errors %}field-error{% endif %}">
+                        <label class="text-sm font-semibold text-on-surface" for="id_ville">Ville du véhicule</label>
+                        <div class="relative">
+                            <select class="champ w-full pl-4 pr-10 py-3 rounded-lg border {% if form.ville.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all appearance-none" data-apercu="ville" id="id_ville" name="ville" required>
+                                <option value="">Choisissez une ville</option>
+                                {% for value, label in form.fields.ville.choices %}{% if value %}<option value="{{ value }}" data-libelle="{{ label }}" {% if form.ville.value == value %}selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                        </div>
+                        {% if form.ville.errors %}<p class="text-xs text-error">{{ form.ville.errors.0 }}</p>{% endif %}
+                    </div>
                 </div>
+
+                <fieldset class="flex flex-col gap-2 {% if form.etat.errors %}field-error{% endif %}">
+                    <legend class="text-sm font-semibold text-on-surface mb-2">État</legend>
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in form.fields.etat.choices %}{% if value %}
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only champ" data-apercu="etat" data-libelle="{{ label }}" name="etat" {% if forloop.counter == 2 %}required {% endif %}type="radio" value="{{ value }}" {% if form.etat.value == value %}checked{% endif %}>
+                            <span class="inline-flex items-center px-4 py-2.5 rounded-lg border border-outline-variant text-sm font-medium text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 hover:border-primary transition-colors">{{ label }}</span>
+                        </label>
+                        {% endif %}{% endfor %}
+                    </div>
+                    {% if form.etat.errors %}<p class="text-xs text-error">{{ form.etat.errors.0 }}</p>{% endif %}
+                </fieldset>
 
                 <fieldset class="flex flex-col gap-2 {% if form.carburant.errors %}field-error{% endif %}">
                     <legend class="text-sm font-semibold text-on-surface mb-2">Carburant</legend>
@@ -368,11 +394,14 @@ Contexte : form, min_photos, max_photos ; en modification : annonce, photos_exis
         if (km >= 0) { specs.appendChild(puce('speed', nf.format(km) + ' km')); }
         if (libelle('carburant')) { specs.appendChild(puce('local_gas_station', libelle('carburant'))); }
         if (libelle('boite_vitesses')) { specs.appendChild(puce('settings', libelle('boite_vitesses'))); }
+        if (libelle('etat')) { specs.appendChild(puce('sell', libelle('etat'))); }
+        var villeOption = form.querySelector('[name="ville"]').selectedOptions[0];
+        if (villeOption && villeOption.value) { specs.appendChild(puce('location_on', villeOption.dataset.libelle)); }
 
         var description = valeur('description');
         document.getElementById('description-compteur').textContent = description.length + ' caractère' + (description.length > 1 ? 's' : '');
 
-        cocher('infos', ['marque', 'modele', 'annee', 'couleur', 'kilometrage', 'carburant', 'boite_vitesses'].every(function (n) { return valeur(n) !== ''; }));
+        cocher('infos', ['marque', 'modele', 'annee', 'couleur', 'kilometrage', 'carburant', 'boite_vitesses', 'etat', 'ville'].every(function (n) { return valeur(n) !== ''; }));
         cocher('prix', prix > 0);
         cocher('photos', total >= MIN);
         cocher('description', description.length > 0);

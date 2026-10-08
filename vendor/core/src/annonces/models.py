@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from app.models import Convention
+from app.models import Convention, Profil
 
 
 class Annonce(Convention):
@@ -21,6 +21,10 @@ class Annonce(Convention):
         MANUELLE = 'manuelle', 'Manuelle'
         AUTOMATIQUE = 'automatique', 'Automatique'
 
+    class Etat(models.TextChoices):
+        NEUF = 'neuf', 'Neuf'
+        OCCASION = 'occasion', 'Occasion'
+
     class MotifRefus(models.TextChoices):
         INFOS_INSUFFISANTES = 'infos_insuffisantes', 'Informations insuffisantes'
         MAUVAISES_PHOTOS = 'mauvaises_photos', 'Mauvaises photos'
@@ -36,6 +40,10 @@ class Annonce(Convention):
     carburant = models.CharField(max_length=20, choices=Carburant.choices)
     boite_vitesses = models.CharField(max_length=20, choices=BoiteVitesses.choices)
     couleur = models.CharField(max_length=50)
+    # blank=True pour les annonces créées avant l'ajout de ces champs ; le
+    # formulaire les rend obligatoires pour toute nouvelle saisie.
+    etat = models.CharField('état', max_length=20, choices=Etat.choices, blank=True)
+    ville = models.CharField('ville du véhicule', max_length=30, choices=Profil.Ville.choices, blank=True)
     description = models.TextField()
     statut = models.CharField(max_length=20, choices=Statut.choices, default=Statut.BROUILLON, db_index=True)
     motif_refus = models.CharField(max_length=30, choices=MotifRefus.choices, blank=True)

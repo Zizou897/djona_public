@@ -121,6 +121,8 @@
                             <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">local_gas_station</span>{{ annonce.get_carburant_display }}</li>
                             <li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">settings</span>{{ annonce.get_boite_vitesses_display }}</li>
                             {% if annonce.couleur %}<li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">palette</span>{{ annonce.couleur }}</li>{% endif %}
+                            {% if annonce.etat %}<li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">sell</span>{{ annonce.get_etat_display }}</li>{% endif %}
+                            {% if annonce.ville %}<li class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-outline">location_on</span>{{ annonce.get_ville_display }}</li>{% endif %}
                         </ul>
 
                         {% if annonce.statut == 'refusee' %}

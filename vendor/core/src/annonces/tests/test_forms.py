@@ -25,6 +25,8 @@ class AnnonceFormTest(TestCase):
             'kilometrage': 45000,
             'carburant': Annonce.Carburant.ESSENCE,
             'boite_vitesses': Annonce.BoiteVitesses.AUTOMATIQUE,
+            'etat': Annonce.Etat.OCCASION,
+            'ville': 'abidjan_cocody',
             'couleur': 'Gris',
             'description': 'Très bon état.',
         }
@@ -59,3 +61,16 @@ class AnnonceFormTest(TestCase):
     def test_ne_contient_pas_de_champ_vendeur(self):
         form = AnnonceForm()
         self.assertNotIn('vendeur', form.fields)
+
+
+class AnnonceFormEtatVilleTest(TestCase):
+    def test_etat_et_ville_obligatoires(self):
+        form = AnnonceForm(data={
+            'marque': 'Toyota', 'modele': 'Corolla', 'annee': 2020, 'prix': 8500000,
+            'kilometrage': 45000, 'carburant': Annonce.Carburant.ESSENCE,
+            'boite_vitesses': Annonce.BoiteVitesses.AUTOMATIQUE, 'couleur': 'Gris',
+            'description': 'Très bon état.',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('etat', form.errors)
+        self.assertIn('ville', form.errors)
