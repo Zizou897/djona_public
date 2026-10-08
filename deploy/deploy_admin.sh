@@ -27,6 +27,6 @@ python manage.py migrate --noinput
 echo "==> [admin] collecte des statiques"
 python manage.py collectstatic --noinput
 
-restart_and_check "$SERVICE" "$URL" 200
+restart_and_check "$SERVICE" "$URL" 200 302
 
 echo "==> [admin] déploiement réussi"
