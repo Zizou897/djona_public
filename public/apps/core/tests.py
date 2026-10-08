@@ -206,3 +206,12 @@ class FooterSocialLinksTests(TestCase):
         self.assertContains(response, 'Djona sur LinkedIn')
         self.assertNotContains(response, 'Djona sur Instagram')
         self.assertNotContains(response, 'Djona sur TikTok')
+
+
+class HomeTruthTests(TestCase):
+    def test_no_invented_figures_or_claims(self):
+        content = self.client.get(reverse('core:home')).content.decode()
+        for phrase in ('1450', 'Clients heureux', "Points d'inspection", "Heures d'accompagnement",
+                       'inspecté par nos experts', 'inspectés et vérifiés par nos experts',
+                       'milliers de vendeurs', 'première plateforme'):
+            self.assertNotIn(phrase, content)

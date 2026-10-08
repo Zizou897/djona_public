@@ -22,12 +22,16 @@ CONTACT_RATE_WINDOW = 3600  # secondes (1 h)
 
 NL = chr(10)
 
-HOME_STATS = [
-    {'end': 1450, 'suffix': '+', 'label': 'Véhicules vendus'},
-    {'end': 2300, 'suffix': '', 'label': 'Clients heureux'},
-    {'end': 150, 'suffix': '', 'label': "Points d'inspection"},
-    {'end': 5000, 'suffix': 'h', 'label': "Heures d'accompagnement"},
-]
+def _home_stats():
+    """Chiffres réels de la marketplace (les compteurs de l'accueil)."""
+    published = Vehicle.objects.filter(publish=True)
+    stats = [
+        {'end': published.count(), 'suffix': '', 'label': 'Véhicules en vente'},
+        {'end': published.values('brand').distinct().count(), 'suffix': '', 'label': 'Marques disponibles'},
+        {'end': published.exclude(seller=None).values('seller').distinct().count(), 'suffix': '', 'label': 'Vendeurs actifs'},
+        {'end': published.exclude(city='').values('city').distinct().count(), 'suffix': '', 'label': 'Villes'},
+    ]
+    return [stat for stat in stats if stat['end']]
 
 
 def home(request):
@@ -43,7 +47,8 @@ def home(request):
     ):
         entry = brand_options.setdefault(brand, {'fuel_types': {}, 'cities': set()})
         entry['fuel_types'][fuel_type] = fuel_labels.get(fuel_type, fuel_type)
-        entry['cities'].add(city)
+        if city:
+            entry['cities'].add(city)
 
     search_brand_options = {
         brand: {
@@ -58,7 +63,7 @@ def home(request):
 
     context = {
         'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:8],
-        'stats': HOME_STATS,
+        'stats': _home_stats(),
         'search_brands': sorted(brand_options.keys()),
         'search_brand_options': search_brand_options,
     }
