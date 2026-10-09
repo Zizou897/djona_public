@@ -11,7 +11,7 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
-from .forms import AnnonceAdminForm
+from .forms import MAX_PHOTOS, MIN_PHOTOS, AnnonceAdminForm
 from .models import (
     AnnonceMirror, AnnoncePhotoMirror, CompteVendeur, DemandePassageProMirror, ProfilMirror, VehicleMirror,
 )
@@ -19,6 +19,7 @@ from .sync import trigger_public_sync
 
 SYSTEM_VENDOR_EMAIL = 'officiel@djona.tech'
 SLA_HEURES = 24
+LIMITES_PHOTOS = {'min_photos': MIN_PHOTOS, 'max_photos': MAX_PHOTOS}
 
 
 def _annoter_sla(annonce, now=None):
@@ -367,12 +368,12 @@ class AnnonceCreateAdminView(_StaffRequiredMixin, View):
     template_name = 'moderation/annonce_form.html'
 
     def get(self, request):
-        return render(request, self.template_name, {'form': AnnonceAdminForm()})
+        return render(request, self.template_name, {'form': AnnonceAdminForm(), **LIMITES_PHOTOS})
 
     def post(self, request):
-        form = AnnonceAdminForm(request.POST, request.FILES)
+        form = AnnonceAdminForm(request.POST, request.FILES, exiger_photos_minimum=True)
         if not form.is_valid():
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form, **LIMITES_PHOTOS})
 
         vendeur = CompteVendeur.objects.using('vendor_db').filter(email=SYSTEM_VENDOR_EMAIL).first()
         if vendeur is None:
@@ -381,7 +382,7 @@ class AnnonceCreateAdminView(_StaffRequiredMixin, View):
                 "Le compte vendeur système (officiel@djona.tech) n'existe pas — "
                 "lancez `manage.py create_system_vendor` côté projet vendor.",
             )
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form, **LIMITES_PHOTOS})
 
         # created_at/update_at n'ont pas d'auto_now(_add) sur ce mirror (ils
         # viennent de app.Convention côté vendor, jamais appliqué ici) — à

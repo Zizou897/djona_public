@@ -1,6 +1,9 @@
+import tempfile
+
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import floatformat
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from moderation.models import AnnonceMirror, CompteVendeur
@@ -177,3 +180,45 @@ class AnnonceModerationListViewTest(TestCase):
         url = reverse('annonce_refuser', args=[self.annonce_en_attente.pk])
         response = self.client.post(url)
         self.assertRedirects(response, f"{reverse('connexion_admin')}?next={url}")
+
+
+PNG_1PX = (
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06'
+    b'\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00'
+    b'\x01\r\n\x2d\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+)
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class AnnonceCreateAdminViewTest(TestCase):
+    databases = {'default', 'vendor_db'}
+
+    def setUp(self):
+        self.admin = User.objects.create_user(username='admin-creation', password='motdepasse', is_staff=True)
+        self.systeme = CompteVendeur.objects.using('vendor_db').create(
+            email='officiel@djona.tech', nom='Djona', prenom='Officiel', telephone='0102030405',
+            type_compte=CompteVendeur.TypeCompte.PROFESSIONNEL, statut_compte=CompteVendeur.StatutCompte.ACTIF,
+            is_active=True, date_joined='2026-08-27T10:00:00Z', password='inutilise',
+        )
+        self.client.force_login(self.admin)
+
+    def donnees(self, nb_photos):
+        return {
+            'marque': 'Toyota', 'modele': 'Prado', 'annee': 2020, 'prix': 32500000, 'kilometrage': 58000,
+            'carburant': 'diesel', 'boite_vitesses': 'automatique', 'couleur': 'Blanc',
+            'etat': 'occasion', 'ville': 'abidjan_cocody', 'description': 'Véhicule officiel Djona.',
+            'photos': [SimpleUploadedFile(f'p{i}.png', PNG_1PX, content_type='image/png') for i in range(nb_photos)],
+        }
+
+    def test_creation_refusee_avec_moins_de_3_photos(self):
+        response = self.client.post(reverse('annonce_creer_admin'), self.donnees(2))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Ajoutez au moins 3 photos')
+        self.assertFalse(AnnonceMirror.objects.using('vendor_db').filter(vendeur=self.systeme).exists())
+
+    def test_creation_publiee_avec_3_photos(self):
+        response = self.client.post(reverse('annonce_creer_admin'), self.donnees(3))
+        self.assertRedirects(response, reverse('annonce_moderation_liste'))
+        annonce = AnnonceMirror.objects.using('vendor_db').get(vendeur=self.systeme)
+        self.assertEqual(annonce.statut, AnnonceMirror.Statut.PUBLIEE)
+        self.assertEqual(annonce.photos.using('vendor_db').count(), 3)

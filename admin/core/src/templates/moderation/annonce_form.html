@@ -28,7 +28,7 @@
             </div>
             {% endif %}
 
-            <form class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start" enctype="multipart/form-data" method="post">
+            <form class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start" enctype="multipart/form-data" id="annonce-form" method="post">
                 {% csrf_token %}
                 <div class="flex flex-col gap-5 min-w-0">
                     {% include 'moderation/_champs_annonce.html' %}
@@ -39,10 +39,10 @@
                                 <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-on-primary text-sm font-bold flex items-center justify-center">4</span>
                                 <div>
                                     <h2 class="font-headline-md font-semibold text-base text-primary">Photos</h2>
-                                    <p class="text-xs text-on-surface-variant">Jusqu'à 4 photos, 4 Mo maximum chacune.</p>
+                                    <p class="text-xs text-on-surface-variant">{{ min_photos }} minimum pour publier, {{ max_photos }} maximum — 4 Mo par image.</p>
                                 </div>
                             </div>
-                            <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-on-surface-variant" id="photo-count">0/4</span>
+                            <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-on-surface-variant" id="photo-count">0/{{ max_photos }}</span>
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3" id="photo-grid"></div>
                         <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl py-8 px-4 text-center cursor-pointer hover:border-primary hover:bg-primary/[0.03] transition-colors" for="id_photos" id="photo-zone">
@@ -50,6 +50,7 @@
                             <span class="text-sm font-semibold text-on-surface">Glissez les photos ici ou <span class="text-primary">parcourez</span></span>
                         </label>
                         <input accept="image/*" class="sr-only" id="id_photos" multiple name="photos" type="file">
+                        <p class="hidden mt-3 text-xs font-medium text-error" id="photo-erreur" role="alert"></p>
                     </section>
                 </div>
 
@@ -72,7 +73,9 @@
 {% block scripts %}
 <script>
 (function () {
-    var MAX = 4;
+    var MIN = {{ min_photos }};
+    var MAX = {{ max_photos }};
+    var erreur = document.getElementById('photo-erreur');
     var input = document.getElementById('id_photos');
     var grille = document.getElementById('photo-grid');
     var compteur = document.getElementById('photo-count');
@@ -99,6 +102,8 @@
             grille.appendChild(item);
         });
         compteur.textContent = fichiers.length + '/' + MAX;
+        compteur.className = 'shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ' + (fichiers.length >= MIN ? 'bg-green-100 text-green-800' : 'bg-surface-container text-on-surface-variant');
+        if (fichiers.length >= MIN) { erreur.classList.add('hidden'); }
         zone.classList.toggle('hidden', fichiers.length >= MAX);
         var dt = new DataTransfer();
         fichiers.forEach(function (f) { dt.items.add(f); });
@@ -113,6 +118,14 @@
     ['dragenter', 'dragover'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.add('border-primary'); }); });
     ['dragleave', 'drop'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.remove('border-primary'); }); });
     zone.addEventListener('drop', function (e) { ajouter(e.dataTransfer.files); });
+    document.getElementById('annonce-form').addEventListener('submit', function (e) {
+        if (fichiers.length < MIN) {
+            e.preventDefault();
+            erreur.textContent = 'Ajoutez au moins ' + MIN + ' photos pour publier l'annonce (' + fichiers.length + '/' + MIN + ' actuellement).';
+            erreur.classList.remove('hidden');
+            zone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
     grille.addEventListener('click', function (e) {
         var bouton = e.target.closest('.retirer');
         if (!bouton) return;
