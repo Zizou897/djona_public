@@ -1,0 +1,12 @@
+{% load static %}
+<div id="page-loader" role="status" aria-live="polite" aria-label="Chargement de Djona Group">
+  <div class="pl-logo">
+    <img id="pl-text" src="{% static 'img/loader/text.png' %}" alt="DJONA" width="1200" height="448">
+    <img id="pl-square" src="{% static 'img/loader/square.png' %}" alt="" width="72" height="68">
+    <span class="pl-ring" aria-hidden="true"></span><span class="pl-ring pl-ring-2" aria-hidden="true"></span>
+    <img id="pl-circle" src="{% static 'img/loader/circle.png' %}" alt="" width="170" height="170">
+    <img id="pl-group" src="{% static 'img/loader/group.png' %}" alt="Group" width="1200" height="448">
+  </div>
+</div>
+<noscript><style>#page-loader{display:none}</style></noscript>
+<script src="{% static 'js/page-loader.js' %}"></script>

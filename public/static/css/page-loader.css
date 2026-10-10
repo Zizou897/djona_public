@@ -1,0 +1,65 @@
+/* Loader de page Djona Group — logo animé (texte, carré, cercle, « Group »).
+   Les 4 calques sont dans static/img/loader/ et partagent le même repère
+   (rapport 1200/448). Hors Tailwind : fichier statique indépendant. */
+#page-loader {
+  --pl-orange: #ec6f1d;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  transition: opacity .5s ease, visibility .5s ease;
+  /* Filet de sécurité si le script ne s'exécute pas */
+  animation: pl-out .5s ease 7s forwards;
+}
+#page-loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+.no-page-loader #page-loader { display: none; }
+
+.pl-logo {
+  position: relative;
+  width: min(300px, 56vw);
+  aspect-ratio: 1200 / 448;
+}
+.pl-logo img { position: absolute; display: block; max-width: none; user-select: none; }
+
+#pl-text {
+  inset: 0; width: 100%; height: 100%;
+  clip-path: inset(0 100% 0 0);
+  animation: pl-wipe 1.5s cubic-bezier(.65, 0, .25, 1) .4s forwards;
+}
+#pl-square {
+  left: 0; top: 39.51%; width: 6%; height: auto;
+  opacity: 0;
+  animation: pl-drop .9s cubic-bezier(.3, 1.5, .5, 1) 1.3s forwards;
+}
+#pl-circle {
+  left: 37.92%; top: 8.26%; width: 14.17%; height: auto;
+  transform: scale(0);
+  animation: pl-pop .9s cubic-bezier(.3, 1.6, .5, 1) 2s forwards;
+}
+.pl-ring {
+  position: absolute; left: 37.92%; top: 8.26%; width: 14.17%;
+  aspect-ratio: 1; border: 3px solid var(--pl-orange); border-radius: 50%;
+  opacity: 0;
+  animation: pl-ring 1.6s ease-out 2.3s infinite;
+}
+.pl-ring.pl-ring-2 { animation-delay: 3.1s; }
+#pl-group {
+  inset: 0; width: 100%; height: 100%;
+  opacity: 0; transform: translateY(12px);
+  animation: pl-fade .9s ease 3.1s forwards;
+}
+
+@keyframes pl-wipe { to { clip-path: inset(0 0 0 0); } }
+@keyframes pl-drop { from { opacity: 0; transform: translateY(-70px) scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes pl-pop  { to { transform: scale(1); } }
+@keyframes pl-ring { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes pl-fade { to { opacity: 1; transform: none; } }
+@keyframes pl-out  { to { opacity: 0; visibility: hidden; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #pl-text, #pl-square, #pl-circle, #pl-group { animation: none; clip-path: none; opacity: 1; transform: none; }
+  .pl-ring { display: none; }
+}
