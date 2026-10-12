@@ -1,0 +1,2 @@
+<option value="">{% if models %}Tous les modèles{% else %}Choisissez une marque{% endif %}</option>
+{% for m in models %}<option value="{{ m }}" {% if vehicle.model|lower == m|lower %}selected{% endif %}>{{ m }}</option>{% endfor %}

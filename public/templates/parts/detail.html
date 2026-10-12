@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ part.name }}{% if part.brand %} {{ part.brand }}{% endif %} — Djona Parts{% endblock %}
+{% block meta_description %}{{ part.name }}{% if part.brand %} {{ part.brand }}{% endif %} — réf. {{ part.manufacturer_reference|default:part.reference }}. {{ part.category.name }}. {% if part.price %}{{ part.price|stringformat:"d" }} FCFA.{% else %}Prix sur demande.{% endif %}{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ part.name|escapejs }}",
+  "sku": "{{ part.reference|escapejs }}",
+  {% if part.manufacturer_reference %}"mpn": "{{ part.manufacturer_reference|escapejs }}",{% endif %}
+  {% if part.brand %}"brand": {"@type": "Brand", "name": "{{ part.brand|escapejs }}"},{% endif %}
+  {% if images %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ images.0.image.url }}",{% endif %}
+  "category": "{{ part.category.name|escapejs }}"{% if part.price and part.availability != 'indisponible' %},
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "XOF",
+    "price": "{{ part.price|stringformat:'d' }}"{% if part.availability == 'disponible' %},
+    "availability": "https://schema.org/InStock"{% endif %}
+  }{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{% url 'parts:request' as request_url %}
+<div class="flex flex-col w-full max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop pt-base pb-section-gap gap-8">
+
+  <nav aria-label="Fil d'Ariane" class="font-label-sm text-label-sm text-on-surface-variant">
+    <a href="{% url 'parts:home' %}" class="hover:text-primary">Djona Parts</a> <span aria-hidden="true">/</span>
+    <a href="{% url 'parts:search' %}?categorie={{ part.category.pk }}" class="hover:text-primary">{{ part.category.name }}</a> <span aria-hidden="true">/</span>
+    <span>{{ part.name }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+
+    {# Galerie #}
+    <div class="flex flex-col gap-3" id="part-gallery">
+      <div class="aspect-[4/3] bg-surface-container rounded-lg overflow-hidden flex items-center justify-center">
+        {% if images %}
+        <img id="part-gallery-main" src="{{ images.0.image.url }}" alt="{{ part.name }}" class="w-full h-full object-contain bg-white">
+        {% else %}
+        <span class="material-symbols-outlined text-[96px] text-outline" aria-hidden="true">{{ part.category.icon }}</span>
+        {% endif %}
+      </div>
+      {% if images|length > 1 %}
+      <div class="grid grid-cols-5 gap-2">
+        {% for image in images %}
+        <button type="button" data-gallery-thumb="{{ image.image.url }}" aria-label="Photo {{ forloop.counter }}"
+                class="aspect-square rounded-md overflow-hidden bg-surface-container border border-outline-variant/40 hover:border-primary transition-colors">
+          <img src="{{ image.image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {# Informations #}
+    <div class="flex flex-col gap-6">
+      <div>
+        <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">{{ part.category.name }}</span>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mt-1">{{ part.name }}</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+          {% if part.brand %}{{ part.brand }} · {% endif %}Réf. Djona {{ part.reference }}{% if part.manufacturer_reference %} · Réf. fabricant {{ part.manufacturer_reference }}{% endif %}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        {% if part.price %}
+        <span class="font-display-lg text-3xl text-secondary">{{ part.price }} <span class="text-lg">FCFA</span></span>
+        {% else %}
+        <span class="font-headline-md text-headline-md text-on-surface">Prix sur demande</span>
+        {% endif %}
+        {% if part.availability == 'disponible' %}
+        <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 font-label-md text-label-md">Disponible</span>
+        {% elif part.availability == 'indisponible' %}
+        <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Indisponible</span>
+        {% else %}
+        <span class="px-3 py-1 rounded-full bg-secondary-container/25 text-secondary font-label-md text-label-md">Disponibilité à confirmer</span>
+        {% endif %}
+      </div>
+
+      {# Compatibilité avec le véhicule saisi #}
+      {% if compatibility == 'compatible' %}
+      <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-green-50 border border-green-200 text-green-900" role="status">
+        <span class="material-symbols-outlined text-[22px] shrink-0" aria-hidden="true">check_circle</span>
+        <p class="font-body-md text-body-md">Compatibilité renseignée avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong>.</p>
+      </div>
+      {% elif compatibility == 'unknown' %}
+      <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-secondary-container/20 border border-secondary-container/50 text-on-surface" role="status">
+        <span class="material-symbols-outlined text-secondary text-[22px] shrink-0" aria-hidden="true">help</span>
+        <p class="font-body-md text-body-md">Compatibilité avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong> non établie : l'équipe Djona peut la vérifier avant toute confirmation.</p>
+      </div>
+      {% endif %}
+
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 bg-surface-container-lowest rounded-lg shadow-signature p-5">
+        <div><dt class="font-label-sm text-label-sm text-on-surface-variant">État</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.get_condition_display|default:"Non précisé" }}</dd></div>
+        <div><dt class="font-label-sm text-label-sm text-on-surface-variant">Garantie</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.warranty|default:"Non précisée" }}</dd></div>
+        {% if part.lead_time %}<div class="col-span-2"><dt class="font-label-sm text-label-sm text-on-surface-variant">Délai estimé</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.lead_time }}</dd></div>{% endif %}
+      </dl>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{{ request_url }}?piece={{ part.pk }}{% if vehicle.make %}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}{% endif %}"
+           class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow hover:brightness-110 transition-all">
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">request_quote</span>Demander cette pièce
+        </a>
+        <a href="{{ site_contact.whatsapp_url }}?text={{ 'Bonjour, je souhaite la pièce '|add:part.name|add:' (réf. '|add:part.reference|add:').'|urlencode }}" target="_blank" rel="noopener"
+           class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-primary text-primary rounded font-label-md text-label-md uppercase tracking-wide hover:bg-primary/5 transition-colors">
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span>WhatsApp
+        </a>
+      </div>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Le prix et la disponibilité sont confirmés par l'équipe Djona lors de votre demande.</p>
+    </div>
+  </div>
+
+  {% if part.description %}
+  <section class="bg-surface-container-lowest rounded-lg shadow-signature p-6">
+    <h2 class="font-headline-md text-headline-md text-primary mb-3">Description</h2>
+    <p class="font-body-md text-body-md text-on-surface whitespace-pre-line">{{ part.description }}</p>
+  </section>
+  {% endif %}
+
+  <section class="bg-surface-container-lowest rounded-lg shadow-signature p-6">
+    <h2 class="font-headline-md text-headline-md text-primary mb-3">Véhicules compatibles</h2>
+    {% if compatibilities %}
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+      {% for item in compatibilities %}
+      <li class="flex items-center gap-2 font-body-md text-body-md text-on-surface"><span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">check</span>{{ item.label }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="font-body-md text-body-md text-on-surface-variant">Aucune compatibilité n'est encore renseignée pour cette pièce. Indiquez-nous votre véhicule : l'équipe Djona la vérifie avant toute confirmation.</p>
+    {% endif %}
+  </section>
+
+  {% if related %}
+  <section>
+    <h2 class="font-headline-md text-headline-md text-on-surface mb-5">Dans la même catégorie</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for part in related %}{% include 'parts/_part_card.html' %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/part-gallery.js' %}" defer></script>
+{% endblock %}

@@ -27,6 +27,14 @@ python manage.py migrate --noinput
 echo "==> [admin] collecte des statiques"
 python manage.py collectstatic --noinput
 
+# Les photos de pièces envoyées depuis le back-office sont écrites dans le
+# media_cdn du projet public (servi par le site) : media_cdn/parts doit y pointer.
+echo "==> [admin] lien média Djona Parts"
+PUBLIC_PARTS="/var/www/project/djona_public/public/media_cdn/parts"
+mkdir -p "$PUBLIC_PARTS" media_cdn
+chown www-data:www-data "$PUBLIC_PARTS"
+ln -sfn "$PUBLIC_PARTS" media_cdn/parts
+
 restart_and_check "$SERVICE" "$URL" 200 302
 
 echo "==> [admin] déploiement réussi"

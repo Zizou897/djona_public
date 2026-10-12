@@ -417,10 +417,6 @@ def transport(request):
     return render(request, 'core/transport.html', {'form': form})
 
 
-def pieces(request):
-    return render(request, 'core/pieces.html')
-
-
 def transport_success(request):
     reference = request.session.pop('transport_reference', None)
     if not reference:

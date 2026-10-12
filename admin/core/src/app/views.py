@@ -56,6 +56,7 @@ class CompteursAdminView(StaffRequisMixin, View):
 
     def get(self, request):
         from contactmessages.models import ContactMessageMirror
+        from parts.models import PartRequestMirror
         from transport.models import TransportRequestMirror
 
         requetes = {
@@ -69,6 +70,8 @@ class CompteursAdminView(StaffRequisMixin, View):
                 status=ContactMessageMirror.Status.NEW).count(),
             'transport': lambda: TransportRequestMirror.objects.using('public_db').filter(
                 status=TransportRequestMirror.Status.NEW).count(),
+            'pieces': lambda: PartRequestMirror.objects.using('public_db').filter(
+                status=PartRequestMirror.Status.NEW).count(),
         }
         compteurs = {}
         for cle, compter in requetes.items():

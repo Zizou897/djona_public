@@ -43,6 +43,7 @@ LOCAL_APPS = [
     'newsletter',
     'transport',
     'contactmessages',
+    'parts',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -210,6 +211,12 @@ MEDIA_ROOT = BASE_DIR / 'media_cdn'
 #   - Windows (dev local) : mklink /J media_cdn\justificatifs ..\..\..\vendor\core\src\media_cdn\justificatifs
 #   - Linux (VPS de prod — admin et vendor partagent le même serveur) :
 #     ln -s /chemin/absolu/vers/vendor/core/src/media_cdn/justificatifs media_cdn/justificatifs
+
+# Même principe pour les photos des pièces détachées (parts.PartImageMirror, fichiers
+# écrits ici par le staff mais servis par le site public) : media_cdn/parts/ de ce
+# projet doit être un lien vers celui du projet public (public/media_cdn/parts/).
+#   - Windows (dev local) : mklink /J media_cdn\parts ..\..\..\public\media_cdn\parts
+#   - Linux (VPS de prod) : créé et rendu inscriptible par deploy/deploy_admin.sh
 
 # Doit rester alignée avec client_max_body_size (nginx) — sinon un fichier
 # accepté par nginx peut quand même être rejeté par Django avant nginx.

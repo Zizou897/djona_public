@@ -11,6 +11,7 @@ urlpatterns = [
     path('', include('newsletter.urls')),
     path('', include('transport.urls')),
     path('', include('contactmessages.urls')),
+    path('', include('parts.urls')),
     path('', include('app.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

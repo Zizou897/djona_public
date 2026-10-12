@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if filters.q %}« {{ filters.q }} » — {% endif %}Pièces détachées — Djona Parts{% endblock %}
+{% block meta_description %}Catalogue de pièces détachées automobiles Djona Parts : filtrez par catégorie, véhicule, référence ou budget.{% endblock %}
+{% block styles %}{% if filters.q or filters.make or filters.categorie or filters.budget or page_obj.number > 1 %}<meta name="robots" content="noindex,follow">{% endif %}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
+    <nav aria-label="Fil d'Ariane" class="font-label-sm text-label-sm text-on-surface-variant mb-3">
+      <a href="{% url 'parts:home' %}" class="hover:text-primary">Djona Parts</a> <span aria-hidden="true">/</span> <span>Catalogue</span>
+    </nav>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter border-b border-surface-container-highest pb-gutter">
+      <div>
+        <h1 class="font-display-lg text-headline-lg text-on-surface">Pièces détachées</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-1">{{ page_obj.paginator.count }} pièce{{ page_obj.paginator.count|pluralize }}{% if filters.q %} pour « {{ filters.q }} »{% endif %}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter mb-section-gap grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-section-gap items-start">
+
+    {# Filtres #}
+    <aside class="bg-surface-container-lowest rounded-lg shadow-signature p-5 lg:sticky lg:top-24">
+      <form method="get" action="{% url 'parts:search' %}" class="flex flex-col gap-5">
+        <label class="flex flex-col gap-1.5">
+          <span class="font-label-md text-label-md text-on-surface">Nom ou référence</span>
+          <input type="search" name="q" value="{{ filters.q }}" placeholder="Ex : plaquettes, 04465-33450"
+                 class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-label-md text-label-md text-on-surface">Catégorie</span>
+          <select name="categorie" class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <option value="">Toutes les catégories</option>
+            {% for category in categories %}<option value="{{ category.pk }}" {% if filters.categorie == category.pk|stringformat:'d' %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+          </select>
+        </label>
+        {% if makes %}
+        <fieldset class="flex flex-col gap-3">
+          <legend class="font-label-md text-label-md text-on-surface mb-1.5">Votre véhicule</legend>
+          <select name="marque" aria-label="Marque"
+                  hx-get="{% url 'parts:models' %}" hx-target="#parts-model-filters" hx-trigger="change"
+                  class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <option value="">Toutes les marques</option>
+            {% for make in makes %}<option value="{{ make }}" {% if vehicle.make|lower == make|lower %}selected{% endif %}>{{ make }}</option>{% endfor %}
+          </select>
+          <select name="modele" id="parts-model-filters" aria-label="Modèle"
+                  class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            {% include 'parts/_model_options.html' %}
+          </select>
+          <input type="number" name="annee" inputmode="numeric" min="1960" max="2100" placeholder="Année" aria-label="Année" value="{{ vehicle.year|default_if_none:'' }}"
+                 class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+        </fieldset>
+        {% endif %}
+        <label class="flex flex-col gap-1.5">
+          <span class="font-label-md text-label-md text-on-surface">Budget maximum (FCFA)</span>
+          <input type="number" name="budget" inputmode="numeric" min="0" step="1000" value="{{ filters.budget }}" placeholder="Ex : 50000"
+                 class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-label-md text-label-md text-on-surface">Trier par</span>
+          <select name="tri" class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <option value="pertinence" {% if filters.tri == 'pertinence' %}selected{% endif %}>Pertinence</option>
+            <option value="prix_asc" {% if filters.tri == 'prix_asc' %}selected{% endif %}>Prix croissant</option>
+            <option value="prix_desc" {% if filters.tri == 'prix_desc' %}selected{% endif %}>Prix décroissant</option>
+          </select>
+        </label>
+        <div class="flex flex-col gap-2">
+          <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-on-primary rounded font-label-md text-label-md uppercase tracking-wide hover:bg-primary-container transition-colors">Appliquer</button>
+          <a href="{% url 'parts:search' %}" class="text-center font-label-md text-label-md text-primary hover:underline">Réinitialiser</a>
+        </div>
+      </form>
+    </aside>
+
+    {# Résultats #}
+    <div class="flex flex-col gap-6 min-w-0">
+      {% if has_vehicle %}
+      <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-primary/5 border border-primary/15 text-on-surface-variant" role="note">
+        <span class="material-symbols-outlined text-primary text-[22px] shrink-0" aria-hidden="true">info</span>
+        <p class="font-body-md text-body-md">
+          Résultats pour <strong class="text-on-surface">{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong>, d'après les compatibilités renseignées.
+          Une pièce absente de cette liste peut tout de même convenir :
+          <a class="text-primary font-semibold hover:underline" href="{% url 'parts:request' %}?marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}">faites-la vérifier par l'équipe Djona</a>.
+        </p>
+      </div>
+      {% endif %}
+
+      {% if page_obj.object_list %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for part in page_obj %}{% include 'parts/_part_card.html' %}{% endfor %}
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav aria-label="Pagination" class="flex items-center justify-center gap-3 pt-4">
+        {% if page_obj.has_previous %}
+        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" class="inline-flex items-center gap-1 px-4 py-2.5 rounded border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_left</span>Précédent
+        </a>
+        {% endif %}
+        <span class="font-label-md text-label-md text-on-surface-variant">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}" class="inline-flex items-center gap-1 px-4 py-2.5 rounded border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container">
+          Suivant<span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
+        </a>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+      {% else %}
+      <div class="bg-surface-container-lowest rounded-lg shadow-signature px-6 py-14 text-center flex flex-col items-center gap-4">
+        <span class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-[32px]" aria-hidden="true">search_off</span>
+        </span>
+        <h2 class="font-headline-md text-headline-md text-on-surface">Aucune pièce ne correspond à votre recherche</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Elle n'est peut-être pas encore au catalogue. Décrivez-la-nous : notre équipe la recherche et vous recontacte.</p>
+        <a href="{% url 'parts:request' %}?piece_nom={{ filters.q|urlencode }}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}"
+           class="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all">
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">manage_search</span>Je ne trouve pas ma pièce
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

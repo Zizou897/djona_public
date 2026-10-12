@@ -29,6 +29,7 @@ LOCAL_APPS = [
     'apps.core',
     'apps.catalog',
     'apps.vendor_sync',
+    'apps.parts',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -113,4 +114,5 @@ from decouple import config as _config  # noqa: E402
 TRANSPORT_NOTIFY_EMAILS = [e.strip() for e in _config('TRANSPORT_NOTIFY_EMAILS', default='').split(',') if e.strip()]
 
 # Destinataires des notifications email de nouveau message de contact. Vide = pas d'email.
+PARTS_NOTIFY_EMAILS = [e.strip() for e in _config('PARTS_NOTIFY_EMAILS', default='').split(',') if e.strip()]
 CONTACT_NOTIFY_EMAILS = [e.strip() for e in _config('CONTACT_NOTIFY_EMAILS', default='').split(',') if e.strip()]

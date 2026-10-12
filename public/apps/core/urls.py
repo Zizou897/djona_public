@@ -16,7 +16,6 @@ urlpatterns = [
     path('conditions-vendeurs/', views.seller_terms, name='seller_terms'),
     path('transport-logistique/', views.transport, name='transport'),
     path('transport-logistique/merci/', views.transport_success, name='transport_success'),
-    path('pieces-detachees/', views.pieces, name='pieces'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('newsletter/', views.newsletter_subscribe, name='newsletter_subscribe'),
 ]

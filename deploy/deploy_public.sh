@@ -35,6 +35,13 @@ echo "==> [public] droits du cache fichiers"
 mkdir -p cache_framework
 chown -R www-data:www-data cache_framework
 
+# Photos des pièces détachées : le back-office (media_cdn/parts, lien vers ce
+# dossier) et le formulaire public (media_cdn/part_requests) écrivent ici sous
+# l'utilisateur de gunicorn.
+echo "==> [public] dossiers médias Djona Parts"
+mkdir -p media_cdn/parts media_cdn/part_requests
+chown -R www-data:www-data media_cdn/parts media_cdn/part_requests
+
 restart_and_check "$SERVICE" "$URL" 200
 
 echo "==> [public] déploiement réussi"

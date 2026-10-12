@@ -1,0 +1,72 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Import CSV — Back-office Djona{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='pieces_import' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-4xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Djona Parts</span>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Import CSV du catalogue</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Ajoutez ou mettez à jour des pièces en une fois. Une pièce dont la référence existe déjà est mise à jour ; sinon elle est créée.</p>
+            </div>
+
+            {% if report %}
+            {% if report.ok %}
+            <section class="reveal flex items-start gap-3 px-5 py-4 rounded-2xl bg-green-50 border border-green-200 text-green-900" role="status">
+                <span class="material-symbols-outlined text-[22px] shrink-0">check_circle</span>
+                <div class="text-sm">
+                    <p class="font-semibold">Import terminé</p>
+                    <p>{{ report.created }} pièce{{ report.created|pluralize }} créée{{ report.created|pluralize }}, {{ report.updated }} mise{{ report.updated|pluralize }} à jour.</p>
+                    {% if report.ignored_columns %}<p class="mt-1 text-xs">Colonnes ignorées : {{ report.ignored_columns|join:", " }}.</p>{% endif %}
+                </div>
+            </section>
+            {% else %}
+            <section class="reveal rounded-2xl bg-error-container text-on-error-container px-5 py-4" role="alert">
+                <p class="flex items-center gap-2 text-sm font-semibold"><span class="material-symbols-outlined text-[20px]">error</span>Aucune pièce n'a été importée : corrigez les lignes ci-dessous puis réessayez.</p>
+                <ul class="mt-3 flex flex-col gap-1 text-sm">
+                    {% for line, message in report.errors %}<li>{% if line %}<span class="font-semibold">Ligne {{ line }} :</span> {% endif %}{{ message }}</li>{% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+            {% endif %}
+
+            <form class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4" method="post" enctype="multipart/form-data" style="animation-delay:.08s">
+                {% csrf_token %}
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-semibold text-on-surface" for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+                    <input type="file" name="file" id="{{ form.file.id_for_label }}" accept=".csv,text/csv" required class="block w-full text-sm text-on-surface-variant file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/15">
+                    {% for e in form.file.errors %}<p class="text-xs text-error">{{ e }}</p>{% endfor %}
+                    <p class="text-xs text-on-surface-variant">Séparateur « ; » ou « , », encodage UTF-8 (export Excel accepté), 2 Mo et 5 000 lignes maximum. Tout ou rien : une erreur annule l'import.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button class="inline-flex items-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary-container transition-colors" type="submit"><span class="material-symbols-outlined text-[18px]">upload_file</span>Importer</button>
+                    <a class="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-outline-variant text-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors" href="{% url 'part_import_modele' %}"><span class="material-symbols-outlined text-[18px]">download</span>Télécharger le modèle</a>
+                </div>
+            </form>
+
+            <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.12s">
+                <h2 class="font-headline-md font-semibold text-base text-primary mb-4">Colonnes du fichier</h2>
+                <dl class="flex flex-col divide-y divide-outline-variant/30">
+                    {% for name, help in colonnes %}
+                    <div class="py-2.5 grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-1 sm:gap-4">
+                        <dt class="text-sm font-semibold text-on-surface font-mono">{{ name }}</dt>
+                        <dd class="text-sm text-on-surface-variant">{{ help }}</dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+                <p class="text-xs text-on-surface-variant mt-4">Catégories reconnues : {% for c in categories %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+                <p class="text-xs text-on-surface-variant mt-2">Les photos ne s'importent pas : ajoutez-les ensuite pièce par pièce. Prix et disponibilité laissés vides s'affichent « sur demande » / « à confirmer » sur le site.</p>
+            </section>
+        </main>
+    </div>
+</div>
+{% endblock %}

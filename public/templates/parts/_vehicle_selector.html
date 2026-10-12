@@ -1,0 +1,32 @@
+{# Sélecteur de véhicule marque → modèle → année. Variables : uid (identifiant unique), makes, models, vehicle. #}
+{% if makes %}
+<form method="get" action="{% url 'parts:search' %}" class="flex flex-col gap-3">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <label class="flex flex-col gap-1.5">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Marque</span>
+      <select name="marque" required
+              hx-get="{% url 'parts:models' %}" hx-target="#parts-model-{{ uid }}" hx-trigger="change"
+              class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+        <option value="">Choisir…</option>
+        {% for make in makes %}<option value="{{ make }}" {% if vehicle.make|lower == make|lower %}selected{% endif %}>{{ make }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="flex flex-col gap-1.5">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Modèle</span>
+      <select name="modele" id="parts-model-{{ uid }}"
+              class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+        {% include 'parts/_model_options.html' %}
+      </select>
+    </label>
+    <label class="flex flex-col gap-1.5">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Année</span>
+      <input type="number" name="annee" inputmode="numeric" min="1960" max="2100" placeholder="Ex : 2015" value="{{ vehicle.year|default_if_none:'' }}"
+             class="w-full px-3 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface font-body-md outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+    </label>
+  </div>
+  <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all">
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">directions_car</span>
+    Afficher les pièces compatibles
+  </button>
+</form>
+{% endif %}

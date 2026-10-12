@@ -2,13 +2,14 @@ from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from apps.catalog.models import Vehicle
+from apps.parts.models import Part
 
 
 class StaticViewSitemap(Sitemap):
     changefreq = 'monthly'
 
     def items(self):
-        return ['core:home', 'catalog:list', 'core:avantages', 'core:contact', 'core:transport', 'core:privacy', 'core:terms', 'core:seller_terms']
+        return ['core:home', 'catalog:list', 'core:avantages', 'core:contact', 'core:transport', 'parts:home', 'parts:search', 'core:privacy', 'core:terms', 'core:seller_terms']
 
     def location(self, item):
         return reverse(item)
@@ -23,6 +24,20 @@ class VehicleSitemap(Sitemap):
 
     def items(self):
         return Vehicle.objects.filter(publish=True)
+
+    def location(self, obj):
+        return obj.get_absolute_url()
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+
+class PartSitemap(Sitemap):
+    changefreq = 'weekly'
+    priority = 0.6
+
+    def items(self):
+        return Part.objects.filter(is_active=True, category__is_active=True)
 
     def location(self, obj):
         return obj.get_absolute_url()

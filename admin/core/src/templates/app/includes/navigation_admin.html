@@ -2,7 +2,7 @@
 {% comment %}
 Navigation du back-office. À inclure en premier enfant du conteneur racine ;
 la colonne de contenu doit porter `lg:pl-64 lg:pt-16`.
-Paramètre : page_active = dashboard | annonces | vendeurs | demandes_pro | messages | transport
+Paramètre : page_active = dashboard | annonces | vendeurs | demandes_pro | messages | transport | pieces_demandes | pieces | pieces_categories | pieces_import
             | partenaires | coordonnees | newsletter | profil
 Les compteurs « à traiter » (data-compteur) sont chargés après l'affichage via `compteurs_admin`.
 {% endcomment %}
@@ -57,6 +57,23 @@ Les compteurs « à traiter » (data-compteur) sont chargés après l'affichage 
             <a {% if page_active == 'transport' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'transport' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'transport_demande_liste' %}">
                 <span class="material-symbols-outlined text-[20px]">local_shipping</span>Transport
                 <span class="{{ badge }}" data-compteur="transport" title="Nouvelles demandes de transport"></span>
+            </a>
+            <a {% if page_active == 'pieces_demandes' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'pieces_demandes' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'part_demande_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">manage_search</span>Demandes de pièces
+                <span class="{{ badge }}" data-compteur="pieces" title="Nouvelles demandes de pièces"></span>
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-0.5">
+            <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-on-primary/45">Djona Parts</p>
+            <a {% if page_active == 'pieces' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'pieces' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'part_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">inventory_2</span>Catalogue pièces
+            </a>
+            <a {% if page_active == 'pieces_categories' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'pieces_categories' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'part_categorie_liste' %}">
+                <span class="material-symbols-outlined text-[20px]">category</span>Catégories
+            </a>
+            <a {% if page_active == 'pieces_import' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'pieces_import' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'part_import' %}">
+                <span class="material-symbols-outlined text-[20px]">upload_file</span>Import CSV
             </a>
         </div>
 

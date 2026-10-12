@@ -4,11 +4,12 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
-from apps.core.sitemaps import StaticViewSitemap, VehicleSitemap
+from apps.core.sitemaps import PartSitemap, StaticViewSitemap, VehicleSitemap
 
 sitemaps = {
     'static': StaticViewSitemap,
     'vehicles': VehicleSitemap,
+    'parts': PartSitemap,
 }
 
 from apps.catalog import views as catalog_views
@@ -19,6 +20,7 @@ urlpatterns = [
     path('', include('apps.core.urls')),
     path('favoris/', catalog_views.vehicle_favorites, name='favorites_direct'),
     path('vehicules/', include('apps.catalog.urls')),
+    path('pieces-detachees/', include('apps.parts.urls')),
 ]
 
 if settings.DEBUG:

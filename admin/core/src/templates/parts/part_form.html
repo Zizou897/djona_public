@@ -1,0 +1,111 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}{% if part %}{{ part.name }}{% else %}Nouvelle pièce{% endif %} — Back-office Djona{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='pieces' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal" style="animation-delay:.05s">
+                <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'part_liste' %}"><span class="material-symbols-outlined text-[18px]">arrow_back</span>Catalogue pièces</a>
+                <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-3">{% if part %}Modifier la pièce{% else %}Nouvelle pièce{% endif %}</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Les informations inconnues se laissent vides : le site affiche alors « sur demande » ou « à confirmer ».</p>
+            </div>
+
+            <form class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 items-start" method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="flex flex-col gap-5 min-w-0">
+                    {% if form.non_field_errors or erreurs_photos %}
+                    <div class="flex items-start gap-3 px-4 py-3 rounded-xl bg-error-container text-on-error-container text-sm" role="alert">
+                        <span class="material-symbols-outlined text-[20px] shrink-0">error</span>
+                        <div>{{ form.non_field_errors }}{% for e in erreurs_photos %}<p>{{ e }}</p>{% endfor %}</div>
+                    </div>
+                    {% endif %}
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" style="animation-delay:.08s">
+                        <h2 class="flex items-center gap-2 font-headline-md font-semibold text-base text-primary mb-5"><span class="material-symbols-outlined text-[22px]">inventory_2</span>Identification</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for field in form %}{% if field.name in 'reference,name,category,brand,manufacturer_reference' %}
+                            <div class="flex flex-col gap-1.5 {% if field.name == 'name' %}md:col-span-2{% endif %}">
+                                <label class="text-sm font-semibold text-on-surface" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-error">*</span>{% endif %}</label>
+                                {{ field }}
+                                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                                {% for error in field.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            {% endif %}{% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" style="animation-delay:.1s">
+                        <h2 class="flex items-center gap-2 font-headline-md font-semibold text-base text-primary mb-5"><span class="material-symbols-outlined text-[22px]">sell</span>Offre</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for field in form %}{% if field.name in 'condition,price,availability,warranty,lead_time' %}
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-sm font-semibold text-on-surface" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                                {% for error in field.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            {% endif %}{% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" style="animation-delay:.12s">
+                        <h2 class="flex items-center gap-2 font-headline-md font-semibold text-base text-primary mb-5"><span class="material-symbols-outlined text-[22px]">directions_car</span>Description et compatibilité</h2>
+                        <div class="flex flex-col gap-4">
+                            {% for field in form %}{% if field.name in 'description,compatibilities' %}
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-sm font-semibold text-on-surface" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                                {% for error in field.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            {% endif %}{% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" style="animation-delay:.14s">
+                        <h2 class="flex items-center gap-2 font-headline-md font-semibold text-base text-primary mb-1"><span class="material-symbols-outlined text-[22px]">photo_library</span>Photos</h2>
+                        <p class="text-xs text-on-surface-variant mb-5">{{ max_photos }} photos maximum, 4 Mo chacune (JPG, PNG, WebP).</p>
+                        {% if images %}
+                        <ul class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+                            {% for img in images %}
+                            <li class="flex flex-col gap-2">
+                                <img src="{{ img.image.url }}" alt="" class="w-full aspect-[4/3] object-cover rounded-lg border border-outline-variant/40">
+                                <label class="inline-flex items-center gap-2 text-xs text-on-surface-variant"><input type="checkbox" name="supprimer_photos" value="{{ img.pk }}">Supprimer</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        <input type="file" name="photos" accept="image/*" multiple class="block w-full text-sm text-on-surface-variant file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/15">
+                    </section>
+                </div>
+
+                <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-4" style="animation-delay:.1s">
+                        <p class="text-sm font-semibold text-on-surface">Publication</p>
+                        <label class="flex items-start gap-3 text-sm"><span>{{ form.is_active }}</span><span><span class="font-semibold text-on-surface">Visible sur le site</span><span class="block text-xs text-on-surface-variant">Décochez pour masquer la pièce.</span></span></label>
+                        <label class="flex items-start gap-3 text-sm"><span>{{ form.is_featured }}</span><span><span class="font-semibold text-on-surface">Pièce populaire</span><span class="block text-xs text-on-surface-variant">Mise en avant sur la page Djona Parts.</span></span></label>
+                        <button class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary-container transition-colors" type="submit"><span class="material-symbols-outlined text-[18px]">save</span>Enregistrer</button>
+                    </section>
+                    {% if part %}
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.14s">
+                        <p class="text-xs text-on-surface-variant mb-3">Créée le {{ part.created_at|date:'d/m/Y' }} · modifiée le {{ part.updated_at|date:'d/m/Y' }}</p>
+                        <button class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-error text-error text-sm font-semibold hover:bg-error-container transition-colors" type="submit" formaction="{% url 'part_supprimer' part.pk %}" formnovalidate onclick="return confirm('Supprimer définitivement cette pièce ?');">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>Supprimer la pièce
+                        </button>
+                    </section>
+                    {% endif %}
+                </aside>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}
