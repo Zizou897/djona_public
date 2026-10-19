@@ -11,20 +11,23 @@ Affiché juste avant le footer sur l'accueil, le catalogue et la fiche véhicule
       <span class="font-label-md text-label-md uppercase tracking-wider">Ils nous font confiance</span>
       <div class="w-8 h-[2px] bg-secondary" aria-hidden="true"></div>
     </div>
-    <div class="flex flex-wrap items-center justify-center gap-gutter">
+    {# Mobile : une seule ligne défilable au doigt (gauche ↔ droite) ; à partir de md : grille centrée. #}
+    <div class="-mx-container-margin-mobile px-container-margin-mobile pb-3 overflow-x-auto snap-x snap-mandatory overscroll-x-contain md:mx-0 md:px-0 md:pb-0 md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="list" aria-label="Nos partenaires">
+    <div class="flex items-center gap-gutter w-max mx-auto md:w-auto md:flex-wrap md:justify-center">
       {% for partner in active_partners %}
         {% if partner.website_url %}
         <a href="{{ partner.website_url }}" target="_blank" rel="noopener" title="{{ partner.name }}"
-           class="group flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-lg shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+           role="listitem" class="group shrink-0 snap-center flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-lg shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 w-auto object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
         </a>
         {% else %}
         <div title="{{ partner.name }}"
-             class="group flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-lg shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+             role="listitem" class="group shrink-0 snap-center flex items-center justify-center w-40 md:w-44 h-20 md:h-24 px-6 bg-surface-container-lowest rounded-lg shadow-signature hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 w-auto object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
         </div>
         {% endif %}
       {% endfor %}
+    </div>
     </div>
   </div>
 </section>
