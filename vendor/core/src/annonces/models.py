@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 
+from app.imaging import optimize_field
 from app.models import Convention, Profil
 
 
@@ -73,3 +74,9 @@ class AnnoncePhoto(models.Model):
 
     def __str__(self):
         return f'Photo #{self.ordre} — {self.annonce}'
+
+    def save(self, *args, **kwargs):
+        # Toute photo téléversée est stockée en WebP (largeur plafonnée) : le
+        # catalogue public ne sert jamais l'image brute d'un téléphone (3-8 Mo).
+        self.image = optimize_field(self.image)
+        super().save(*args, **kwargs)

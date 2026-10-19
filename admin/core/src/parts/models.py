@@ -1,5 +1,7 @@
 from django.db import models
 
+from app.imaging import optimize_field
+
 
 class PartCategoryMirror(models.Model):
     """Miroir de public.apps.parts.PartCategory (table parts_partcategory,
@@ -68,6 +70,10 @@ class PartImageMirror(models.Model):
         managed = False
         db_table = 'parts_partimage'
         ordering = ['order', 'id']
+
+    def save(self, *args, **kwargs):
+        self.image = optimize_field(self.image)
+        super().save(*args, **kwargs)
 
 
 class PartCompatibilityMirror(models.Model):

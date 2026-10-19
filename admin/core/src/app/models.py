@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from .imaging import SMALL_MAX_WIDTH, SMALL_QUALITY, optimize_field
+
 class Convention(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
@@ -32,6 +34,11 @@ class Profil(models.Model):
     langue = models.CharField(max_length=2, choices=Langue.choices, default=Langue.FRANCAIS)
     notif_email = models.BooleanField(default=True)
     notif_whatsapp = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        # Photo de profil / logo : WebP léger (taille d'affichage ≤ 600 px).
+        self.avatar = optimize_field(self.avatar, max_width=SMALL_MAX_WIDTH, quality=SMALL_QUALITY)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Profil de {self.user}'

@@ -1,5 +1,7 @@
 from django.db import models
 
+from app.imaging import optimize_field
+
 
 class CompteVendeur(models.Model):
     """Miroir en lecture/écriture de vendor.app.Utilisateur (schéma djona_vendor,
@@ -218,6 +220,12 @@ class AnnoncePhotoMirror(models.Model):
         managed = False
         db_table = 'annonce_photos'
         ordering = ['ordre']
+
+    def save(self, *args, **kwargs):
+        # Toute photo téléversée est stockée en WebP (largeur plafonnée) : le
+        # catalogue public ne sert jamais l'image brute d'un téléphone (3-8 Mo).
+        self.image = optimize_field(self.image)
+        super().save(*args, **kwargs)
 
 
 class VehicleMirror(models.Model):

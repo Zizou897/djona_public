@@ -1,5 +1,7 @@
 from django.db import models
 
+from app.imaging import SMALL_MAX_WIDTH, SMALL_QUALITY, optimize_field
+
 
 class PartnerMirror(models.Model):
     """Miroir en lecture/écriture de public.apps.core.Partner (table
@@ -28,6 +30,10 @@ class PartnerMirror(models.Model):
         managed = False
         db_table = 'core_partner'
         ordering = ['order', 'name']
+
+    def save(self, *args, **kwargs):
+        self.logo = optimize_field(self.logo, max_width=SMALL_MAX_WIDTH, quality=SMALL_QUALITY)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

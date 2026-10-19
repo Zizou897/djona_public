@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
+from apps.core.imaging import optimize_field
+
 
 def normalize_reference(value):
     """« 04465-33450 » et « 0446533450 » désignent la même référence : on
@@ -174,6 +176,7 @@ class PartRequest(models.Model):
         return self.reference
 
     def save(self, *args, **kwargs):
+        self.photo = optimize_field(self.photo)
         if self.reference:
             return super().save(*args, **kwargs)
         # Deux soumissions simultanées peuvent viser le même numéro : on retente.

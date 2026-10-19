@@ -91,6 +91,7 @@ class MembreEquipeTest(TestCase):
             'marque': 'Toyota', 'modele': 'Corolla', 'annee': 2019, 'prix': 8500000,
             'kilometrage': 45000, 'carburant': Annonce.Carburant.ESSENCE,
             'boite_vitesses': Annonce.BoiteVitesses.AUTOMATIQUE, 'couleur': 'Gris',
+            'etat': Annonce.Etat.OCCASION, 'ville': 'abidjan_cocody',
             'description': 'Très bon état.', 'action': 'enregistrer',
         })
         self.assertRedirects(response, reverse('mes_annonces'))

@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 from decouple import config
@@ -6,6 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from apps.catalog.models import Seller, Vehicle, VehicleImage
+from apps.core.imaging import SMALL_MAX_WIDTH, SMALL_QUALITY, convert_path
 from apps.vendor_sync.models import AnnonceMirror, AnnoncePhotoMirror, ProfilMirror
 
 # Libellés lisibles des villes vendor (mêmes valeurs que vendor.app.Profil.Ville).
@@ -100,8 +100,8 @@ class Command(BaseCommand):
             return
 
         filename = Path(profil.avatar.name).name
-        dest_relative = f'sellers/{seller.source_vendeur_id}/{filename}'
-        if seller.logo and seller.logo.name == dest_relative:
+        folder = f'sellers/{seller.source_vendeur_id}'
+        if seller.logo and seller.logo.name in {f'{folder}/{filename}', f'{folder}/{Path(filename).stem}.webp'}:
             return  # déjà synchronisé, rien à refaire
 
         source_path = Path(VENDOR_MEDIA_ROOT) / profil.avatar.name
@@ -111,9 +111,8 @@ class Command(BaseCommand):
 
         try:
             dest_dir = Path(settings.MEDIA_ROOT) / 'sellers' / str(seller.source_vendeur_id)
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source_path, dest_dir / filename)
-            seller.logo = dest_relative
+            written = convert_path(source_path, dest_dir, max_width=SMALL_MAX_WIDTH, quality=SMALL_QUALITY)
+            seller.logo = f'{folder}/{written.name}'
             seller.save(update_fields=['logo'])
         except Exception as exc:
             # Un logo en échec (fichier corrompu, nom de fichier trop long, etc.)
@@ -132,8 +131,10 @@ class Command(BaseCommand):
         photos = AnnoncePhotoMirror.objects.using('vendor_db').filter(annonce_id=annonce.id).order_by('ordre')
         for photo in photos:
             filename = Path(photo.image.name).name
-            dest_relative = f'vehicles/annonce-{annonce.id}/{filename}'
-            if dest_relative in existing:
+            folder = f'vehicles/annonce-{annonce.id}'
+            # Les photos sont copiées en WebP : on reconnaît aussi bien le nom
+            # d'origine que son équivalent .webp (synchro déjà faite).
+            if {f'{folder}/{filename}', f'{folder}/{Path(filename).stem}.webp'} & existing:
                 continue
 
             source_path = vendor_media_root / photo.image.name
@@ -142,9 +143,8 @@ class Command(BaseCommand):
                 continue
 
             try:
-                dest_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(source_path, dest_dir / filename)
-                VehicleImage.objects.create(vehicle=vehicle, image=dest_relative, order=photo.ordre)
+                written = convert_path(source_path, dest_dir)
+                VehicleImage.objects.create(vehicle=vehicle, image=f'{folder}/{written.name}', order=photo.ordre)
                 synced += 1
             except Exception as exc:
                 # Une photo en échec (fichier corrompu, nom de fichier trop long,
