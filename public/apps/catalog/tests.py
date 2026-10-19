@@ -125,3 +125,19 @@ class MarketplaceOnlyWithPhotosTests(TestCase):
         sitemap = self.client.get('/sitemap.xml').content.decode()
         self.assertIn(self.with_photo.slug, sitemap)
         self.assertNotIn(self.without_photo.slug, sitemap)
+
+
+class ListingCardClickableTests(TestCase):
+    def test_whole_card_including_image_is_one_link(self):
+        import re
+        seller = Seller.objects.create(source_vendeur_id=9300, first_name='Awa', last_name='Traoré', member_since=timezone.now())
+        vehicle = Vehicle.objects.create(brand='Kia', model_name='Rio', year=2020, price=5_000_000, mileage=40_000,
+                                         fuel_type='essence', transmission='manuelle', seller=seller)
+        VehicleImage.objects.create(vehicle=vehicle, image='vehicles/rio.webp', order=0)
+        html = self.client.get(reverse('catalog:list')).content.decode()
+        card = re.search(r'<a href="%s"[^>]*>(.*?)</a>' % re.escape(vehicle.get_absolute_url()), html, re.S)
+        self.assertIsNotNone(card)
+        self.assertIn('<img', card.group(1))            # l'image est dans le lien
+        self.assertIn('Kia Rio 2020', card.group(1))    # le titre aussi
+        self.assertIn('FCFA', card.group(1))            # et le prix
+        self.assertNotIn('<a ', card.group(1))          # pas de lien imbriqué

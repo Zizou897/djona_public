@@ -1,9 +1,10 @@
 {% comment %}
-Carte compacte pour la grille /vehicules/ — attend `vehicle` (instance catalog.Vehicle,
+Carte compacte pour la grille /vehicules/ — entièrement cliquable (image comprise) — attend `vehicle` (instance catalog.Vehicle,
 avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) dans le contexte.
 {% endcomment %}
 {% load humanize %}
-<div class="reveal group bg-white rounded-lg shadow-signature overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+<a href="{{ vehicle.get_absolute_url }}" aria-label="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:'d' }} — voir l'annonce"
+   class="reveal group bg-white rounded-lg shadow-signature overflow-hidden hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary transition-all duration-300 flex flex-col">
   <div class="relative h-36 overflow-hidden bg-surface-container">
     {% with image=vehicle.images.first %}
     {% if image %}
@@ -19,7 +20,7 @@ avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) 
     {% endif %}
   </div>
 
-  <a href="{{ vehicle.get_absolute_url }}" class="p-3 flex flex-col flex-1">
+  <div class="p-3 flex flex-col flex-1">
     <div class="flex justify-between items-start gap-2 mb-1">
       <h3 class="font-headline-md text-[13px] leading-tight text-on-surface group-hover:text-primary transition-colors">{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}</h3>
       {% if vehicle.condition %}
@@ -46,5 +47,5 @@ avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) 
         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
       </span>
     </div>
-  </a>
-</div>
+  </div>
+</a>
