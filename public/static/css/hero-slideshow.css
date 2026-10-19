@@ -1,4 +1,5 @@
-/* Bannière d'accueil : fondu enchaîné entre deux visuels (cycle de 12 s).
+/* Bannière d'accueil : fondu enchaîné entre deux visuels (cycle de 12 s) et
+   animation légère des quatre verbes du titre (voir plus bas).
    Chaque visuel reste affiché ~5,4 s ; le fondu dure ~0,6 s. */
 .hero-slide {
   position: absolute;
@@ -20,4 +21,38 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-slide { animation: none; }
   .hero-slide + .hero-slide { display: none; }
+}
+
+/* Titre : les quatre verbes se lèvent un à un derrière un masque (révélation
+   « éditoriale »), puis un reflet doux les traverse de gauche à droite, verbe
+   après verbe, toutes les 7 s. Aucun clignotement ni soulignement.
+   Tout est dans « no-preference » : sans animation, le titre reste statique. */
+.hero-verb { display: inline-block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-verb {
+    overflow: hidden;               /* masque de la révélation */
+    vertical-align: bottom;
+    padding-block: .1em;            /* évite de rogner accents et jambages */
+    margin-block: -.1em;
+  }
+  .hero-verb__text {
+    display: inline-block;
+    transform: translateY(115%);
+    /* reflet : dégradé blanc → orange doux → blanc, déplacé derrière le texte */
+    background: linear-gradient(100deg, #fff 0 42%, #ffb27a 50%, #fff 58% 100%) 100% 0 / 300% 100% no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation:
+      verb-rise .9s cubic-bezier(.16, 1, .3, 1) calc(.3s + var(--i) * .12s) forwards,
+      verb-sheen 7s cubic-bezier(.4, 0, .2, 1) calc(1.8s + var(--i) * .3s) infinite;
+  }
+}
+
+@keyframes verb-rise { to { transform: none; } }
+@keyframes verb-sheen {
+  0% { background-position: 100% 0; }
+  30%, 100% { background-position: 0 0; }
 }
