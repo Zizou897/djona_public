@@ -60,7 +60,7 @@ def _remove_from_compare(request, vehicle_id):
 # --- Filtres catalogue -------------------------------------------------------
 
 def _filtered_queryset(request):
-    qs = Vehicle.objects.filter(publish=True).prefetch_related('images')
+    qs = Vehicle.objects.marketplace().prefetch_related('images')
 
     brands = request.GET.getlist('brand')
     if brands:
@@ -114,8 +114,8 @@ def vehicle_list(request):
         'page_obj': page_obj,
         'base_qs': base_qs.urlencode(),
         'total_count': paginator.count,
-        'brands': Vehicle.objects.filter(publish=True).values_list('brand', flat=True).distinct().order_by('brand'),
-        'cities': Vehicle.objects.filter(publish=True).exclude(city='').values_list('city', flat=True).distinct().order_by('city'),
+        'brands': Vehicle.objects.marketplace().values_list('brand', flat=True).distinct().order_by('brand'),
+        'cities': Vehicle.objects.marketplace().exclude(city='').values_list('city', flat=True).distinct().order_by('city'),
         'selected_brands': request.GET.getlist('brand'),
         'selected_transmissions': request.GET.getlist('transmission'),
         'selected_conditions': request.GET.getlist('condition'),
@@ -134,17 +134,17 @@ def vehicle_list(request):
 
 
 def vehicle_detail(request, slug):
-    vehicle = get_object_or_404(Vehicle.objects.prefetch_related('images'), slug=slug, publish=True)
+    vehicle = get_object_or_404(Vehicle.objects.marketplace().prefetch_related('images'), slug=slug)
 
     similar_vehicles = list(
-        Vehicle.objects.filter(publish=True, brand=vehicle.brand)
+        Vehicle.objects.marketplace().filter(brand=vehicle.brand)
         .exclude(pk=vehicle.pk)
         .prefetch_related('images')[:4]
     )
     if len(similar_vehicles) < 4:
         exclude_ids = [vehicle.pk] + [v.pk for v in similar_vehicles]
         similar_vehicles += list(
-            Vehicle.objects.filter(publish=True)
+            Vehicle.objects.marketplace()
             .exclude(pk__in=exclude_ids)
             .prefetch_related('images')[:4 - len(similar_vehicles)]
         )
@@ -183,7 +183,7 @@ def express_interest(request, slug):
     apps.core.views.newsletter_subscribe (JSON+SweetAlert2 si JS, redirect+
     messages sinon), rate-limité par IP pour éviter le spam.
     """
-    vehicle = get_object_or_404(Vehicle, slug=slug, publish=True)
+    vehicle = get_object_or_404(Vehicle.objects.marketplace(), slug=slug)
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     cache_key = f'express-interest:{_client_ip(request)}'
@@ -219,7 +219,7 @@ def seller_detail(request, slug):
     statut côté vendor). Voir apps.vendor_sync.models.Seller.
     """
     seller = get_object_or_404(Seller, slug=slug)
-    published_vehicles = list(seller.vehicles.filter(publish=True).prefetch_related('images'))
+    published_vehicles = list(seller.vehicles.marketplace().prefetch_related('images'))
     past_vehicles = list(seller.vehicles.filter(publish=False).prefetch_related('images'))
 
     favorite_ids = _favorite_vehicle_ids(request)
@@ -243,7 +243,7 @@ def seller_detail(request, slug):
 def vehicle_favorites(request):
     """Page dédiée des véhicules mis en favoris."""
     favorite_ids = _favorite_vehicle_ids(request)
-    vehicles = list(Vehicle.objects.filter(id__in=favorite_ids, publish=True).prefetch_related('images'))
+    vehicles = list(Vehicle.objects.marketplace().filter(id__in=favorite_ids).prefetch_related('images'))
     compare_ids = _compare_ids(request)
     for vehicle in vehicles:
         vehicle.is_favorite = True
@@ -269,7 +269,7 @@ def vehicle_compare(request):
         return redirect('catalog:compare')
 
     compare_ids = _compare_ids(request)
-    vehicles = list(Vehicle.objects.filter(id__in=compare_ids, publish=True).prefetch_related('images'))
+    vehicles = list(Vehicle.objects.marketplace().filter(id__in=compare_ids).prefetch_related('images'))
     # Conserver l'ordre de selection
     vehicles_map = {v.id: v for v in vehicles}
     vehicles = [vehicles_map[vid] for vid in compare_ids if vid in vehicles_map]
@@ -321,7 +321,7 @@ def toggle_favorite(request, vehicle_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
-    vehicle = get_object_or_404(Vehicle, pk=vehicle_id, publish=True)
+    vehicle = get_object_or_404(Vehicle.objects.marketplace(), pk=vehicle_id)
     if not request.session.session_key:
         request.session.save()
     session_key = request.session.session_key
@@ -346,7 +346,7 @@ def toggle_compare(request, vehicle_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
-    vehicle = get_object_or_404(Vehicle, pk=vehicle_id, publish=True)
+    vehicle = get_object_or_404(Vehicle.objects.marketplace(), pk=vehicle_id)
     if not request.session.session_key:
         request.session.save()
 

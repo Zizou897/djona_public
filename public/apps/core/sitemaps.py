@@ -23,7 +23,7 @@ class VehicleSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Vehicle.objects.filter(publish=True)
+        return Vehicle.objects.marketplace()
 
     def location(self, obj):
         return obj.get_absolute_url()

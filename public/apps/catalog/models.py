@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -82,6 +82,13 @@ class Seller(models.Model):
         return reverse('catalog:seller_detail', kwargs={'slug': self.slug})
 
 
+class VehicleQuerySet(models.QuerySet):
+    def marketplace(self):
+        """Véhicules affichés sur la marketplace : publiés ET avec au moins une photo.
+        Une annonce sans photo n'est pas montrée (pas d'image par défaut trompeuse)."""
+        return self.filter(publish=True).filter(Exists(VehicleImage.objects.filter(vehicle=OuterRef('pk'))))
+
+
 class Vehicle(Convention):
     class FuelType(models.TextChoices):
         ESSENCE = 'essence', 'Essence'
@@ -118,6 +125,8 @@ class Vehicle(Convention):
     seller = models.ForeignKey(
         Seller, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehicles',
     )
+
+    objects = VehicleQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'véhicule'

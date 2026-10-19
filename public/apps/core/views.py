@@ -24,7 +24,7 @@ NL = chr(10)
 
 def _home_stats():
     """Chiffres réels de la marketplace (les compteurs de l'accueil)."""
-    published = Vehicle.objects.filter(publish=True)
+    published = Vehicle.objects.marketplace()
     stats = [
         {'end': published.count(), 'suffix': '', 'label': 'Véhicules en vente'},
         {'end': published.values('brand').distinct().count(), 'suffix': '', 'label': 'Marques disponibles'},
@@ -41,7 +41,7 @@ def home(request):
     fuel_labels = dict(Vehicle.FuelType.choices)
     brand_options = {}
     for brand, fuel_type, city in (
-        Vehicle.objects.filter(publish=True)
+        Vehicle.objects.marketplace()
         .values_list('brand', 'fuel_type', 'city')
         .distinct()
     ):
@@ -62,7 +62,7 @@ def home(request):
     }
 
     context = {
-        'featured_vehicles': Vehicle.objects.filter(publish=True).prefetch_related('images').order_by('-is_verified', '-created_at')[:8],
+        'featured_vehicles': Vehicle.objects.marketplace().prefetch_related('images').order_by('-is_verified', '-created_at')[:8],
         'stats': _home_stats(),
         'search_brands': sorted(brand_options.keys()),
         'search_brand_options': search_brand_options,
