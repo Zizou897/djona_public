@@ -40,7 +40,7 @@
       </div>
 
       {# Onglets entre les documents légaux #}
-      <nav class="animate-slide-up-4 mt-10 -mb-px flex gap-1 overflow-x-auto" aria-label="Documents légaux">
+      <nav class="animate-slide-up-4 mt-10 -mb-px flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Documents légaux">
         {% for d in legal_docs %}
         <a href="{% url d.url_name %}"
            class="shrink-0 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-3.5 rounded-t-md font-label-md text-label-md transition-colors {% if d.key == legal_key %}bg-background text-primary{% else %}text-on-primary/70 hover:text-on-primary hover:bg-white/10{% endif %}"

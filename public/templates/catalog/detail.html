@@ -116,7 +116,7 @@
           </div>
 
           {% if photo_count > 1 %}
-          <div class="flex gap-3 overflow-x-auto py-1 -mx-1 px-1" role="list">
+          <div class="flex gap-3 overflow-x-auto py-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="list">
             {% for image in vehicle.images.all %}
             <button type="button" role="listitem"
                     class="js-gallery-thumb shrink-0 w-28 sm:w-36 aspect-[4/3] rounded-md overflow-hidden transition-all ring-offset-2 {% if forloop.first %}ring-2 ring-primary opacity-100{% else %}opacity-60 hover:opacity-100{% endif %}"
