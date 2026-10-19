@@ -12,6 +12,13 @@ avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) 
     {% endif %}
     {% endwith %}
 
+    {% if vehicle.is_rental %}
+    <div class="absolute top-2 right-2 bg-primary text-on-primary px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
+      <span class="material-symbols-outlined text-[12px]" aria-hidden="true">key</span>
+      <span class="font-label-sm text-[9px] uppercase tracking-wider font-bold">À louer</span>
+    </div>
+    {% endif %}
+
     {% if vehicle.is_verified %}
     <div class="absolute top-2 left-2 bg-secondary text-on-secondary px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
       <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
@@ -42,7 +49,10 @@ avec les attributs `.is_favorite` et `.in_compare` déjà calculés par la vue) 
       </div>
     </div>
     <div class="mt-auto flex items-center justify-between pt-2 border-t border-surface-container">
-      <span class="font-display-lg text-[15px] text-primary">{{ vehicle.price|intcomma }} <span class="text-[10px] font-label-md">FCFA</span></span>
+      <span class="font-display-lg text-[15px] text-primary whitespace-nowrap">
+        {% if vehicle.is_rental %}{% with rate=vehicle.rental_rates.0 %}{% if rate %}{{ rate.text }} <span class="text-[10px] font-label-md">FCFA / {{ rate.period }}</span>{% else %}<span class="text-[12px] font-label-md">Tarif non renseigné</span>{% endif %}{% endwith %}
+        {% else %}{{ vehicle.price|intcomma }} <span class="text-[10px] font-label-md">FCFA</span>{% endif %}
+      </span>
       <span class="text-primary group-hover:bg-primary-fixed p-1 rounded-full transition-colors">
         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
       </span>

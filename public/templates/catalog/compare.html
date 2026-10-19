@@ -177,7 +177,7 @@
             <a href="{{ vehicle.get_absolute_url }}" class="hover:text-primary transition-colors">
               <h3 class="font-headline-md text-[15px] sm:text-[17px] text-on-surface leading-snug">{{ vehicle.brand }} {{ vehicle.model_name }}</h3>
             </a>
-            <p class="font-headline-lg text-[18px] sm:text-headline-lg text-primary mt-1">{{ vehicle.price|intcomma }} FCFA</p>
+            <p class="font-headline-lg text-[18px] sm:text-headline-lg text-primary mt-1">{{ vehicle.price_label }}</p>
             <a href="{{ vehicle.get_absolute_url }}"
                class="mt-3 inline-flex items-center gap-1.5 text-[11px] font-label-md text-secondary hover:underline">
               Voir l'annonce
@@ -206,7 +206,7 @@
           <div class="p-3 sm:p-gutter border-r border-surface-variant/20 last:border-r-0 {% if vehicle.id == expert_pick_id %}bg-secondary/[0.02]{% endif %}">
             {% if criterion.format == 'price' %}
               <span class="font-headline-md text-[15px] sm:text-headline-md text-primary">
-                {{ vehicle.price|intcomma }} FCFA
+                {{ vehicle.price_label }}
               </span>
 
             {% elif criterion.format == 'number' %}

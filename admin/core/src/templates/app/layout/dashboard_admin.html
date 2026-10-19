@@ -103,7 +103,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-on-surface truncate">{{ annonce.marque }} {{ annonce.modele }} <span class="font-normal text-on-surface-variant">{{ annonce.annee|stringformat:"d" }}</span></p>
-                                <p class="text-xs text-on-surface-variant mt-0.5 truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.prix|floatformat:"0g" }} FCFA · il y a {{ annonce.created_at|timesince }}</p>
+                                <p class="text-xs text-on-surface-variant mt-0.5 truncate">{{ annonce.vendeur.prenom }} {{ annonce.vendeur.nom }} · {{ annonce.resume_prix }} · il y a {{ annonce.created_at|timesince }}</p>
                             </div>
                             <a class="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors" href="{% url 'annonce_moderation_detail' annonce.pk %}">
                                 <span class="material-symbols-outlined text-[16px]">visibility</span>Examiner

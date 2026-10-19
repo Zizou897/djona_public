@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import formats
 
 from app.imaging import optimize_field
 from app.models import Convention, Profil
@@ -26,6 +27,10 @@ class Annonce(Convention):
         NEUF = 'neuf', 'Neuf'
         OCCASION = 'occasion', 'Occasion'
 
+    class TypeAnnonce(models.TextChoices):
+        VENTE = 'vente', 'À vendre'
+        LOCATION = 'location', 'À louer'
+
     class MotifRefus(models.TextChoices):
         INFOS_INSUFFISANTES = 'infos_insuffisantes', 'Informations insuffisantes'
         MAUVAISES_PHOTOS = 'mauvaises_photos', 'Mauvaises photos'
@@ -36,7 +41,16 @@ class Annonce(Convention):
     marque = models.CharField(max_length=80)
     modele = models.CharField(max_length=80)
     annee = models.PositiveIntegerField()
+    # Prix de vente ; vaut 0 pour une annonce de location (tarifs ci-dessous).
     prix = models.PositiveIntegerField()
+    type_annonce = models.CharField(
+        "type d'annonce", max_length=10, choices=TypeAnnonce.choices, default=TypeAnnonce.VENTE, db_index=True,
+    )
+    # Location : le vendeur renseigne les périodes qu'il propose (au moins une).
+    prix_jour = models.PositiveIntegerField('tarif par jour (FCFA)', null=True, blank=True)
+    prix_semaine = models.PositiveIntegerField('tarif par semaine (FCFA)', null=True, blank=True)
+    prix_mois = models.PositiveIntegerField('tarif par mois (FCFA)', null=True, blank=True)
+    caution = models.PositiveIntegerField('caution (FCFA)', null=True, blank=True)
     kilometrage = models.PositiveIntegerField()
     carburant = models.CharField(max_length=20, choices=Carburant.choices)
     boite_vitesses = models.CharField(max_length=20, choices=BoiteVitesses.choices)
@@ -54,6 +68,28 @@ class Annonce(Convention):
 
     def __str__(self):
         return f'{self.marque} {self.modele} ({self.annee})'
+
+    @property
+    def est_location(self):
+        return self.type_annonce == self.TypeAnnonce.LOCATION
+
+    @property
+    def tarifs_location(self):
+        """[(période, montant)] des périodes renseignées, de la plus courte à la plus longue."""
+        return [(periode, montant) for periode, montant in (
+            ('jour', self.prix_jour), ('semaine', self.prix_semaine), ('mois', self.prix_mois),
+        ) if montant]
+
+    @property
+    def resume_prix(self):
+        """Texte de prix pour les listes : « 8 500 000 FCFA » ou « 25 000 FCFA / jour »."""
+        if self.est_location:
+            tarifs = self.tarifs_location
+            if not tarifs:
+                return 'Tarif non renseigné'
+            periode, montant = tarifs[0]
+            return f'{formats.number_format(montant, force_grouping=True)} FCFA / {periode}'
+        return f'{formats.number_format(self.prix, force_grouping=True)} FCFA'
 
     def save(self, *args, **kwargs):
         # Ne se synchronise qu'à .save() — un .update()/.bulk_create() en masse

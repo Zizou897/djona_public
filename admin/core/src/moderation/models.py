@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import formats
 
 from app.imaging import optimize_field
 
@@ -183,7 +184,13 @@ class AnnonceMirror(models.Model):
     marque = models.CharField(max_length=80)
     modele = models.CharField(max_length=80)
     annee = models.PositiveIntegerField()
+    # Prix de vente ; vaut 0 pour une annonce de location (tarifs ci-dessous).
     prix = models.PositiveIntegerField()
+    type_annonce = models.CharField(max_length=10, default='vente', choices=[('vente', 'À vendre'), ('location', 'À louer')])
+    prix_jour = models.PositiveIntegerField(null=True, blank=True)
+    prix_semaine = models.PositiveIntegerField(null=True, blank=True)
+    prix_mois = models.PositiveIntegerField(null=True, blank=True)
+    caution = models.PositiveIntegerField(null=True, blank=True)
     kilometrage = models.PositiveIntegerField()
     carburant = models.CharField(max_length=20, choices=Carburant.choices)
     boite_vitesses = models.CharField(max_length=20, choices=BoiteVitesses.choices)
@@ -200,6 +207,28 @@ class AnnonceMirror(models.Model):
     # fonctionnent sans erreur de colonne manquante, comme pour CompteVendeur ci-dessus.
     update_at = models.DateTimeField()
     publish = models.BooleanField(default=False)
+
+    @property
+    def est_location(self):
+        return self.type_annonce == 'location'
+
+    @property
+    def tarifs_location(self):
+        """[(période, montant)] des périodes renseignées, de la plus courte à la plus longue."""
+        return [(periode, montant) for periode, montant in (
+            ('jour', self.prix_jour), ('semaine', self.prix_semaine), ('mois', self.prix_mois),
+        ) if montant]
+
+    @property
+    def resume_prix(self):
+        """« 8 500 000 FCFA » ou « 25 000 FCFA / jour » (première période renseignée)."""
+        if self.est_location:
+            tarifs = self.tarifs_location
+            if not tarifs:
+                return 'Tarif non renseigné'
+            periode, montant = tarifs[0]
+            return f'{formats.number_format(montant, force_grouping=True)} FCFA / {periode}'
+        return f'{formats.number_format(self.prix, force_grouping=True)} FCFA'
 
     class Meta:
         managed = False

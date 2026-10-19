@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Exists, OuterRef, Q
+from django.utils import formats
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -88,6 +89,12 @@ class VehicleQuerySet(models.QuerySet):
         Une annonce sans photo n'est pas montrée (pas d'image par défaut trompeuse)."""
         return self.filter(publish=True).filter(Exists(VehicleImage.objects.filter(vehicle=OuterRef('pk'))))
 
+    def for_sale(self):
+        return self.filter(listing_type='vente')
+
+    def for_rent(self):
+        return self.filter(listing_type='location')
+
 
 class Vehicle(Convention):
     class FuelType(models.TextChoices):
@@ -107,7 +114,19 @@ class Vehicle(Convention):
     brand = models.CharField('marque', max_length=80)
     model_name = models.CharField('modèle', max_length=120)
     year = models.PositiveSmallIntegerField('année')
+    class ListingType(models.TextChoices):
+        SALE = 'vente', 'À vendre'
+        RENT = 'location', 'À louer'
+
+    # Prix de vente ; vaut 0 pour une location (tarifs rent_price_* ci-dessous).
     price = models.PositiveBigIntegerField('prix (FCFA)')
+    listing_type = models.CharField("type d'annonce", max_length=10, choices=ListingType.choices,
+                                    default=ListingType.SALE, db_index=True)
+    # Location : périodes proposées par le vendeur (au moins une) et caution facultative.
+    rent_price_day = models.PositiveBigIntegerField('location par jour (FCFA)', null=True, blank=True)
+    rent_price_week = models.PositiveBigIntegerField('location par semaine (FCFA)', null=True, blank=True)
+    rent_price_month = models.PositiveBigIntegerField('location par mois (FCFA)', null=True, blank=True)
+    deposit = models.PositiveBigIntegerField('caution (FCFA)', null=True, blank=True)
     mileage = models.PositiveIntegerField('kilométrage (km)')
     fuel_type = models.CharField('carburant', max_length=20, choices=FuelType.choices, default=FuelType.ESSENCE)
     transmission = models.CharField('transmission', max_length=20, choices=Transmission.choices, default=Transmission.AUTOMATIQUE)
@@ -146,6 +165,33 @@ class Vehicle(Convention):
                 slug = f'{base_slug}-{i}'
             self.slug = slug
         super().save(*args, **kwargs)
+
+    @property
+    def is_rental(self):
+        return self.listing_type == self.ListingType.RENT
+
+    @property
+    def rental_rates(self):
+        """Tarifs de location renseignés, de la période la plus courte à la plus longue :
+        [{'period': 'jour', 'unit': 'DAY', 'amount': 35000, 'text': '35 000'}]."""
+        rates = []
+        for period, unit, amount in (('jour', 'DAY', self.rent_price_day), ('semaine', 'WEEK', self.rent_price_week),
+                                     ('mois', 'MONTH', self.rent_price_month)):
+            if amount:
+                rates.append({'period': period, 'unit': unit, 'amount': amount,
+                              'text': formats.number_format(amount, force_grouping=True)})
+        return rates
+
+    @property
+    def price_label(self):
+        """« 8 500 000 FCFA » pour une vente ; « 35 000 FCFA / jour » (première période
+        renseignée) pour une location ; « Tarif non renseigné » si aucun tarif."""
+        if self.is_rental:
+            rates = self.rental_rates
+            if not rates:
+                return 'Tarif non renseigné'
+            return f"{rates[0]['text']} FCFA / {rates[0]['period']}"
+        return f'{formats.number_format(self.price, force_grouping=True)} FCFA'
 
     def get_absolute_url(self):
         return reverse('catalog:detail', kwargs={'slug': self.slug})

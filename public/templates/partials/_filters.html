@@ -10,6 +10,27 @@ selected_transmissions, selected_conditions, selected_city, price_min, price_max
       class="flex flex-col gap-8">
 
   <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Je veux</h3>
+    <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Acheter ou louer">
+      {% for value, label in listing_choices %}
+      <label class="cursor-pointer">
+        <input type="radio" name="type" value="{{ value }}" class="peer hidden js-listing-type" {% if listing_type == value %}checked{% endif %}>
+        <span class="block text-center px-2 py-2 bg-surface-container-highest text-on-surface-variant rounded font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors">{{ label }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <div id="rent-period-block" class="flex flex-col gap-2" style="{% if listing_type != 'location' %}display:none{% endif %}">
+      <label for="rent-period" class="font-label-md text-label-md text-on-surface-variant">Période de location</label>
+      <select id="rent-period" name="period" class="w-full bg-white border border-outline-variant rounded px-4 py-2.5 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
+        <option value="">Toutes les périodes</option>
+        <option value="jour" {% if rent_period == 'jour' %}selected{% endif %}>Par jour</option>
+        <option value="semaine" {% if rent_period == 'semaine' %}selected{% endif %}>Par semaine</option>
+        <option value="mois" {% if rent_period == 'mois' %}selected{% endif %}>Par mois</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
     <h3 class="font-headline-md text-[16px] text-on-surface">Marque</h3>
     <div class="flex flex-wrap gap-2">
       {% for brand in brands %}
@@ -21,8 +42,8 @@ selected_transmissions, selected_conditions, selected_city, price_min, price_max
     </div>
   </div>
 
-  <div class="flex flex-col gap-4">
-    <h3 class="font-headline-md text-[16px] text-on-surface">Budget (FCFA)</h3>
+  <div id="budget-block" class="flex flex-col gap-4" style="{% if listing_type == 'location' %}display:none{% endif %}">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Budget d'achat (FCFA)</h3>
     <div class="flex items-center gap-2">
       <input type="number" name="price_min" value="{{ price_min }}" placeholder="Min" class="w-1/2 bg-white border border-outline-variant rounded px-3 py-2 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
       <div class="w-4 h-[1px] bg-outline-variant" aria-hidden="true"></div>
@@ -76,3 +97,17 @@ selected_transmissions, selected_conditions, selected_city, price_min, price_max
     Réinitialiser les filtres
   </a>
 </form>
+<script>
+(function () {
+  // Période de location et budget d'achat : n'apparaissent que pour le type concerné.
+  var form = document.getElementById('filters-form');
+  if (!form) { return; }
+  form.addEventListener('change', function (event) {
+    if (!event.target.classList.contains('js-listing-type')) { return; }
+    var location = event.target.value === 'location';
+    // style.display (et non l'attribut hidden) : « flex » l'emporterait sur [hidden].
+    document.getElementById('rent-period-block').style.display = location ? '' : 'none';
+    document.getElementById('budget-block').style.display = location ? 'none' : '';
+  });
+})();
+</script>

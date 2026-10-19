@@ -26,7 +26,8 @@ def _home_stats():
     """Chiffres réels de la marketplace (les compteurs de l'accueil)."""
     published = Vehicle.objects.marketplace()
     stats = [
-        {'end': published.count(), 'suffix': '', 'label': 'Véhicules en vente'},
+        {'end': published.for_sale().count(), 'suffix': '', 'label': 'Véhicules en vente'},
+        {'end': published.for_rent().count(), 'suffix': '', 'label': 'Véhicules à louer'},
         {'end': published.values('brand').distinct().count(), 'suffix': '', 'label': 'Marques disponibles'},
         {'end': published.exclude(seller=None).values('seller').distinct().count(), 'suffix': '', 'label': 'Vendeurs actifs'},
         {'end': published.exclude(city='').values('city').distinct().count(), 'suffix': '', 'label': 'Villes'},

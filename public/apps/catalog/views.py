@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.core.cache import cache
 from django.core.paginator import Paginator
+from django.db.models import F, FloatField
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -16,12 +18,15 @@ MAX_COMPARE = 3
 INTEREST_RATE_LIMIT = 5
 INTEREST_RATE_WINDOW = 600  # secondes (10 min)
 
+# Tri par prix : les ventes d'abord (« vente » > « location » alphabétiquement), puis le prix.
+# Pour les locations seules, voir _filtered_queryset (tarif ramené au jour).
 SORT_OPTIONS = {
-    'recent': '-created_at',
-    'price_asc': 'price',
-    'price_desc': '-price',
-    'mileage': 'mileage',
+    'recent': ('-created_at',),
+    'price_asc': ('-listing_type', 'price'),
+    'price_desc': ('-listing_type', '-price'),
+    'mileage': ('mileage',),
 }
+RENT_PERIODS = {'jour': 'rent_price_day', 'semaine': 'rent_price_week', 'mois': 'rent_price_month'}
 
 
 # --- Helpers session ---------------------------------------------------------
@@ -82,16 +87,33 @@ def _filtered_queryset(request):
     if city:
         qs = qs.filter(city=city)
 
-    price_min = request.GET.get('price_min')
-    if price_min:
-        qs = qs.filter(price__gte=price_min)
+    listing = request.GET.get('type', '')
+    if listing == 'achat':
+        qs = qs.for_sale()
+    elif listing == 'location':
+        qs = qs.for_rent()
+        period = request.GET.get('period', '')
+        if period in RENT_PERIODS:
+            qs = qs.filter(**{f'{RENT_PERIODS[period]}__isnull': False})
 
+    # Le budget concerne l'achat : il écarte donc les locations (dont le prix de vente vaut 0).
+    price_min = request.GET.get('price_min')
     price_max = request.GET.get('price_max')
-    if price_max:
-        qs = qs.filter(price__lte=price_max)
+    if (price_min or price_max) and listing != 'location':
+        qs = qs.for_sale()
+        if price_min:
+            qs = qs.filter(price__gte=price_min)
+        if price_max:
+            qs = qs.filter(price__lte=price_max)
 
     sort = request.GET.get('sort', 'recent')
-    return qs.order_by(SORT_OPTIONS.get(sort, SORT_OPTIONS['recent']))
+    if listing == 'location' and sort in ('price_asc', 'price_desc'):
+        # Tarifs comparables : tout ramené au prix par jour.
+        qs = qs.annotate(rent_per_day=Coalesce(
+            F('rent_price_day'), F('rent_price_week') / 7.0, F('rent_price_month') / 30.0, output_field=FloatField(),
+        ))
+        return qs.order_by('rent_per_day' if sort == 'price_asc' else '-rent_per_day')
+    return qs.order_by(*SORT_OPTIONS.get(sort, SORT_OPTIONS['recent']))
 
 
 # --- Vues publiques ----------------------------------------------------------
@@ -120,6 +142,9 @@ def vehicle_list(request):
         'selected_transmissions': request.GET.getlist('transmission'),
         'selected_conditions': request.GET.getlist('condition'),
         'selected_city': request.GET.get('city', ''),
+        'listing_choices': [('', 'Tous'), ('achat', 'Acheter'), ('location', 'Louer')],
+        'listing_type': request.GET.get('type', ''),
+        'rent_period': request.GET.get('period', ''),
         'price_min': request.GET.get('price_min', ''),
         'price_max': request.GET.get('price_max', ''),
         'sort': request.GET.get('sort', 'recent'),
@@ -159,7 +184,7 @@ def vehicle_detail(request, slug):
 
     whatsapp_message = (
         f"Bonjour, je suis intéressé(e) par votre {vehicle.brand} {vehicle.model_name} "
-        f"({vehicle.year}) à {vehicle.price} FCFA sur Djona.\n{request.build_absolute_uri()}"
+        f"({vehicle.year}) — {vehicle.price_label} sur Djona.\n{request.build_absolute_uri()}"
     )
 
     context = {
@@ -299,8 +324,10 @@ def vehicle_compare(request):
                 s += 10
             max_mileage = max((x.mileage for x in vehicles), default=1)
             s += int((1 - v.mileage / max_mileage) * 20)
-            max_price = max((x.price for x in vehicles), default=1)
-            s += int((1 - v.price / max_price) * 10)
+            # Le prix ne départage que les ventes : une location n'a pas de prix d'achat.
+            max_price = max((x.price for x in vehicles), default=1) or 1
+            if not v.is_rental:
+                s += int((1 - v.price / max_price) * 10)
             return s
         expert_pick_id = max(vehicles, key=score).id if vehicles else None
 

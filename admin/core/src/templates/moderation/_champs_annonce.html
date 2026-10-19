@@ -53,6 +53,17 @@ Champs du formulaire d'annonce admin (création et correction). Contexte : form.
         <h2 class="font-headline-md font-semibold text-base text-primary">Caractéristiques et prix</h2>
     </div>
     <div class="flex flex-col gap-5">
+        <fieldset class="flex flex-col gap-2">
+            <legend class="text-sm font-semibold text-on-surface mb-2">Type d'annonce</legend>
+            <div class="flex flex-wrap gap-2">
+                {% for value, label in form.fields.type_annonce.choices %}{% if value %}
+                <label class="cursor-pointer">
+                    <input class="peer sr-only" name="type_annonce" type="radio" value="{{ value }}" {% if form.type_annonce.value == value or not form.type_annonce.value and value == 'vente' %}checked{% endif %}>
+                    <span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant text-sm font-medium text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 hover:border-primary transition-colors">{{ label }}</span>
+                </label>
+                {% endif %}{% endfor %}
+            </div>
+        </fieldset>
         <div class="grid sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
                 <label class="text-sm font-semibold text-on-surface" for="id_kilometrage">Kilométrage</label>
@@ -62,13 +73,52 @@ Champs du formulaire d'annonce admin (création et correction). Contexte : form.
                 </div>
                 {% if form.kilometrage.errors %}<p class="text-xs text-error">{{ form.kilometrage.errors.0 }}</p>{% endif %}
             </div>
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5" id="bloc-vente">
                 <label class="text-sm font-semibold text-on-surface" for="id_prix">Prix de vente</label>
                 <div class="relative">
                     <input class="{{ champ }} pr-16 font-semibold {% if form.prix.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_prix" inputmode="numeric" min="0" name="prix" required type="number" value="{{ form.prix.value|default:''|stringformat:'s' }}">
                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-on-surface-variant pointer-events-none">FCFA</span>
                 </div>
                 {% if form.prix.errors %}<p class="text-xs text-error">{{ form.prix.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="hidden flex-col gap-4" id="bloc-location">
+            <p class="text-xs text-on-surface-variant">Renseignez les périodes proposées — <strong class="text-on-surface">au moins une</strong>. Une période vide n'est pas affichée aux clients.</p>
+            <div class="grid sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-on-surface" for="id_prix_jour">Tarif par jour</label>
+                <div class="relative">
+                    <input class="{{ champ }} pr-20 font-semibold {% if form.prix_jour.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_prix_jour" inputmode="numeric" min="0" name="prix_jour" type="number" value="{{ form.prix_jour.value|default:''|stringformat:'s' }}">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant pointer-events-none">FCFA / jour</span>
+                </div>
+                {% if form.prix_jour.errors %}<p class="text-xs text-error">{{ form.prix_jour.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-on-surface" for="id_prix_semaine">Tarif par semaine</label>
+                <div class="relative">
+                    <input class="{{ champ }} pr-20 font-semibold {% if form.prix_semaine.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_prix_semaine" inputmode="numeric" min="0" name="prix_semaine" type="number" value="{{ form.prix_semaine.value|default:''|stringformat:'s' }}">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant pointer-events-none">FCFA / sem.</span>
+                </div>
+                {% if form.prix_semaine.errors %}<p class="text-xs text-error">{{ form.prix_semaine.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-on-surface" for="id_prix_mois">Tarif par mois</label>
+                <div class="relative">
+                    <input class="{{ champ }} pr-20 font-semibold {% if form.prix_mois.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_prix_mois" inputmode="numeric" min="0" name="prix_mois" type="number" value="{{ form.prix_mois.value|default:''|stringformat:'s' }}">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant pointer-events-none">FCFA / mois</span>
+                </div>
+                {% if form.prix_mois.errors %}<p class="text-xs text-error">{{ form.prix_mois.errors.0 }}</p>{% endif %}
+            </div>
+            </div>
+            <div class="sm:max-w-xs">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-on-surface" for="id_caution">Caution (facultatif)</label>
+                <div class="relative">
+                    <input class="{{ champ }} pr-20 font-semibold {% if form.caution.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_caution" inputmode="numeric" min="0" name="caution" type="number" value="{{ form.caution.value|default:''|stringformat:'s' }}">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant pointer-events-none">FCFA</span>
+                </div>
+                <p class="text-xs text-on-surface-variant">Laissez vide si aucune caution.</p>{% if form.caution.errors %}<p class="text-xs text-error">{{ form.caution.errors.0 }}</p>{% endif %}
+            </div>
             </div>
         </div>
         <fieldset class="flex flex-col gap-2">
@@ -107,4 +157,22 @@ Champs du formulaire d'annonce admin (création et correction). Contexte : form.
     <textarea class="{{ champ }} leading-relaxed {% if form.description.errors %}border-error{% else %}border-outline-variant{% endif %}" id="id_description" name="description" required rows="6">{{ form.description.value|default:'' }}</textarea>
     {% if form.description.errors %}<p class="text-xs text-error mt-1">{{ form.description.errors.0 }}</p>{% endif %}
 </section>
+<script>
+(function () {
+    var radios = document.querySelectorAll('input[name="type_annonce"]');
+    var vente = document.getElementById('bloc-vente');
+    var location_ = document.getElementById('bloc-location');
+    var prix = document.getElementById('id_prix');
+    function maj() {
+        var choisi = document.querySelector('input[name="type_annonce"]:checked');
+        var enLocation = choisi && choisi.value === 'location';
+        vente.classList.toggle('hidden', enLocation);
+        location_.classList.toggle('hidden', !enLocation);
+        location_.classList.toggle('flex', enLocation);
+        prix.required = !enLocation;
+    }
+    radios.forEach(function (r) { r.addEventListener('change', maj); });
+    maj();
+})();
+</script>
 {% endwith %}

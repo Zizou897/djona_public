@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
-{% block title %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA | Djona{% endblock %}
-{% block meta_description %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}, {{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.price }} FCFA{% if vehicle.city %} à {{ vehicle.city }}{% endif %}.{% if vehicle.condition %} Véhicule {{ vehicle.get_condition_display|lower }}.{% endif %}{% endblock %}
+{% block title %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price_label }} | Djona{% endblock %}
+{% block meta_description %}{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}, {{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}. À {{ vehicle.price_label }}{% if vehicle.city %} à {{ vehicle.city }}{% endif %}.{% if vehicle.condition %} Véhicule {{ vehicle.get_condition_display|lower }}.{% endif %}{% endblock %}
 
 {% block og_extra %}
 {% with main_image=vehicle.images.first %}
 <meta property="og:type" content="product">
 <meta property="og:site_name" content="Djona">
 <meta property="og:locale" content="fr_CI">
-<meta property="og:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA">
+<meta property="og:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price_label }}">
 <meta property="og:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}.{% if vehicle.city %} À {{ vehicle.city }}.{% endif %}">
 <meta property="og:image" content="{% if main_image %}{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endif %}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price }} FCFA">
+<meta name="twitter:title" content="{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }} — {{ vehicle.price_label }}">
 <meta name="twitter:description" content="{{ vehicle.mileage }} km, {{ vehicle.get_transmission_display }}, {{ vehicle.get_fuel_type_display }}.{% if vehicle.city %} À {{ vehicle.city }}.{% endif %}">
 <meta name="twitter:image" content="{% if main_image %}{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endif %}">
 {% endwith %}
@@ -41,7 +41,18 @@
   "fuelType": "{{ vehicle.get_fuel_type_display|escapejs }}",
   {% if vehicle.condition %}"itemCondition": "{% if vehicle.condition == 'neuf' %}https://schema.org/NewCondition{% else %}https://schema.org/UsedCondition{% endif %}",{% endif %}
   {% if main_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ main_image.image.url|escapejs }}",{% endif %}
-  "offers": {
+  {% if vehicle.is_rental %}"offers": {
+    "@type": "Offer",
+    "businessFunction": "http://purl.org/goodrelations/v1#LeaseOut",
+    "priceCurrency": "XOF",
+    "availability": "https://schema.org/InStock",
+    {% if vehicle.rental_rates %}"priceSpecification": [{% for rate in vehicle.rental_rates %}{"@type": "UnitPriceSpecification", "price": {{ rate.amount|stringformat:"d" }}, "priceCurrency": "XOF", "unitText": "{{ rate.unit }}"}{% if not forloop.last %}, {% endif %}{% endfor %}],{% endif %}
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"{% if vehicle.city %},
+    "areaServed": {
+      "@type": "City",
+      "name": "{{ vehicle.city|escapejs }}"
+    }{% endif %}
+  }{% else %}"offers": {
     "@type": "Offer",
     "price": {{ vehicle.price|stringformat:"d" }},
     "priceCurrency": "XOF",
@@ -51,7 +62,7 @@
       "@type": "City",
       "name": "{{ vehicle.city|escapejs }}"
     }{% endif %}
-  }
+  }{% endif %}
 }
 </script>
 {% endwith %}
@@ -133,8 +144,20 @@
           <div class="rounded-lg bg-primary/[0.06] p-5 sm:p-6 flex flex-col gap-5">
             <div class="flex items-start justify-between gap-4">
               <div>
+                {% if vehicle.is_rental %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 mb-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm uppercase tracking-wide"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">key</span>À louer</span>
+                <p class="font-display-lg text-[28px] sm:text-[32px] leading-none text-primary whitespace-nowrap">{{ vehicle.price_label }}</p>
+                <p class="mt-2 text-label-sm text-on-surface-variant">Tarif fixé par le vendeur</p>
+                {% if vehicle.rental_rates|length > 1 %}
+                <ul class="mt-3 flex flex-col gap-1 text-label-md text-on-surface">
+                  {% for rate in vehicle.rental_rates %}<li class="flex items-center justify-between gap-6"><span class="text-on-surface-variant">Par {{ rate.period }}</span><span class="font-semibold">{{ rate.text }} FCFA</span></li>{% endfor %}
+                </ul>
+                {% endif %}
+                {% if vehicle.deposit %}<p class="mt-3 text-label-md text-on-surface"><span class="text-on-surface-variant">Caution :</span> <span class="font-semibold">{{ vehicle.deposit|intcomma }} FCFA</span></p>{% endif %}
+                {% else %}
                 <p class="font-display-lg text-[30px] sm:text-[34px] leading-none text-primary whitespace-nowrap">{{ vehicle.price }} <span class="text-[18px]">FCFA</span></p>
                 <p class="mt-2 text-label-sm text-on-surface-variant">Prix fixé par le vendeur</p>
+                {% endif %}
               </div>
               <div class="flex items-center gap-1 shrink-0">
                 <button type="button" class="js-share w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-white transition-colors" aria-label="Partager cette annonce">
@@ -402,7 +425,7 @@
       <p class="font-headline-md text-[17px] text-on-background truncate">{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}</p>
       <p class="text-label-sm text-on-surface-variant truncate">{{ vehicle.get_transmission_display }} · {{ vehicle.get_fuel_type_display }} · {{ vehicle.mileage }} km</p>
     </div>
-    <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{{ vehicle.price }} FCFA</p>
+    <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{{ vehicle.price_label }}</p>
     <div class="ml-auto flex items-center gap-3">
       <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Je suis intéressé</button>
       {% if vehicle.seller.phone %}
@@ -418,7 +441,7 @@
 <div class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface/95 backdrop-blur-md border-t border-outline-variant/40 shadow-[0_-4px_16px_rgba(12,75,112,0.08)] px-4 py-3 flex items-center gap-3 print:hidden">
   <div class="flex-1 min-w-0">
     <p class="font-label-sm text-label-sm text-on-surface-variant truncate">{{ vehicle.brand }} {{ vehicle.model_name }}</p>
-    <p class="font-headline-md text-[17px] text-primary whitespace-nowrap">{{ vehicle.price }} FCFA</p>
+    <p class="font-headline-md text-[17px] text-primary whitespace-nowrap">{{ vehicle.price_label }}</p>
   </div>
   {% if vehicle.seller.phone %}
   <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="w-12 h-12 shrink-0 rounded bg-[#25D366] text-white flex items-center justify-center" aria-label="Contacter sur WhatsApp">

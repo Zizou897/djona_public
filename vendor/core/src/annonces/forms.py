@@ -15,7 +15,7 @@ class AnnonceForm(forms.ModelForm):
     class Meta:
         model = Annonce
         fields = [
-            'marque', 'modele', 'annee', 'prix',
+            'marque', 'modele', 'annee', 'type_annonce', 'prix', 'prix_jour', 'prix_semaine', 'prix_mois', 'caution',
             'kilometrage', 'carburant', 'boite_vitesses', 'couleur',
             'etat', 'ville', 'description',
         ]
@@ -30,10 +30,15 @@ class AnnonceForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['etat'].required = True
         self.fields['ville'].required = True
+        # Le prix de vente n'est exigé que pour une vente ; une location demande
+        # au moins un tarif (jour, semaine ou mois), au choix du vendeur.
+        self.fields['prix'].required = False
+        self.fields['type_annonce'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
         errors = []
+        self.valider_tarifs(cleaned_data)
 
         photos = self.files.getlist('photos')
         total = self.nb_photos_conservees + len(photos)
@@ -65,3 +70,22 @@ class AnnonceForm(forms.ModelForm):
             raise forms.ValidationError(errors)
 
         return cleaned_data
+
+    def valider_tarifs(self, cleaned_data):
+        """Vente : prix de vente obligatoire. Location : au moins un tarif ; le prix
+        de vente vaut alors 0 et la caution est facultative."""
+        type_annonce = cleaned_data.get('type_annonce') or Annonce.TypeAnnonce.VENTE
+        cleaned_data['type_annonce'] = type_annonce
+        champs_location = ('prix_jour', 'prix_semaine', 'prix_mois', 'caution')
+        if type_annonce == Annonce.TypeAnnonce.LOCATION:
+            for nom in champs_location:
+                if cleaned_data.get(nom) == 0:
+                    self.add_error(nom, 'Indiquez un montant supérieur à 0, ou laissez vide.')
+            if not any(cleaned_data.get(nom) for nom in ('prix_jour', 'prix_semaine', 'prix_mois')):
+                self.add_error('prix_jour', 'Indiquez au moins un tarif : par jour, par semaine ou par mois.')
+            cleaned_data['prix'] = 0
+        else:
+            if not cleaned_data.get('prix'):
+                self.add_error('prix', 'Indiquez le prix de vente.')
+            for nom in champs_location:
+                cleaned_data[nom] = None
