@@ -168,3 +168,16 @@ class SyncPhotosTests(TestCase):
         VehicleImage.objects.create(vehicle=self.vehicle, image='vehicles/annonce-5/a.jpg', order=0)
         self.assertEqual(self.run_sync([self.photo('annonces/2026/10/a.jpg')]), 0)
         self.assertEqual(self.vehicle.images.count(), 1)
+
+
+class LowQualityJpegTests(TestCase):
+    def test_already_compressed_jpeg_still_becomes_smaller_webp(self):
+        """Un JPEG très compressé donnerait un WebP q82 plus lourd : on retente plus bas."""
+        image = Image.new('RGB', (1200, 700))
+        image.putdata([((x * 3) % 256, (y * 5) % 256, ((x + y) * 2) % 256) for y in range(700) for x in range(1200)])
+        buffer = io.BytesIO()
+        image.save(buffer, 'JPEG', quality=35)
+        upload = SimpleUploadedFile('a.jpg', buffer.getvalue(), content_type='image/jpeg')
+        result = optimize_upload(upload)
+        self.assertTrue(result.name.endswith('.webp'))
+        self.assertLess(result.size, len(buffer.getvalue()))

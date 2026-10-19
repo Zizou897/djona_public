@@ -33,6 +33,21 @@ def _encode(image, max_width, quality):
     return buffer.getvalue()
 
 
+FALLBACK_QUALITIES = (72, 62)
+
+
+def _encode_within(image, max_width, quality, limit):
+    """Encode en WebP ; si le résultat n'est pas plus léger que `limit` (taille de
+    l'original), retente à qualité plus basse — un JPEG déjà très compressé reste
+    ainsi convertible plutôt que de rester en JPEG."""
+    data = _encode(image, max_width, quality)
+    for fallback in FALLBACK_QUALITIES:
+        if len(data) < limit or fallback >= quality:
+            break
+        data = _encode(image, max_width, fallback)
+    return data
+
+
 def optimize_upload(upload, max_width=VEHICLE_MAX_WIDTH, quality=VEHICLE_QUALITY, name=None):
     """Retourne un fichier WebP (ContentFile nommé *.webp) à partir d'un fichier
     téléversé, ou `upload` inchangé s'il ne faut/peut pas le convertir : image
@@ -47,7 +62,7 @@ def optimize_upload(upload, max_width=VEHICLE_MAX_WIDTH, quality=VEHICLE_QUALITY
                 return upload
             if image.format == 'WEBP' and image.width <= (max_width or image.width):
                 return upload
-            data = _encode(image, max_width, quality)
+            data = _encode_within(image, max_width, quality, len(raw))
     except _ERRORS:
         return upload
     if len(data) >= len(raw):
@@ -75,7 +90,7 @@ def convert_path(source, destination_dir, max_width=VEHICLE_MAX_WIDTH, quality=V
         with Image.open(source) as image:
             if getattr(image, 'is_animated', False):
                 raise ValueError('animé')
-            data = _encode(image, max_width, quality)
+            data = _encode_within(image, max_width, quality, source.stat().st_size)
     except _ERRORS:
         data = None
     if data is not None and (len(data) < source.stat().st_size or source.suffix.lower() == '.webp'):
