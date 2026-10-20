@@ -174,7 +174,12 @@ def detail(request, pk, slug):
         matches = _compatibility_filter(vehicle).filter(part=part).exists()
         compatibility = 'compatible' if matches else 'unknown'
     related = (_active_parts().filter(category=part.category).exclude(pk=part.pk)[:4])
+    whatsapp_message = f'Bonjour, je souhaite la pièce « {part.name} » (réf. {part.reference})'
+    if vehicle['make']:
+        whatsapp_message += f" pour ma {vehicle['make']} {vehicle['model']} {vehicle['year'] or ''}".rstrip()
+    whatsapp_message += '.' + chr(10) + request.build_absolute_uri()
     return render(request, 'parts/detail.html', {
+        'whatsapp_message': whatsapp_message,
         'part': part,
         'images': list(part.images.all()),
         'compatibilities': list(part.compatibilities.all()),

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}{{ part.name }}{% if part.brand %} {{ part.brand }}{% endif %} — Djona Parts{% endblock %}
 {% block meta_description %}{{ part.name }}{% if part.brand %} {{ part.brand }}{% endif %} — réf. {{ part.manufacturer_reference|default:part.reference }}. {{ part.category.name }}. {% if part.price %}{{ part.price|stringformat:"d" }} FCFA.{% else %}Prix sur demande.{% endif %}{% endblock %}
@@ -27,126 +27,340 @@
 
 {% block content %}
 {% url 'parts:request' as request_url %}
-<div class="flex flex-col w-full max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop pt-base pb-section-gap gap-8">
+{% with photo_count=images|length main_image=images.0 %}
+<div class="flex flex-col w-full">
 
-  <nav aria-label="Fil d'Ariane" class="font-label-sm text-label-sm text-on-surface-variant">
-    <a href="{% url 'parts:home' %}" class="hover:text-primary">Djona Parts</a> <span aria-hidden="true">/</span>
-    <a href="{% url 'parts:search' %}?categorie={{ part.category.pk }}" class="hover:text-primary">{{ part.category.name }}</a> <span aria-hidden="true">/</span>
-    <span>{{ part.name }}</span>
-  </nav>
+  {# ══ Galerie + bloc d'action ══ #}
+  <section class="w-full pt-6 pb-10 lg:pt-8">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <nav class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant mb-5 overflow-hidden" aria-label="Fil d'ariane">
+        <a href="{% url 'core:home' %}" class="hover:text-primary transition-colors shrink-0">Accueil</a>
+        <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">chevron_right</span>
+        <a href="{% url 'parts:home' %}" class="hover:text-primary transition-colors shrink-0">Djona Parts</a>
+        <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">chevron_right</span>
+        <a href="{% url 'parts:search' %}?categorie={{ part.category.pk }}" class="hover:text-primary transition-colors shrink-0">{{ part.category.name }}</a>
+        <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">chevron_right</span>
+        <span class="text-on-surface truncate">{{ part.name }}</span>
+      </nav>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-    {# Galerie #}
-    <div class="flex flex-col gap-3" id="part-gallery">
-      <div class="aspect-[4/3] bg-surface-container rounded-lg overflow-hidden flex items-center justify-center">
-        {% if images %}
-        <img id="part-gallery-main" src="{{ images.0.image.url }}" alt="{{ part.name }}" class="w-full h-full object-contain bg-white">
-        {% else %}
-        <span class="material-symbols-outlined text-[96px] text-outline" aria-hidden="true">{{ part.category.icon }}</span>
-        {% endif %}
+        {# Galerie #}
+        <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-3 min-w-0">
+          <div class="relative aspect-[4/3] sm:aspect-[16/11] w-full overflow-hidden rounded-lg bg-surface-container group">
+            {% if main_image %}
+            <img id="gallery-main-image" src="{{ main_image.image.url }}" alt="{{ part.name }}" class="js-gallery-open w-full h-full object-cover cursor-zoom-in transition-opacity duration-300">
+            {% else %}
+            <div class="w-full h-full flex flex-col items-center justify-center gap-2 text-outline">
+              <span class="material-symbols-outlined text-[72px]" aria-hidden="true">{{ part.category.icon }}</span>
+              <span class="text-label-sm">Photo non disponible</span>
+            </div>
+            {% endif %}
+
+            {% if part.is_featured %}
+            <span class="absolute top-4 left-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow-md">
+              <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">star</span> Pièce populaire
+            </span>
+            {% endif %}
+
+            {% if photo_count > 1 %}
+            <button type="button" class="js-gallery-prev absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-on-surface shadow-md flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 hover:bg-white transition-all" aria-label="Photo précédente">
+              <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+            </button>
+            <button type="button" class="js-gallery-next absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-on-surface shadow-md flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 hover:bg-white transition-all" aria-label="Photo suivante">
+              <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+            </button>
+            {% endif %}
+
+            {% if main_image %}
+            <div class="absolute bottom-4 right-4 flex items-center gap-2">
+              {% if photo_count > 1 %}
+              <span class="px-3 py-2 rounded bg-on-background/70 backdrop-blur-md text-white font-label-sm text-label-sm"><span id="gallery-counter">1 / {{ photo_count }}</span></span>
+              {% endif %}
+              <button type="button" class="js-gallery-open inline-flex items-center gap-2 px-4 py-2 rounded bg-white/90 backdrop-blur-md text-on-surface font-label-md text-label-sm shadow-md hover:bg-white transition-colors">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">photo_library</span>
+                <span class="hidden sm:inline">Voir toutes les images</span><span class="sm:hidden">Photos</span>
+              </button>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if photo_count > 1 %}
+          <div class="flex gap-3 overflow-x-auto py-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="list">
+            {% for image in images %}
+            <button type="button" role="listitem"
+                    class="js-gallery-thumb shrink-0 w-28 sm:w-36 aspect-[4/3] rounded-md overflow-hidden transition-all ring-offset-2 {% if forloop.first %}ring-2 ring-primary opacity-100{% else %}opacity-60 hover:opacity-100{% endif %}"
+                    data-full-src="{{ image.image.url }}" aria-label="Photo {{ forloop.counter }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+              <img src="{{ image.image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+            </button>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        {# Bloc d'action #}
+        <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
+          <div class="rounded-lg bg-primary/[0.06] p-5 sm:p-6 flex flex-col gap-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                {% if part.price %}
+                <p class="font-display-lg text-[30px] sm:text-[34px] leading-none text-primary whitespace-nowrap">{{ part.price|intcomma }} <span class="text-[18px]">FCFA</span></p>
+                {% else %}
+                <p class="font-display-lg text-[26px] sm:text-[30px] leading-none text-primary">Prix sur demande</p>
+                {% endif %}
+                <p class="mt-2 text-label-sm text-on-surface-variant">
+                  {% if part.availability == 'disponible' %}<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 font-label-sm"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">check_circle</span>Disponible</span>
+                  {% elif part.availability == 'indisponible' %}<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">block</span>Indisponible</span>
+                  {% else %}<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/25 text-secondary font-label-sm"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">schedule</span>Disponibilité à confirmer</span>{% endif %}
+                </p>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <button type="button" class="js-share w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-white transition-colors" aria-label="Partager cette pièce">
+                  <span class="material-symbols-outlined text-[22px]" aria-hidden="true">share</span>
+                  <span class="js-share-label sr-only">Partager</span>
+                </button>
+              </div>
+            </div>
+
+            {# Compatibilité avec le véhicule saisi #}
+            {% if compatibility == 'compatible' %}
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-green-50 border border-green-200 text-green-900" role="status">
+              <span class="material-symbols-outlined text-[22px] shrink-0" aria-hidden="true">check_circle</span>
+              <p class="text-label-md">Compatibilité renseignée avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:"d" }}{% endif %}</strong>.</p>
+            </div>
+            {% elif compatibility == 'unknown' %}
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-secondary-container/20 border border-secondary-container/50 text-on-surface" role="status">
+              <span class="material-symbols-outlined text-secondary text-[22px] shrink-0" aria-hidden="true">help</span>
+              <p class="text-label-md">Compatibilité avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:"d" }}{% endif %}</strong> non établie : l'équipe Djona peut la vérifier avant toute confirmation.</p>
+            </div>
+            {% endif %}
+
+            <div class="rounded-md bg-surface-container-lowest p-5 flex flex-col gap-4">
+              <h1 class="font-headline-lg text-[22px] sm:text-[24px] leading-tight text-on-background">{{ part.name }}</h1>
+              <ul class="flex flex-wrap items-center gap-y-2 text-label-sm text-on-surface-variant divide-x divide-outline-variant/50">
+                {% if part.brand %}<li class="flex items-center gap-1.5 pr-3"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">factory</span>{{ part.brand }}</li>{% endif %}
+                <li class="flex items-center gap-1.5 {% if part.brand %}px-3{% else %}pr-3{% endif %}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">tag</span>Réf. {{ part.manufacturer_reference|default:part.reference }}</li>
+              </ul>
+              <ul class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 border-t border-outline-variant/40 text-label-sm">
+                <li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">{{ part.category.icon }}</span>{{ part.category.name }}</li>
+                {% if part.condition %}<li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">sell</span>{{ part.get_condition_display }}</li>{% endif %}
+                {% if part.lead_time %}<li class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">schedule</span>Délai : {{ part.lead_time }}</li>{% endif %}
+              </ul>
+            </div>
+
+            <div id="detail-cta" class="grid grid-cols-1 gap-3">
+              <a href="{{ request_url }}?piece={{ part.pk }}{% if vehicle.make %}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}{% endif %}"
+                 class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">request_quote</span> Demander cette pièce
+              </a>
+              <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener"
+                 class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-95 transition-all">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
+              </a>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 text-label-sm">
+              <a href="tel:{{ site_contact.phone_tel }}" class="inline-flex items-center gap-1.5 font-label-md text-primary hover:underline">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span> Appeler Djona
+              </a>
+              <a href="{% url 'parts:request' %}" class="inline-flex items-center gap-1.5 font-label-md text-on-surface-variant hover:text-primary hover:underline">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">manage_search</span> Une autre pièce ?
+              </a>
+            </div>
+          </div>
+
+          <div class="rounded-lg border-2 border-secondary/30 bg-secondary/[0.06] p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">handshake</span>
+              </span>
+              <div>
+                <h2 class="font-headline-md text-[17px] text-on-background leading-tight">Comment ça se passe ?</h2>
+                <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Avec Djona</span>
+              </div>
+            </div>
+            <ol class="flex flex-col gap-2 text-label-md text-on-surface-variant">
+              <li class="flex gap-2"><span class="font-bold text-secondary">1.</span>Vous envoyez votre demande pour cette pièce.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">2.</span>Notre équipe confirme disponibilité, prix et délai.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">3.</span>Vous recevez une proposition et vous restez libre de refuser.</li>
+            </ol>
+          </div>
+          <div class="flex items-start gap-3 px-1">
+            <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">verified_user</span>
+            <p class="text-label-sm text-on-surface-variant">Le prix et la disponibilité sont confirmés par l'équipe Djona lors de votre demande.</p>
+          </div>
+        </div>
       </div>
-      {% if images|length > 1 %}
-      <div class="grid grid-cols-5 gap-2">
-        {% for image in images %}
-        <button type="button" data-gallery-thumb="{{ image.image.url }}" aria-label="Photo {{ forloop.counter }}"
-                class="aspect-square rounded-md overflow-hidden bg-surface-container border border-outline-variant/40 hover:border-primary transition-colors">
-          <img src="{{ image.image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
-        </button>
-        {% endfor %}
-      </div>
-      {% endif %}
     </div>
+  </section>
 
-    {# Informations #}
-    <div class="flex flex-col gap-6">
-      <div>
-        <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">{{ part.category.name }}</span>
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mt-1">{{ part.name }}</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-          {% if part.brand %}{{ part.brand }} · {% endif %}Réf. Djona {{ part.reference }}{% if part.manufacturer_reference %} · Réf. fabricant {{ part.manufacturer_reference }}{% endif %}
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-3">
-        {% if part.price %}
-        <span class="font-display-lg text-3xl text-secondary">{{ part.price }} <span class="text-lg">FCFA</span></span>
-        {% else %}
-        <span class="font-headline-md text-headline-md text-on-surface">Prix sur demande</span>
-        {% endif %}
-        {% if part.availability == 'disponible' %}
-        <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 font-label-md text-label-md">Disponible</span>
-        {% elif part.availability == 'indisponible' %}
-        <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Indisponible</span>
-        {% else %}
-        <span class="px-3 py-1 rounded-full bg-secondary-container/25 text-secondary font-label-md text-label-md">Disponibilité à confirmer</span>
-        {% endif %}
-      </div>
-
-      {# Compatibilité avec le véhicule saisi #}
-      {% if compatibility == 'compatible' %}
-      <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-green-50 border border-green-200 text-green-900" role="status">
-        <span class="material-symbols-outlined text-[22px] shrink-0" aria-hidden="true">check_circle</span>
-        <p class="font-body-md text-body-md">Compatibilité renseignée avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong>.</p>
-      </div>
-      {% elif compatibility == 'unknown' %}
-      <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-secondary-container/20 border border-secondary-container/50 text-on-surface" role="status">
-        <span class="material-symbols-outlined text-secondary text-[22px] shrink-0" aria-hidden="true">help</span>
-        <p class="font-body-md text-body-md">Compatibilité avec votre <strong>{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong> non établie : l'équipe Djona peut la vérifier avant toute confirmation.</p>
-      </div>
-      {% endif %}
-
-      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 bg-surface-container-lowest rounded-lg shadow-signature p-5">
-        <div><dt class="font-label-sm text-label-sm text-on-surface-variant">État</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.get_condition_display|default:"Non précisé" }}</dd></div>
-        <div><dt class="font-label-sm text-label-sm text-on-surface-variant">Garantie</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.warranty|default:"Non précisée" }}</dd></div>
-        {% if part.lead_time %}<div class="col-span-2"><dt class="font-label-sm text-label-sm text-on-surface-variant">Délai estimé</dt><dd class="font-label-md text-label-md text-on-surface">{{ part.lead_time }}</dd></div>{% endif %}
-      </dl>
-
-      <div class="flex flex-col sm:flex-row gap-3">
-        <a href="{{ request_url }}?piece={{ part.pk }}{% if vehicle.make %}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}{% endif %}"
-           class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow hover:brightness-110 transition-all">
-          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">request_quote</span>Demander cette pièce
-        </a>
-        <a href="{{ site_contact.whatsapp_url }}?text={{ 'Bonjour, je souhaite la pièce '|add:part.name|add:' (réf. '|add:part.reference|add:').'|urlencode }}" target="_blank" rel="noopener"
-           class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-primary text-primary rounded font-label-md text-label-md uppercase tracking-wide hover:bg-primary/5 transition-colors">
-          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span>WhatsApp
-        </a>
-      </div>
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Le prix et la disponibilité sont confirmés par l'équipe Djona lors de votre demande.</p>
-    </div>
-  </div>
-
+  {# ══ Description ══ #}
   {% if part.description %}
-  <section class="bg-surface-container-lowest rounded-lg shadow-signature p-6">
-    <h2 class="font-headline-md text-headline-md text-primary mb-3">Description</h2>
-    <p class="font-body-md text-body-md text-on-surface whitespace-pre-line">{{ part.description }}</p>
+  <section class="reveal w-full py-section-gap bg-surface-container-low border-y border-outline-variant/30">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="max-w-4xl">
+        {% include 'partials/_detail_heading.html' with title='Description' align='left' %}
+        <div class="relative">
+          <p id="vehicle-description" class="max-h-48 overflow-hidden font-body-lg text-body-lg text-on-surface-variant leading-relaxed whitespace-pre-line transition-[max-height] duration-300">{{ part.description }}</p>
+          <div id="vehicle-description-fade" class="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-surface-container-low to-transparent pointer-events-none" aria-hidden="true"></div>
+        </div>
+        <div class="mt-4">
+          <button type="button" id="vehicle-description-toggle" aria-expanded="false" aria-controls="vehicle-description" class="inline-flex items-center gap-1 px-5 py-2.5 rounded bg-primary text-on-primary font-label-md text-label-sm hover:brightness-125 transition-all">
+            <span class="js-toggle-label">Voir plus</span>
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">expand_more</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
   {% endif %}
 
-  <section class="bg-surface-container-lowest rounded-lg shadow-signature p-6">
-    <h2 class="font-headline-md text-headline-md text-primary mb-3">Véhicules compatibles</h2>
-    {% if compatibilities %}
-    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-      {% for item in compatibilities %}
-      <li class="flex items-center gap-2 font-body-md text-body-md text-on-surface"><span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">check</span>{{ item.label }}</li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p class="font-body-md text-body-md text-on-surface-variant">Aucune compatibilité n'est encore renseignée pour cette pièce. Indiquez-nous votre véhicule : l'équipe Djona la vérifie avant toute confirmation.</p>
-    {% endif %}
+  {# ══ Informations générales ══ #}
+  <section class="reveal w-full py-section-gap">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      {% include 'partials/_detail_heading.html' with title='Informations générales' %}
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 max-w-5xl mx-auto">
+        <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">{{ part.category.icon }}</span>
+          <span class="text-label-sm text-on-surface-variant">Catégorie</span>
+          <span class="font-label-md text-label-md text-on-background">{{ part.category.name }}</span>
+        </div>
+        <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">sell</span>
+          <span class="text-label-sm text-on-surface-variant">État</span>
+          <span class="font-label-md text-label-md {% if part.condition %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ part.get_condition_display|default:"Non précisé" }}</span>
+        </div>
+        <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">inventory_2</span>
+          <span class="text-label-sm text-on-surface-variant">Disponibilité</span>
+          <span class="font-label-md text-label-md text-on-background">{{ part.get_availability_display }}</span>
+        </div>
+        <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">workspace_premium</span>
+          <span class="text-label-sm text-on-surface-variant">Garantie</span>
+          <span class="font-label-md text-label-md {% if part.warranty %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ part.warranty|default:"Non précisée" }}</span>
+        </div>
+        <div class="rounded-md bg-surface-container-low p-4 flex flex-col items-center text-center gap-1.5">
+          <span class="material-symbols-outlined text-primary" aria-hidden="true">schedule</span>
+          <span class="text-label-sm text-on-surface-variant">Délai estimé</span>
+          <span class="font-label-md text-label-md {% if part.lead_time %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ part.lead_time|default:"À confirmer" }}</span>
+        </div>
+      </div>
+    </div>
   </section>
 
+  {# ══ Résumé ══ #}
+  <section class="reveal w-full pb-section-gap">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      {% include 'partials/_detail_heading.html' with title='Résumé' %}
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-5xl mx-auto">
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">badge</span><dt class="flex-1 text-on-surface-variant">Référence Djona</dt><dd class="font-label-md text-label-md text-on-background text-right">{{ part.reference }}</dd></div>
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">tag</span><dt class="flex-1 text-on-surface-variant">Référence fabricant</dt><dd class="font-label-md text-label-md text-right {% if part.manufacturer_reference %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ part.manufacturer_reference|default:"Non précisée" }}</dd></div>
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">factory</span><dt class="flex-1 text-on-surface-variant">Marque de la pièce</dt><dd class="font-label-md text-label-md text-right {% if part.brand %}text-on-background{% else %}text-on-surface-variant{% endif %}">{{ part.brand|default:"Non précisée" }}</dd></div>
+        <div class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5"><span class="material-symbols-outlined text-on-surface-variant text-[20px]" aria-hidden="true">payments</span><dt class="flex-1 text-on-surface-variant">Prix</dt><dd class="font-label-md text-label-md text-right text-on-background">{% if part.price %}{{ part.price|intcomma }} FCFA{% else %}Sur demande{% endif %}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  {# ══ Véhicules compatibles ══ #}
+  <section class="reveal w-full pb-section-gap">
+    <div class="max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      {% include 'partials/_detail_heading.html' with title='Véhicules compatibles' %}
+      {% if compatibilities %}
+      <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-5xl mx-auto">
+        {% for item in compatibilities %}
+        <li class="flex items-center gap-3 rounded-md bg-surface-container-low px-5 py-3.5 text-on-background"><span class="material-symbols-outlined text-primary text-[20px]" aria-hidden="true">directions_car</span><span class="flex-1">{{ item.label }}</span><span class="material-symbols-outlined text-green-700 text-[20px]" aria-hidden="true">check</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="max-w-3xl mx-auto text-center text-on-surface-variant">Aucune compatibilité n'est encore renseignée pour cette pièce. Indiquez-nous votre véhicule : l'équipe Djona la vérifie avant toute confirmation.</p>
+      <div class="mt-6 text-center">
+        <a href="{{ request_url }}?piece={{ part.pk }}" class="inline-flex items-center gap-2 px-6 py-3 rounded border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">verified</span>Faire vérifier la compatibilité</a>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ══ Même catégorie ══ #}
   {% if related %}
-  <section>
-    <h2 class="font-headline-md text-headline-md text-on-surface mb-5">Dans la même catégorie</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {% for part in related %}{% include 'parts/_part_card.html' %}{% endfor %}
+  <section class="w-full py-section-gap bg-surface-container-low border-t border-outline-variant/30">
+    <div class="reveal max-w-page mx-auto px-container-margin-mobile lg:px-container-margin-desktop">
+      <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+        <div>
+          <span class="block w-16 h-1 rounded-full bg-secondary mb-4" aria-hidden="true"></span>
+          <h2 class="font-headline-lg text-[24px] sm:text-headline-lg text-on-background">Dans la même catégorie</h2>
+        </div>
+        <a href="{% url 'parts:search' %}?categorie={{ part.category.pk }}" class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline">
+          Voir tout <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+        {% for part in related %}{% include 'parts/_part_card.html' %}{% endfor %}
+      </div>
     </div>
   </section>
   {% endif %}
 </div>
+
+{# ══ Barre compacte (bureau) : apparaît quand le bloc d'action sort de l'écran ══ #}
+<div id="detail-sticky-bar" aria-hidden="true" class="hidden lg:block fixed top-0 inset-x-0 z-[60] bg-surface shadow-signature -translate-y-full opacity-0 transition-all duration-300 print:hidden">
+  <div class="max-w-page mx-auto px-container-margin-desktop h-20 flex items-center gap-6">
+    {% if main_image %}<img src="{{ main_image.image.url }}" alt="" class="w-24 h-14 rounded object-cover shrink-0">{% endif %}
+    <div class="min-w-0 pr-6 border-r border-outline-variant/50">
+      <p class="font-headline-md text-[17px] text-on-background truncate">{{ part.name }}</p>
+      <p class="text-label-sm text-on-surface-variant truncate">{{ part.category.name }}{% if part.brand %} · {{ part.brand }}{% endif %} · Réf. {{ part.manufacturer_reference|default:part.reference }}</p>
+    </div>
+    <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{% if part.price %}{{ part.price|intcomma }} FCFA{% else %}Prix sur demande{% endif %}</p>
+    <div class="ml-auto flex items-center gap-3">
+      <a href="{{ request_url }}?piece={{ part.pk }}" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Demander cette pièce</a>
+      <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 rounded bg-[#25D366] text-white font-label-md text-label-md uppercase tracking-wide hover:brightness-95 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+{# ══ Barre d'action mobile ══ #}
+<div class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface/95 backdrop-blur-md border-t border-outline-variant/40 shadow-[0_-4px_16px_rgba(12,75,112,0.08)] px-4 py-3 flex items-center gap-3 print:hidden">
+  <div class="flex-1 min-w-0">
+    <p class="font-label-sm text-label-sm text-on-surface-variant truncate">{{ part.name }}</p>
+    <p class="font-headline-md text-[17px] text-primary whitespace-nowrap">{% if part.price %}{{ part.price|intcomma }} FCFA{% else %}Prix sur demande{% endif %}</p>
+  </div>
+  <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="w-12 h-12 shrink-0 rounded bg-[#25D366] text-white flex items-center justify-center" aria-label="Écrire sur WhatsApp">
+    <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+  </a>
+  <a href="{{ request_url }}?piece={{ part.pk }}" class="shrink-0 px-5 py-3.5 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide">Demander</a>
+</div>
+
+{# ══ Visionneuse photos ══ #}
+{% if main_image %}
+<div id="gallery-lightbox" class="fixed inset-0 z-[120] hidden flex-col bg-[#05080b]" role="dialog" aria-modal="true" aria-label="Photos de la pièce">
+  <div class="flex items-center justify-between px-4 sm:px-8 h-16 text-white shrink-0">
+    <p class="font-label-md text-label-md truncate">{{ part.name }}</p>
+    <div class="flex items-center gap-4">
+      <span id="lightbox-counter" class="font-label-sm text-label-sm text-white/70">1 / {{ photo_count }}</span>
+      <button type="button" class="js-lightbox-close w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center" aria-label="Fermer">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+  </div>
+  <div class="relative flex-1 flex items-center justify-center px-4 sm:px-20 pb-8 min-h-0">
+    <img id="lightbox-image" src="{{ main_image.image.url }}" alt="{{ part.name }}" class="max-w-full max-h-full object-contain select-none">
+    {% if photo_count > 1 %}
+    <button type="button" class="js-gallery-prev absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center" aria-label="Photo précédente">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+    </button>
+    <button type="button" class="js-gallery-next absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center" aria-label="Photo suivante">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+    </button>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endwith %}
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/part-gallery.js' %}" defer></script>
+<script src="{% static 'js/vehicle-gallery.js' %}" defer></script>
+<script src="{% static 'js/vehicle-detail.js' %}" defer></script>
 {% endblock %}

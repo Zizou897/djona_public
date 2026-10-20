@@ -279,3 +279,43 @@ class CategoryPageDesignTests(TestCase):
         self.assertIn('Freinage', html)
         html = self.client.get(self.url, {'categorie': ''}, HTTP_HX_REQUEST='true').content.decode()
         self.assertIn('Pièces détachées', html)
+
+
+class PartDetailDesignTests(TestCase):
+    """La fiche pièce reprend la structure de la fiche véhicule."""
+
+    def setUp(self):
+        from .models import PartImage
+        self.part = make_part(price=25000, availability=Part.Availability.AVAILABLE, condition=Part.Condition.NEW,
+                              warranty='6 mois', lead_time='3 jours', description='Jeu de 4 plaquettes.', is_featured=True)
+        PartCompatibility.objects.create(part=self.part, make='Toyota', model='Corolla', year_from=2014, year_to=2019)
+        PartImage.objects.create(part=self.part, image='parts/a.webp', order=0)
+        PartImage.objects.create(part=self.part, image='parts/b.webp', order=1)
+        self.html = self.client.get(self.part.get_absolute_url(), {'marque': 'Toyota', 'modele': 'Corolla', 'annee': '2016'}).content.decode()
+
+    def test_gallery_lightbox_and_scripts(self):
+        for expected in ('id="gallery-main-image"', 'js-gallery-thumb', 'id="gallery-lightbox"', '1 / 2',
+                         'vehicle-gallery.js', 'vehicle-detail.js'):
+            self.assertIn(expected, self.html)
+        self.assertIn('Pièce populaire', self.html)
+
+    def test_action_block_sticky_and_mobile_bars(self):
+        for expected in ('id="detail-cta"', 'id="detail-sticky-bar"', 'Demander cette pièce', 'WhatsApp', 'Appeler Djona',
+                         'Comment ça se passe', 'js-share'):
+            self.assertIn(expected, self.html)
+        self.assertIn('wa.me', self.html)
+        self.assertIn('Toyota', self.html)  # le véhicule choisi suit jusqu'à la demande et au message WhatsApp
+
+    def test_sections_use_real_data_only(self):
+        for expected in ('Informations générales', 'Résumé', 'Véhicules compatibles', 'Toyota Corolla (2014–2019)',
+                         '6 mois', '3 jours', 'Jeu de 4 plaquettes.', 'Compatibilité renseignée'):
+            self.assertIn(expected, self.html)
+
+    def test_unknown_values_are_flagged_not_invented(self):
+        bare = make_part(reference='BARE-1', name='Pièce nue')
+        html = self.client.get(bare.get_absolute_url()).content.decode()
+        for expected in ('Prix sur demande', 'Non précisé', 'Non précisée', 'Disponibilité à confirmer', 'Photo non disponible',
+                         'Aucune compatibilité'):
+            self.assertIn(expected, html)
+        self.assertNotIn('gallery-lightbox', html)
+        self.assertNotIn('Description</h2>', html)  # pas de section vide
