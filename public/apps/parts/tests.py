@@ -300,11 +300,17 @@ class PartDetailDesignTests(TestCase):
         self.assertIn('Pièce populaire', self.html)
 
     def test_action_block_sticky_and_mobile_bars(self):
-        for expected in ('id="detail-cta"', 'id="detail-sticky-bar"', 'Demander cette pièce', 'WhatsApp', 'Appeler Djona',
+        for expected in ('id="detail-cta"', 'id="detail-sticky-bar"', 'Je suis intéressé', 'WhatsApp', 'Appeler Djona',
                          'Comment ça se passe', 'js-share'):
             self.assertIn(expected, self.html)
         self.assertIn('wa.me', self.html)
-        self.assertIn('Toyota', self.html)  # le véhicule choisi suit jusqu'à la demande et au message WhatsApp
+        self.assertIn('Toyota', self.html)  # le véhicule choisi suit jusqu'à la modale et au message WhatsApp
+        self.assertIn('ouvrirModalInteret()', self.html)
+        self.assertIn('id="modal-interet"', self.html)
+        self.assertIn('interest-form.js', self.html)
+        self.assertIn(reverse('parts:interest', args=[self.part.pk]), self.html)
+        # La page « pièce introuvable » est réservée aux pièces introuvables : plus de lien depuis la fiche.
+        self.assertNotIn(reverse('parts:request'), self.html)
 
     def test_sections_use_real_data_only(self):
         for expected in ('Informations générales', 'Résumé', 'Véhicules compatibles', 'Toyota Corolla (2014–2019)',
@@ -319,3 +325,73 @@ class PartDetailDesignTests(TestCase):
             self.assertIn(expected, html)
         self.assertNotIn('gallery-lightbox', html)
         self.assertNotIn('Description</h2>', html)  # pas de section vide
+
+
+class PartInterestTests(TestCase):
+    """« Je suis intéressé » sur une fiche pièce — même procédé que pour un véhicule."""
+
+    def setUp(self):
+        cache.clear()
+        self.part = make_part(price=25000)
+        self.url = reverse('parts:interest', args=[self.part.pk])
+
+    def post(self, ajax=True, **overrides):
+        data = {'name': 'Jean Kouadio', 'phone': '07 00 00 00 00', 'message': 'Deux pièces svp'}
+        data.update(overrides)
+        extra = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'} if ajax else {}
+        return self.client.post(self.url, data, **extra)
+
+    @override_settings(PARTS_NOTIFY_EMAILS=['pieces@example.com'])
+    def test_interest_creates_a_back_office_request_linked_to_the_part(self):
+        response = self.post(marque='Toyota', modele='Corolla', annee='2016')
+        self.assertEqual(response.json()['status'], 'success')
+        request = PartRequest.objects.get()
+        self.assertEqual(request.request_type, PartRequest.RequestType.INTEREST)
+        self.assertEqual(request.part, self.part)
+        self.assertEqual((request.full_name, request.phone, request.description), ('Jean Kouadio', '+225 0700000000', 'Deux pièces svp'))
+        self.assertEqual((request.make, request.model, request.year), ('Toyota', 'Corolla', 2016))
+        self.assertEqual(request.status, PartRequest.Status.NEW)
+        self.assertTrue(request.reference.startswith('DJ-PC-'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('intéressé', mail.outbox[0].subject)
+        self.assertIn(request.reference, mail.outbox[0].subject)
+
+    def test_only_name_and_phone_are_needed(self):
+        response = self.post(message='')
+        self.assertEqual(response.json()['status'], 'success')
+        request = PartRequest.objects.get()
+        self.assertEqual((request.make, request.model, request.year, request.description), ('', '', None, ''))
+
+    def test_invalid_data_is_rejected(self):
+        for bad in ({'name': ''}, {'phone': '123'}, {'name': 'J'}):
+            self.assertEqual(self.post(**bad).json()['status'], 'error', bad)
+        self.assertEqual(PartRequest.objects.count(), 0)
+
+    def test_non_ajax_post_redirects_back_to_the_part(self):
+        response = self.post(ajax=False)
+        self.assertRedirects(response, self.part.get_absolute_url(), fetch_redirect_response=False)
+        self.assertEqual(PartRequest.objects.count(), 1)
+
+    def test_get_is_not_allowed_and_inactive_part_is_404(self):
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+        Part.objects.filter(pk=self.part.pk).update(is_active=False)
+        self.assertEqual(self.post().status_code, 404)
+
+    def test_rate_limit(self):
+        for _ in range(5):
+            self.assertEqual(self.post().json()['status'], 'success')
+        response = self.post()
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(PartRequest.objects.count(), 5)
+
+    def test_unfound_part_form_is_unchanged(self):
+        """Le formulaire « pièce introuvable » garde ses champs obligatoires et son type."""
+        data = {'full_name': 'Jean', 'phone': '0700000000', 'make': '', 'model': '', 'year': '', 'part_name': 'Courroie',
+                'description': ''}
+        response = self.client.post(reverse('parts:request'), data)
+        self.assertEqual(response.status_code, 200)
+        for field in ('make', 'model', 'year', 'description'):
+            self.assertIn(field, response.context['form'].errors)
+        data.update(make='Kia', model='Rio', year='2018', description='Courroie de distribution')
+        self.assertEqual(self.client.post(reverse('parts:request'), data).status_code, 302)
+        self.assertEqual(PartRequest.objects.get().request_type, PartRequest.RequestType.SEARCH)

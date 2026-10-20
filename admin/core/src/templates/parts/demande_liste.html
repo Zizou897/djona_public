@@ -28,8 +28,13 @@
                     {% endfor %}
                 </nav>
                 {% endwith %}
-                <form class="p-3" method="get" role="search">
+                <form class="p-3 flex flex-col gap-3" method="get" role="search">
                     {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <div class="flex flex-wrap gap-2" role="group" aria-label="Type de demande">
+                        <a class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors {% if not type_actif %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}" href="?{% if statut_actif %}statut={{ statut_actif }}&{% endif %}{% if recherche %}q={{ recherche|urlencode }}{% endif %}">Tous les types</a>
+                        {% for t in types %}<a class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors {% if type_actif == t.value %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %}" href="?type={{ t.value }}{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">{{ t.label }}</a>{% endfor %}
+                    </div>
+                    {% if type_actif %}<input name="type" type="hidden" value="{{ type_actif }}">{% endif %}
                     <label class="relative block">
                         <span class="sr-only">Rechercher</span>
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">search</span>
@@ -44,17 +49,18 @@
                     <li>
                         <a class="px-4 sm:px-6 py-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors {% if d.status == 'nouvelle' %}bg-secondary-container/[0.06]{% endif %}" href="{% url 'part_demande_detail' d.pk %}">
                             <span class="relative w-10 h-10 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                                <span class="material-symbols-outlined text-[20px]">manage_search</span>
+                                <span class="material-symbols-outlined text-[20px]">{% if d.request_type == 'interesse' %}favorite{% else %}manage_search{% endif %}</span>
                                 {% if d.status == 'nouvelle' %}<span class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-secondary-container ring-2 ring-surface-container-lowest"></span>{% endif %}
                             </span>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-baseline justify-between gap-3">
-                                    <p class="text-sm {% if d.status == 'nouvelle' %}font-bold{% else %}font-semibold{% endif %} text-on-surface truncate">{{ d.part_name }} <span class="font-normal text-on-surface-variant">· {{ d.make }} {{ d.model }} {{ d.year|stringformat:'d' }}</span></p>
+                                    <p class="text-sm {% if d.status == 'nouvelle' %}font-bold{% else %}font-semibold{% endif %} text-on-surface truncate">{{ d.part_name }} {% if d.make %}<span class="font-normal text-on-surface-variant">· {{ d.make }} {{ d.model }}{% if d.year %} {{ d.year|stringformat:'d' }}{% endif %}</span>{% endif %}</p>
                                     <span class="shrink-0 text-[11px] text-outline">{{ d.created_at|date:'d/m/Y H:i' }}</span>
                                 </div>
-                                <p class="text-sm text-on-surface-variant mt-0.5 line-clamp-1">{{ d.description }}</p>
+                                <p class="text-sm text-on-surface-variant mt-0.5 line-clamp-1">{{ d.description|default:"Aucun message — à rappeler pour confirmer disponibilité, prix et délai." }}</p>
                                 <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant">
                                     <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold {% if d.status == 'nouvelle' %}bg-secondary-container/25 text-secondary{% elif d.status == 'acceptee' %}bg-green-100 text-green-800{% elif d.status == 'refusee' or d.status == 'sans_suite' %}bg-surface-container text-on-surface-variant{% else %}bg-primary/10 text-primary{% endif %}">{{ d.get_status_display }}</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold {% if d.request_type == 'interesse' %}bg-secondary-container/25 text-secondary{% else %}bg-surface-container text-on-surface-variant{% endif %}">{{ d.get_request_type_display }}</span>
                                     <span class="font-semibold">{{ d.reference }}</span>
                                     <span>{{ d.full_name }}</span>
                                     <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">call</span>{{ d.phone }}</span>

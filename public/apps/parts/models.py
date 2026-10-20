@@ -147,16 +147,22 @@ class PartRequest(models.Model):
         DECLINED = 'refusee', 'Refusée par le client'
         NO_FOLLOW_UP = 'sans_suite', 'Sans suite'
 
+    class RequestType(models.TextChoices):
+        SEARCH = 'introuvable', 'Pièce introuvable'
+        INTEREST = 'interesse', 'Intéressé par une pièce'
+
     reference = models.CharField('numéro de demande', max_length=20, unique=True, editable=False)
+    request_type = models.CharField('type de demande', max_length=20, choices=RequestType.choices,
+                                    default=RequestType.SEARCH, db_index=True)
     full_name = models.CharField('nom et prénom', max_length=150)
     phone = models.CharField('téléphone / WhatsApp', max_length=30)
-    make = models.CharField('marque du véhicule', max_length=60)
-    model = models.CharField('modèle', max_length=80)
-    year = models.PositiveSmallIntegerField('année')
+    make = models.CharField('marque du véhicule', max_length=60, blank=True)
+    model = models.CharField('modèle', max_length=80, blank=True)
+    year = models.PositiveSmallIntegerField('année', null=True, blank=True)
     engine = models.CharField('motorisation', max_length=80, blank=True)
     part_name = models.CharField('pièce recherchée', max_length=150)
     part_reference = models.CharField('référence', max_length=80, blank=True)
-    description = models.TextField('description du besoin')
+    description = models.TextField('description du besoin', blank=True)
     photo = models.ImageField('photo', upload_to='part_requests/', max_length=255, blank=True)
     part = models.ForeignKey(Part, verbose_name='pièce du catalogue', null=True, blank=True,
                              on_delete=models.SET_NULL, related_name='requests')

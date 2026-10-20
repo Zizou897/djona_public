@@ -1,21 +1,26 @@
 from django.conf import settings
+from django.contrib import messages
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q, Value
 from django.db.models.functions import Concat, Replace, Upper
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from apps.catalog.models import Vehicle
 from apps.core.views import _client_ip
 
-from .forms import PartRequestForm
+from .forms import PartInterestForm, PartRequestForm
 from .models import Part, PartCategory, PartCompatibility, PartRequest, normalize_reference
 
 PAGE_SIZE = 12
 REQUEST_RATE_LIMIT = 5
 REQUEST_RATE_WINDOW = 3600  # secondes (1 h)
+INTEREST_RATE_LIMIT = 5
+INTEREST_RATE_WINDOW = 600  # secondes (10 min)
 NL = chr(10)
 SORTS = {
     'pertinence': ('-is_featured', 'name'),
@@ -196,19 +201,21 @@ def _notify_part_request(part_request):
     recipients = getattr(settings, 'PARTS_NOTIFY_EMAILS', [])
     if not recipients:
         return
+    interested = part_request.request_type == PartRequest.RequestType.INTEREST
+    title = 'Client intéressé par une pièce' if interested else 'Nouvelle demande de pièce'
     body = NL.join([
-        f'Nouvelle demande de pièce {part_request.reference}',
+        f'{title} {part_request.reference}',
         '',
         f'Client : {part_request.full_name}',
         f'Téléphone : {part_request.phone}',
-        f'Véhicule : {part_request.make} {part_request.model} {part_request.year}'
+        'Véhicule : ' + (' '.join(str(v) for v in (part_request.make, part_request.model, part_request.year) if v) or 'non précisé')
         + (f' — {part_request.engine}' if part_request.engine else ''),
         f'Pièce : {part_request.part_name}' + (f' (réf. {part_request.part_reference})' if part_request.part_reference else ''),
         '',
-        f'Description : {part_request.description}',
+        f'Message : {part_request.description or "—"}',
     ])
     try:
-        send_mail(f'Nouvelle demande de pièce {part_request.reference}', body, None, recipients, fail_silently=True)
+        send_mail(f'{title} {part_request.reference}', body, None, recipients, fail_silently=True)
     except Exception:
         pass
 
@@ -253,3 +260,45 @@ def request_success(request):
     if not reference:
         return redirect('parts:request')
     return render(request, 'parts/request_success.html', {'reference': reference, 'today': timezone.localdate()})
+
+
+@require_POST
+def interest(request, pk):
+    """« Je suis intéressé » sur une fiche pièce : enregistre le contact du client
+    (nom, téléphone, message) pour que l'équipe Djona le rappelle et confirme
+    disponibilité, prix et délai. Même schéma que catalog.views.express_interest
+    (JSON + SweetAlert2 avec JS, redirection sinon), limité par IP.
+    Visible dans le back-office, « Demandes de pièces ».
+    """
+    part = get_object_or_404(_active_parts(), pk=pk)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    cache_key = f'part-interest:{_client_ip(request)}'
+    attempts = cache.get(cache_key, 0)
+    if attempts >= INTEREST_RATE_LIMIT:
+        message = 'Trop de tentatives — réessayez dans quelques minutes.'
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': message}, status=429)
+        messages.error(request, message)
+        return redirect(part.get_absolute_url())
+    cache.set(cache_key, attempts + 1, INTEREST_RATE_WINDOW)
+
+    form = PartInterestForm(request.POST)
+    if form.is_valid():
+        data = form.cleaned_data
+        part_request = PartRequest.objects.create(
+            request_type=PartRequest.RequestType.INTEREST,
+            full_name=data['name'], phone=data['phone'], part=part,
+            part_name=part.name, part_reference=part.manufacturer_reference or part.reference,
+            description=data['message'].strip(), make=data['marque'].strip(), model=data['modele'].strip(),
+            year=data['annee'],
+        )
+        _notify_part_request(part_request)
+        status, message = 'success', "Merci ! L'équipe Djona a reçu vos coordonnées et va vous recontacter rapidement."
+    else:
+        status, message = 'error', 'Merci de renseigner votre nom et un numéro de téléphone valide.'
+
+    if is_ajax:
+        return JsonResponse({'status': status, 'message': message})
+    getattr(messages, status)(request, message)
+    return redirect(part.get_absolute_url())

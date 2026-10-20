@@ -193,3 +193,52 @@ class RequestTests(PartsBase):
     def test_counter_exposes_new_requests(self):
         response = self.client.get(reverse('compteurs_admin'))
         self.assertGreaterEqual(response.json().get('pieces', 0), 1)
+
+
+class InterestRequestTests(PartsBase):
+    """Les « Je suis intéressé » arrivent dans les demandes de pièces, distincts des pièces introuvables."""
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.admin)
+        self.part = self.make_part()
+        self.interest = PartRequestMirror.objects.using(DB).create(
+            reference='DJ-PC-2026-9001', request_type='interesse', full_name='Awa Traoré', phone='+225 0701020304',
+            part=self.part, part_name='Plaquettes', part_reference='T-001', description='', created_at=timezone.now(),
+        )
+        self.search = PartRequestMirror.objects.using(DB).create(
+            reference='DJ-PC-2026-9002', request_type='introuvable', full_name='Jean Kouadio', phone='+225 0700000000',
+            make='Toyota', model='Corolla', year=2015, part_name='Amortisseur', description='Bruit à gauche',
+            created_at=timezone.now(),
+        )
+
+    def test_list_shows_both_kinds_with_badges_and_filters_by_type(self):
+        html = self.client.get(reverse('part_demande_liste')).content.decode()
+        self.assertIn('DJ-PC-2026-9001', html)
+        self.assertIn('DJ-PC-2026-9002', html)
+        self.assertIn('Intéressé par une pièce', html)
+        self.assertIn('Pièce introuvable', html)
+        self.assertIn('à rappeler', html)  # intérêt sans message
+        only_interest = self.client.get(reverse('part_demande_liste'), {'type': 'interesse'}).content.decode()
+        self.assertIn('DJ-PC-2026-9001', only_interest)
+        self.assertNotIn('DJ-PC-2026-9002', only_interest)
+        only_search = self.client.get(reverse('part_demande_liste'), {'type': 'introuvable'}).content.decode()
+        self.assertIn('DJ-PC-2026-9002', only_search)
+        self.assertNotIn('DJ-PC-2026-9001', only_search)
+
+    def test_interest_detail_handles_missing_vehicle_and_links_the_part(self):
+        response = self.client.get(reverse('part_demande_detail', args=[self.interest.pk]))
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertIn('Intéressé par une pièce', html)
+        self.assertIn('Non précisée', html)
+        self.assertNotIn('None', html.split('Véhicule')[-1][:600])
+        self.assertIn(reverse('part_modifier', args=[self.part.pk]), html)
+
+    def test_interest_counts_in_the_new_requests_counter_and_can_be_followed_up(self):
+        counters = self.client.get(reverse('compteurs_admin')).json()
+        self.assertGreaterEqual(counters.get('pieces', 0), 2)
+        url = reverse('part_demande_detail', args=[self.interest.pk])
+        self.client.post(url, {'status': 'en_recherche', 'proposed_price': '', 'proposed_lead_time': '', 'internal_note': 'Rappelé.'})
+        self.interest.refresh_from_db(using=DB)
+        self.assertEqual(self.interest.status, 'en_recherche')

@@ -102,16 +102,21 @@ class PartRequestMirror(models.Model):
         DECLINED = 'refusee', 'Refusée par le client'
         NO_FOLLOW_UP = 'sans_suite', 'Sans suite'
 
+    class RequestType(models.TextChoices):
+        SEARCH = 'introuvable', 'Pièce introuvable'
+        INTEREST = 'interesse', 'Intéressé par une pièce'
+
     reference = models.CharField(max_length=20)
+    request_type = models.CharField(max_length=20, choices=RequestType.choices, default=RequestType.SEARCH)
     full_name = models.CharField(max_length=150)
     phone = models.CharField(max_length=30)
-    make = models.CharField(max_length=60)
-    model = models.CharField(max_length=80)
-    year = models.PositiveSmallIntegerField()
+    make = models.CharField(max_length=60, blank=True)
+    model = models.CharField(max_length=80, blank=True)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
     engine = models.CharField(max_length=80, blank=True)
     part_name = models.CharField(max_length=150)
     part_reference = models.CharField(max_length=80, blank=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     photo = models.ImageField(upload_to='part_requests/', max_length=255, blank=True)
     part = models.ForeignKey(PartMirror, null=True, blank=True, on_delete=models.SET_NULL, related_name='requests')
     status = models.CharField(max_length=30, choices=Status.choices, default=Status.NEW)

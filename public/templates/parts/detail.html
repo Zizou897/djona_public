@@ -26,7 +26,6 @@
 {% endblock %}
 
 {% block content %}
-{% url 'parts:request' as request_url %}
 {% with photo_count=images|length main_image=images.0 %}
 <div class="flex flex-col w-full">
 
@@ -149,10 +148,9 @@
             </div>
 
             <div id="detail-cta" class="grid grid-cols-1 gap-3">
-              <a href="{{ request_url }}?piece={{ part.pk }}{% if vehicle.make %}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}{% endif %}"
-                 class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">
-                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">request_quote</span> Demander cette pièce
-              </a>
+              <button type="button" onclick="ouvrirModalInteret()" class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">favorite</span> Je suis intéressé
+              </button>
               <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener"
                  class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-95 transition-all">
                 <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
@@ -162,9 +160,6 @@
             <div class="flex flex-wrap items-center justify-between gap-3 text-label-sm">
               <a href="tel:{{ site_contact.phone_tel }}" class="inline-flex items-center gap-1.5 font-label-md text-primary hover:underline">
                 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span> Appeler Djona
-              </a>
-              <a href="{% url 'parts:request' %}" class="inline-flex items-center gap-1.5 font-label-md text-on-surface-variant hover:text-primary hover:underline">
-                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">manage_search</span> Une autre pièce ?
               </a>
             </div>
           </div>
@@ -180,14 +175,14 @@
               </div>
             </div>
             <ol class="flex flex-col gap-2 text-label-md text-on-surface-variant">
-              <li class="flex gap-2"><span class="font-bold text-secondary">1.</span>Vous envoyez votre demande pour cette pièce.</li>
-              <li class="flex gap-2"><span class="font-bold text-secondary">2.</span>Notre équipe confirme disponibilité, prix et délai.</li>
-              <li class="flex gap-2"><span class="font-bold text-secondary">3.</span>Vous recevez une proposition et vous restez libre de refuser.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">1.</span>Vous cliquez sur « Je suis intéressé » et laissez vos coordonnées.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">2.</span>Notre équipe vous rappelle pour confirmer disponibilité, prix et délai.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">3.</span>Vous décidez ensuite : aucun engagement avant votre accord.</li>
             </ol>
           </div>
           <div class="flex items-start gap-3 px-1">
             <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">verified_user</span>
-            <p class="text-label-sm text-on-surface-variant">Le prix et la disponibilité sont confirmés par l'équipe Djona lors de votre demande.</p>
+            <p class="text-label-sm text-on-surface-variant">Le prix et la disponibilité sont confirmés par l'équipe Djona lorsqu'elle vous rappelle.</p>
           </div>
         </div>
       </div>
@@ -275,7 +270,7 @@
       {% else %}
       <p class="max-w-3xl mx-auto text-center text-on-surface-variant">Aucune compatibilité n'est encore renseignée pour cette pièce. Indiquez-nous votre véhicule : l'équipe Djona la vérifie avant toute confirmation.</p>
       <div class="mt-6 text-center">
-        <a href="{{ request_url }}?piece={{ part.pk }}" class="inline-flex items-center gap-2 px-6 py-3 rounded border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">verified</span>Faire vérifier la compatibilité</a>
+        <button type="button" onclick="ouvrirModalInteret()" class="inline-flex items-center gap-2 px-6 py-3 rounded border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">verified</span>Je suis intéressé — faire vérifier la compatibilité</button>
       </div>
       {% endif %}
     </div>
@@ -312,7 +307,7 @@
     </div>
     <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{% if part.price %}{{ part.price|intcomma }} FCFA{% else %}Prix sur demande{% endif %}</p>
     <div class="ml-auto flex items-center gap-3">
-      <a href="{{ request_url }}?piece={{ part.pk }}" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Demander cette pièce</a>
+      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Je suis intéressé</button>
       <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 rounded bg-[#25D366] text-white font-label-md text-label-md uppercase tracking-wide hover:brightness-95 transition-all">
         <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
       </a>
@@ -329,7 +324,7 @@
   <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="w-12 h-12 shrink-0 rounded bg-[#25D366] text-white flex items-center justify-center" aria-label="Écrire sur WhatsApp">
     <span class="material-symbols-outlined" aria-hidden="true">chat</span>
   </a>
-  <a href="{{ request_url }}?piece={{ part.pk }}" class="shrink-0 px-5 py-3.5 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide">Demander</a>
+  <button type="button" onclick="ouvrirModalInteret()" class="shrink-0 px-5 py-3.5 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide">Je suis intéressé</button>
 </div>
 
 {# ══ Visionneuse photos ══ #}
@@ -357,10 +352,37 @@
   </div>
 </div>
 {% endif %}
+
+{# ══ « Je suis intéressé » — même modale que la fiche véhicule ══ #}
+<div class="fixed inset-0 z-[110] hidden items-center justify-center bg-on-surface/40 backdrop-blur-sm px-4" id="modal-interet">
+  <div class="relative bg-surface rounded-lg shadow-xl max-w-sm w-full p-6 flex flex-col gap-4">
+    <button type="button" onclick="fermerModalInteret()" class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface" aria-label="Fermer">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+    <div class="flex flex-col items-center text-center gap-2">
+      <span class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">favorite</span>
+      </span>
+      <h3 class="font-headline-md text-[18px] text-on-surface">Je suis intéressé</h3>
+      <p class="font-body-md text-label-sm text-on-surface-variant">Laissez vos coordonnées : l'équipe Djona vous rappelle pour confirmer la disponibilité, le prix et le délai de « {{ part.name }} ».</p>
+    </div>
+    <form action="{% url 'parts:interest' part.pk %}" class="flex flex-col gap-3" id="interest-form" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="marque" value="{{ vehicle.make }}">
+      <input type="hidden" name="modele" value="{{ vehicle.model }}">
+      <input type="hidden" name="annee" value="{{ vehicle.year|default_if_none:'' }}">
+      <input class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="name" placeholder="Votre nom" required type="text" autocomplete="name">
+      <input class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="phone" placeholder="Votre téléphone" required type="tel" autocomplete="tel">
+      <textarea class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none" name="message" placeholder="Message (optionnel) — quantité, véhicule…" rows="2"></textarea>
+      <button class="w-full bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md shadow-md hover:brightness-125 transition-all" type="submit">Envoyer ma demande</button>
+    </form>
+  </div>
+</div>
 {% endwith %}
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/vehicle-gallery.js' %}" defer></script>
 <script src="{% static 'js/vehicle-detail.js' %}" defer></script>
+<script src="{% static 'js/interest-form.js' %}" defer></script>
 {% endblock %}

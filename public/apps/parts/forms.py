@@ -36,6 +36,8 @@ class PartRequestForm(forms.ModelForm):
         })
         self.fields['photo'].widget = forms.ClearableFileInput(attrs={'accept': 'image/*'})
         self.fields['photo'].required = False
+        for name in ('make', 'model', 'description'):
+            self.fields[name].required = True  # facultatifs côté modèle (intérêt), obligatoires ici
         for name, field in self.fields.items():
             if name == 'photo':
                 field.widget.attrs['class'] = 'block w-full text-sm text-on-surface-variant file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-2.5 file:font-label-md file:text-primary hover:file:bg-primary/15'
@@ -62,3 +64,29 @@ class PartRequestForm(forms.ModelForm):
         if photo and hasattr(photo, 'size') and photo.size > MAX_PHOTO_BYTES:
             raise forms.ValidationError('La photo ne doit pas dépasser 5 Mo.')
         return photo
+
+
+class PartInterestForm(forms.Form):
+    """« Je suis intéressé » sur une fiche pièce — même idée que pour un véhicule :
+    nom + téléphone (+ message facultatif), pas de formulaire long."""
+
+    name = forms.CharField(max_length=150)
+    phone = forms.CharField(max_length=30)
+    message = forms.CharField(max_length=1000, required=False)
+    marque = forms.CharField(max_length=60, required=False)
+    modele = forms.CharField(max_length=80, required=False)
+    annee = forms.IntegerField(required=False, min_value=1950, max_value=2100)
+
+    def clean_name(self):
+        value = self.cleaned_data['name'].strip()
+        if len(value) < 2:
+            raise forms.ValidationError('Nom trop court.')
+        return value
+
+    def clean_phone(self):
+        digits = ''.join(ch for ch in self.cleaned_data['phone'] if ch.isdigit())
+        if digits.startswith('225') and len(digits) > 10:
+            digits = digits[3:]
+        if not 8 <= len(digits) <= 10:
+            raise forms.ValidationError('Numéro de téléphone invalide.')
+        return f'+225 {digits}'

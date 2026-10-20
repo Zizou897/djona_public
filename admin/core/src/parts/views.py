@@ -217,6 +217,9 @@ class PartRequestListView(StaffRequisMixin, View):
         statut = request.GET.get('statut', '')
         if statut in PartRequestMirror.Status.values:
             qs = qs.filter(status=statut)
+        type_demande = request.GET.get('type', '')
+        if type_demande in PartRequestMirror.RequestType.values:
+            qs = qs.filter(request_type=type_demande)
         recherche = request.GET.get('q', '').strip()
         if recherche:
             qs = qs.filter(Q(reference__icontains=recherche) | Q(full_name__icontains=recherche)
@@ -228,6 +231,8 @@ class PartRequestListView(StaffRequisMixin, View):
             'demandes': qs,
             'statuts': [{'value': v, 'label': l, 'count': counts.get(v, 0)} for v, l in PartRequestMirror.Status.choices],
             'statut_actif': statut,
+            'type_actif': type_demande,
+            'types': [{'value': v, 'label': l} for v, l in PartRequestMirror.RequestType.choices],
             'recherche': recherche,
             'nb_total': sum(counts.values()),
         })
