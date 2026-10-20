@@ -133,18 +133,28 @@ def home(request):
 
 
 def search(request):
-    qs, filters = _search(request.GET)
-    page = Paginator(qs, PAGE_SIZE).get_page(request.GET.get('page'))
     params = request.GET.copy()
+    # Changer de marque dans les filtres renvoie l'ancien modèle : on l'ignore s'il
+    # n'existe pas pour la marque choisie (sinon résultats vides le temps du rafraîchissement).
+    make, model = params.get('marque', '').strip(), params.get('modele', '').strip()
+    if make and model and model.casefold() not in {m.casefold() for m in _models_for(make)}:
+        params['modele'] = ''
+    qs, filters = _search(params)
+    page = Paginator(qs, PAGE_SIZE).get_page(params.get('page'))
     params.pop('page', None)
+    categories = PartCategory.objects.filter(is_active=True)
+    category = next((c for c in categories if str(c.pk) == filters['categorie']), None)
     context = {
         'page_obj': page,
         'filters': filters,
         'querystring': params.urlencode(),
-        'categories': PartCategory.objects.filter(is_active=True),
+        'categories': categories,
+        'category': category,
         'has_vehicle': bool(filters['make']),
         **_vehicle_context({k: filters[k] for k in ('make', 'model', 'year')}),
     }
+    if request.htmx:
+        return render(request, 'parts/_results.html', context)
     return render(request, 'parts/search.html', context)
 
 

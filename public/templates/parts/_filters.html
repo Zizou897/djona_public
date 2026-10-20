@@ -1,0 +1,68 @@
+{% comment %}
+Filtres du catalogue de pièces — même présentation que partials/_filters.html (véhicules) :
+filtrage en direct via HTMX, résultats dans #parts-results.
+Attend filters, categories, makes, models, vehicle.
+{% endcomment %}
+<form id="filters-form"
+      hx-get="{% url 'parts:search' %}"
+      hx-target="#parts-results"
+      hx-push-url="true"
+      hx-include="[name='tri']"
+      hx-trigger="change, keyup changed delay:450ms from:#parts-q"
+      onsubmit="return false"
+      class="flex flex-col gap-8">
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Recherche</h3>
+    <label class="relative block">
+      <span class="sr-only">Nom ou référence de la pièce</span>
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none" aria-hidden="true">search</span>
+      <input id="parts-q" type="search" name="q" value="{{ filters.q }}" placeholder="Nom ou référence" autocomplete="off"
+             class="w-full bg-white border border-outline-variant rounded pl-10 pr-3 py-2.5 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
+    </label>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Catégorie</h3>
+    <div class="flex flex-wrap gap-2">
+      <label class="cursor-pointer">
+        <input type="radio" name="categorie" value="" class="peer hidden" {% if not filters.categorie %}checked{% endif %}>
+        <span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors block">Toutes</span>
+      </label>
+      {% for category in categories %}
+      <label class="cursor-pointer">
+        <input type="radio" name="categorie" value="{{ category.pk }}" class="peer hidden" {% if filters.categorie == category.pk|stringformat:'d' %}checked{% endif %}>
+        <span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full font-label-sm text-label-sm peer-checked:bg-primary peer-checked:text-on-primary transition-colors block">{{ category.name }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if makes %}
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Votre véhicule</h3>
+    <select name="marque" aria-label="Marque"
+            class="w-full bg-white border border-outline-variant rounded px-4 py-2.5 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
+      <option value="">Toutes les marques</option>
+      {% for make in makes %}<option value="{{ make }}" {% if vehicle.make|lower == make|lower %}selected{% endif %}>{{ make }}</option>{% endfor %}
+    </select>
+    {% include 'parts/_model_select.html' %}
+    <input type="number" name="annee" inputmode="numeric" min="1960" max="2100" placeholder="Année" aria-label="Année" value="{{ vehicle.year|default_if_none:'' }}"
+           class="w-full bg-white border border-outline-variant rounded px-4 py-2.5 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
+  </div>
+  {% endif %}
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface">Budget maximum (FCFA)</h3>
+    <input type="number" name="budget" inputmode="numeric" min="0" step="1000" value="{{ filters.budget }}" placeholder="Ex : 50000"
+           class="w-full bg-white border border-outline-variant rounded px-4 py-2.5 font-body-md text-label-md outline-none focus:ring-2 focus:ring-primary transition-shadow">
+  </div>
+
+  <a href="{% url 'parts:search' %}"
+     hx-get="{% url 'parts:search' %}"
+     hx-target="#parts-results"
+     hx-push-url="true"
+     class="w-full text-center bg-surface-container text-on-surface-variant font-label-md text-label-md py-3 rounded hover:bg-surface-container-highest transition-colors">
+    Réinitialiser les filtres
+  </a>
+</form>

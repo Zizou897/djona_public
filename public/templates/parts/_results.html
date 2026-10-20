@@ -1,0 +1,64 @@
+{% comment %}Attend page_obj, filters, vehicle, has_vehicle, querystring. Cible des swaps HTMX (filtres, tri, pagination).{% endcomment %}
+<p id="results-count" class="font-body-md text-body-md text-on-surface-variant mb-gutter">
+  {{ page_obj.paginator.count }} pièce{{ page_obj.paginator.count|pluralize }} trouvée{{ page_obj.paginator.count|pluralize }}{% if filters.q %} pour « {{ filters.q }} »{% endif %}
+</p>
+
+{% if has_vehicle %}
+<div class="flex items-start gap-3 px-4 py-3 mb-gutter rounded-md bg-primary/5 border border-primary/15 text-on-surface-variant" role="note">
+  <span class="material-symbols-outlined text-primary text-[22px] shrink-0" aria-hidden="true">info</span>
+  <p class="font-body-md text-body-md">
+    Résultats pour <strong class="text-on-surface">{{ vehicle.make }}{% if vehicle.model %} {{ vehicle.model }}{% endif %}{% if vehicle.year %} {{ vehicle.year|stringformat:'d' }}{% endif %}</strong>, d'après les compatibilités renseignées.
+    Une pièce absente de cette liste peut tout de même convenir :
+    <a class="text-primary font-semibold hover:underline" href="{% url 'parts:request' %}?marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}">faites-la vérifier par l'équipe Djona</a>.
+  </p>
+</div>
+{% endif %}
+
+{% if page_obj %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+  {% for part in page_obj %}{% include 'parts/_part_card.html' %}{% endfor %}
+</div>
+{% else %}
+<div class="py-16 flex flex-col items-center gap-4 text-center">
+  <span class="material-symbols-outlined text-outline text-[48px]" aria-hidden="true">search_off</span>
+  <p class="font-body-md text-body-md text-on-surface-variant">Aucune pièce ne correspond à votre recherche.</p>
+  <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Elle n'est peut-être pas encore au catalogue. Décrivez-la-nous : notre équipe la recherche et vous recontacte.</p>
+  <a href="{% url 'parts:request' %}?piece_nom={{ filters.q|urlencode }}&marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}"
+     class="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all">
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">manage_search</span>Je ne trouve pas ma pièce
+  </a>
+</div>
+{% endif %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="mt-section-gap flex justify-center items-center gap-2">
+  {% if page_obj.has_previous %}
+  <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.previous_page_number }}"
+     hx-get="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.previous_page_number }}"
+     hx-target="#parts-results" hx-push-url="true" aria-label="Page précédente"
+     class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
+    <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+  </a>
+  {% endif %}
+
+  {% for page_number in page_obj.paginator.page_range %}
+  <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_number }}"
+     hx-get="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_number }}"
+     hx-target="#parts-results" hx-push-url="true"
+     class="w-10 h-10 rounded flex items-center justify-center font-label-md {% if page_number == page_obj.number %}bg-primary text-on-primary{% else %}text-on-surface hover:bg-surface-container-highest transition-colors{% endif %}">
+    {{ page_number }}
+  </a>
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+  <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.next_page_number }}"
+     hx-get="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.next_page_number }}"
+     hx-target="#parts-results" hx-push-url="true" aria-label="Page suivante"
+     class="w-10 h-10 rounded flex items-center justify-center text-outline hover:bg-surface-container-highest transition-colors">
+    <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if request.htmx %}{% include 'parts/_model_select.html' with oob=True %}{% include 'parts/_title.html' with oob=True %}{% endif %}

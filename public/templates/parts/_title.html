@@ -1,0 +1,4 @@
+{% comment %}Titre de la page catalogue ; `oob` = mis à jour avec les résultats HTMX quand la catégorie change.{% endcomment %}
+<h1 id="parts-title" {% if oob %}hx-swap-oob="true"{% endif %} class="font-display-lg text-headline-lg text-on-surface flex items-center gap-3">
+  {% if category %}<span class="w-10 h-10 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center"><span class="material-symbols-outlined text-[22px]" aria-hidden="true">{{ category.icon }}</span></span>{{ category.name }}{% else %}Pièces détachées{% endif %}
+</h1>

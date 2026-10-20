@@ -1,35 +1,56 @@
+{% comment %}
+Carte compacte (même gabarit que _listing_vehicle_card.html) — entièrement cliquable.
+Attend `part` ; `vehicle` (marque/modèle/année choisis) est facultatif et suivi jusqu'à la fiche.
+{% endcomment %}
+{% load humanize %}
 {% with image=part.images.all.0 %}
 <a href="{{ part.get_absolute_url }}{% if vehicle.make %}?marque={{ vehicle.make|urlencode }}&modele={{ vehicle.model|urlencode }}{% if vehicle.year %}&annee={{ vehicle.year|stringformat:'d' }}{% endif %}{% endif %}"
-   class="group flex flex-col bg-surface-container-lowest rounded-lg shadow-signature overflow-hidden border border-outline-variant/30 hover:shadow-lg transition-shadow">
-  <div class="relative aspect-[4/3] bg-surface-container flex items-center justify-center overflow-hidden">
+   aria-label="{{ part.name }} — voir la fiche"
+   class="reveal group bg-white rounded-lg shadow-signature overflow-hidden hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary transition-all duration-300 flex flex-col">
+  <div class="relative h-36 overflow-hidden bg-surface-container flex items-center justify-center">
     {% if image %}
     <img src="{{ image.image.url }}" alt="{{ part.name }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
     {% else %}
-    <span class="material-symbols-outlined text-[56px] text-outline" aria-hidden="true">{{ part.category.icon }}</span>
+    <span class="material-symbols-outlined text-[48px] text-outline" aria-hidden="true">{{ part.category.icon }}</span>
     {% endif %}
     {% if part.condition %}
-    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-on-surface-variant font-label-sm text-label-sm">{{ part.get_condition_display }}</span>
+    <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/90 text-on-surface-variant font-label-sm text-[9px] uppercase tracking-wider font-bold shadow-sm">{{ part.get_condition_display }}</span>
+    {% endif %}
+    {% if part.is_featured %}
+    <span class="absolute top-2 right-2 bg-secondary text-on-secondary px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
+      <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">star</span>
+      <span class="font-label-sm text-[9px] uppercase tracking-wider font-bold">Populaire</span>
+    </span>
     {% endif %}
   </div>
-  <div class="flex flex-col gap-2 p-4 flex-1">
-    <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">{{ part.category.name }}</span>
-    <h3 class="font-headline-md text-[16px] leading-snug text-on-surface group-hover:text-primary transition-colors">{{ part.name }}</h3>
-    <p class="font-label-sm text-label-sm text-on-surface-variant">
-      {% if part.brand %}{{ part.brand }} · {% endif %}Réf. {{ part.manufacturer_reference|default:part.reference }}
-    </p>
-    <div class="mt-auto pt-3 flex items-end justify-between gap-2">
-      {% if part.price %}
-      <span class="font-headline-md text-[17px] text-secondary whitespace-nowrap">{{ part.price }} FCFA</span>
-      {% else %}
-      <span class="font-label-md text-label-md text-on-surface-variant">Prix sur demande</span>
-      {% endif %}
-      {% if part.availability == 'disponible' %}
-      <span class="px-2.5 py-1 rounded-full bg-green-100 text-green-800 font-label-sm text-label-sm">Disponible</span>
-      {% elif part.availability == 'indisponible' %}
-      <span class="px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Indisponible</span>
-      {% else %}
-      <span class="px-2.5 py-1 rounded-full bg-secondary-container/25 text-secondary font-label-sm text-label-sm">À confirmer</span>
-      {% endif %}
+
+  <div class="p-3 flex flex-col flex-1">
+    <span class="font-label-sm text-[9px] text-primary uppercase tracking-wider mb-1">{{ part.category.name }}</span>
+    <h3 class="font-headline-md text-[13px] leading-tight text-on-surface group-hover:text-primary transition-colors mb-1">{{ part.name }}</h3>
+    <div class="flex items-center gap-2 text-outline mb-2">
+      <div class="flex items-center gap-0.5 min-w-0">
+        <span class="material-symbols-outlined text-[13px]" aria-hidden="true">tag</span>
+        <span class="font-body-md text-[10px] truncate">{% if part.brand %}{{ part.brand }} · {% endif %}{{ part.manufacturer_reference|default:part.reference }}</span>
+      </div>
+    </div>
+    <div class="mt-auto flex items-center justify-between gap-2 pt-2 border-t border-surface-container">
+      <div class="flex flex-col min-w-0">
+        {% if part.price %}
+        <span class="font-display-lg text-[15px] text-primary whitespace-nowrap">{{ part.price|intcomma }} <span class="text-[10px] font-label-md">FCFA</span></span>
+        {% else %}
+        <span class="font-label-md text-[12px] text-on-surface-variant">Prix sur demande</span>
+        {% endif %}
+        {% if part.availability == 'disponible' %}
+        <span class="font-label-sm text-[10px] text-green-700">Disponible</span>
+        {% elif part.availability == 'indisponible' %}
+        <span class="font-label-sm text-[10px] text-on-surface-variant">Indisponible</span>
+        {% else %}
+        <span class="font-label-sm text-[10px] text-secondary">À confirmer</span>
+        {% endif %}
+      </div>
+      <span class="text-primary group-hover:bg-primary-fixed p-1 rounded-full transition-colors shrink-0">
+        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+      </span>
     </div>
   </div>
 </a>

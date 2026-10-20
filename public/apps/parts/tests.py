@@ -218,3 +218,64 @@ class HelperTests(TestCase):
         self.assertEqual(normalize_reference('04465-33450'), '0446533450')
         self.assertEqual(normalize_reference('djp 0002'), 'DJP0002')
         self.assertEqual(normalize_reference(None), '')
+
+
+class CategoryPageDesignTests(TestCase):
+    """La page d'une catégorie reprend la structure du catalogue de véhicules."""
+
+    def setUp(self):
+        self.brake = PartCategory.objects.get(name='Freinage')
+        self.part = make_part(category=self.brake, price=25000, availability=Part.Availability.AVAILABLE, is_featured=True)
+        PartCompatibility.objects.create(part=self.part, make='Toyota', model='Corolla', year_from=2014, year_to=2019)
+        PartCompatibility.objects.create(part=self.part, make='Kia', model='Rio')
+        self.url = reverse('parts:search')
+
+    def test_full_page_has_catalog_structure(self):
+        html = self.client.get(self.url, {'categorie': self.brake.pk}).content.decode()
+        for expected in ('id="filters-panel"', 'id="filters-toggle"', 'id="parts-results"', 'id="filters-form"',
+                         'Trier par', 'Freinage', '1 pièce trouvée', 'filters-drawer.js'):
+            self.assertIn(expected, html)
+        self.assertIn('<h1', html)
+        self.assertNotIn('noindex', html)  # une catégorie reste indexable
+
+    def test_htmx_request_returns_only_results_and_model_list(self):
+        response = self.client.get(self.url, {'marque': 'Toyota'}, HTTP_HX_REQUEST='true')
+        html = response.content.decode()
+        self.assertNotIn('<html', html)
+        self.assertIn('pièce trouvée', html)
+        self.assertIn('hx-swap-oob="true"', html)
+        self.assertIn('Corolla', html)
+
+    def test_stale_model_is_ignored_when_make_changes(self):
+        # Le modèle « Corolla » n'existe pas pour Kia : il ne doit pas vider les résultats.
+        response = self.client.get(self.url, {'marque': 'Kia', 'modele': 'Corolla'}, HTTP_HX_REQUEST='true')
+        self.assertEqual(response.context['page_obj'].paginator.count, 1)
+        self.assertEqual(response.context['filters']['model'], '')
+        # Un modèle valide continue de filtrer.
+        response = self.client.get(self.url, {'marque': 'Toyota', 'modele': 'Corolla', 'annee': '2010'}, HTTP_HX_REQUEST='true')
+        self.assertEqual(response.context['page_obj'].paginator.count, 0)
+
+    def test_card_is_one_link_with_image_name_and_price(self):
+        import re
+        html = self.client.get(self.url).content.decode()
+        card = re.search(r'<a href="%s[^"]*"[^>]*>(.*?)</a>' % re.escape(self.part.get_absolute_url()), html, re.S)
+        self.assertIsNotNone(card)
+        inside = card.group(1)
+        self.assertIn(self.part.name, inside)
+        self.assertRegex(inside, r'25[\s\xa0 ]?000')
+        self.assertIn('Disponible', inside)
+        self.assertNotIn('<a ', inside)
+
+    def test_pagination_links_use_htmx(self):
+        for i in range(14):
+            make_part(reference=f'P-{i}', name=f'Pièce {i}', category=self.brake)
+        html = self.client.get(self.url, {'categorie': self.brake.pk}).content.decode()
+        self.assertIn('hx-target="#parts-results"', html)
+        self.assertIn('page=2', html)
+
+    def test_htmx_results_refresh_the_title_when_category_changes(self):
+        html = self.client.get(self.url, {'categorie': self.brake.pk}, HTTP_HX_REQUEST='true').content.decode()
+        self.assertIn('id="parts-title"', html)
+        self.assertIn('Freinage', html)
+        html = self.client.get(self.url, {'categorie': ''}, HTTP_HX_REQUEST='true').content.decode()
+        self.assertIn('Pièces détachées', html)
