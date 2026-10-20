@@ -17,7 +17,7 @@
                 <div>
                     <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Djona Parts</span>
                     <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Catalogue pièces</h1>
-                    <p class="text-sm text-on-surface-variant mt-1">{{ nb_total }} pièce{{ nb_total|pluralize }} au catalogue. Seules les pièces visibles apparaissent sur le site.</p>
+                    <p class="text-sm text-on-surface-variant mt-1">{{ nb_total }} pièce{{ nb_total|pluralize }} au catalogue. Une pièce n'apparaît sur le site que si elle est visible <strong>et</strong> a au moins une photo{% if nb_sans_photo %} — <a class="text-primary font-semibold hover:underline" href="?visibilite=sans_photo">{{ nb_sans_photo }} sans photo</a>{% endif %}.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <a class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors" href="{% url 'part_import' %}"><span class="material-symbols-outlined text-[18px]">upload_file</span>Importer un CSV</a>
@@ -39,6 +39,7 @@
                     <option value="">Toutes</option>
                     <option value="visibles" {% if visibilite == 'visibles' %}selected{% endif %}>Visibles</option>
                     <option value="masquees" {% if visibilite == 'masquees' %}selected{% endif %}>Masquées</option>
+                    <option value="sans_photo" {% if visibilite == 'sans_photo' %}selected{% endif %}>Sans photo</option>
                 </select>
                 <button class="px-5 py-2.5 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors" type="submit">Filtrer</button>
             </form>
@@ -57,6 +58,7 @@
                                 <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">{% if p.price %}{{ p.price }} FCFA{% else %}Prix sur demande{% endif %}</span>
                                 {% if p.is_featured %}<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary">Populaire</span>{% endif %}
                                 {% if not p.is_active %}<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container">Masquée</span>{% endif %}
+                                {% if not p.nb_photos %}<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container" title="Une pièce sans photo n'est pas affichée sur le site">Sans photo · non affichée</span>{% else %}<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">{{ p.nb_photos }} photo{{ p.nb_photos|pluralize }}</span>{% endif %}
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">

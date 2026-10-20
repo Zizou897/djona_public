@@ -30,7 +30,7 @@ SORTS = {
 
 
 def _active_parts():
-    return Part.objects.filter(is_active=True, category__is_active=True).select_related('category').prefetch_related('images')
+    return Part.objects.marketplace().select_related('category').prefetch_related('images')
 
 
 def _unique_casefold(values):
@@ -45,7 +45,7 @@ def _unique_casefold(values):
 
 def _known_makes():
     """Marques pour lesquelles au moins une pièce visible a une compatibilité."""
-    values = (PartCompatibility.objects.filter(part__is_active=True, part__category__is_active=True)
+    values = (PartCompatibility.objects.filter(part__in=Part.objects.marketplace().values('pk'))
               .order_by('make').values_list('make', flat=True).distinct())
     return sorted(_unique_casefold(values), key=str.casefold)
 
@@ -53,7 +53,7 @@ def _known_makes():
 def _models_for(make):
     if not make:
         return []
-    values = (PartCompatibility.objects.filter(part__is_active=True, part__category__is_active=True, make__iexact=make)
+    values = (PartCompatibility.objects.filter(part__in=Part.objects.marketplace().values('pk'), make__iexact=make)
               .exclude(model='').order_by('model').values_list('model', flat=True).distinct())
     return sorted(_unique_casefold(values), key=str.casefold)
 

@@ -10,16 +10,20 @@ from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
 
-from .models import Part, PartCategory, PartCompatibility, PartRequest, normalize_reference
+from .models import Part, PartCategory, PartCompatibility, PartImage, PartRequest, normalize_reference
 
 
-def make_part(category=None, **overrides):
+def make_part(category=None, photo=True, **overrides):
+    """Pièce de test. Par défaut avec une photo : sans photo, une pièce n'est pas affichée."""
     data = dict(
         reference='DJP-0001', name='Plaquettes de frein avant', manufacturer_reference='04465-33450',
         brand='Bosch', category=category or PartCategory.objects.get(name='Freinage'),
     )
     data.update(overrides)
-    return Part.objects.create(**data)
+    part = Part.objects.create(**data)
+    if photo:
+        PartImage.objects.create(part=part, image=f'parts/{part.reference}.webp', order=0)
+    return part
 
 
 class SeedAndHomeTests(TestCase):
@@ -285,12 +289,10 @@ class PartDetailDesignTests(TestCase):
     """La fiche pièce reprend la structure de la fiche véhicule."""
 
     def setUp(self):
-        from .models import PartImage
         self.part = make_part(price=25000, availability=Part.Availability.AVAILABLE, condition=Part.Condition.NEW,
                               warranty='6 mois', lead_time='3 jours', description='Jeu de 4 plaquettes.', is_featured=True)
         PartCompatibility.objects.create(part=self.part, make='Toyota', model='Corolla', year_from=2014, year_to=2019)
-        PartImage.objects.create(part=self.part, image='parts/a.webp', order=0)
-        PartImage.objects.create(part=self.part, image='parts/b.webp', order=1)
+        PartImage.objects.create(part=self.part, image='parts/b.webp', order=1)  # + la photo créée par make_part
         self.html = self.client.get(self.part.get_absolute_url(), {'marque': 'Toyota', 'modele': 'Corolla', 'annee': '2016'}).content.decode()
 
     def test_gallery_lightbox_and_scripts(self):
@@ -320,10 +322,9 @@ class PartDetailDesignTests(TestCase):
     def test_unknown_values_are_flagged_not_invented(self):
         bare = make_part(reference='BARE-1', name='Pièce nue')
         html = self.client.get(bare.get_absolute_url()).content.decode()
-        for expected in ('Prix sur demande', 'Non précisé', 'Non précisée', 'Disponibilité à confirmer', 'Photo non disponible',
+        for expected in ('Prix sur demande', 'Non précisé', 'Non précisée', 'Disponibilité à confirmer',
                          'Aucune compatibilité'):
             self.assertIn(expected, html)
-        self.assertNotIn('gallery-lightbox', html)
         self.assertNotIn('Description</h2>', html)  # pas de section vide
 
 
@@ -395,3 +396,44 @@ class PartInterestTests(TestCase):
         data.update(make='Kia', model='Rio', year='2018', description='Courroie de distribution')
         self.assertEqual(self.client.post(reverse('parts:request'), data).status_code, 302)
         self.assertEqual(PartRequest.objects.get().request_type, PartRequest.RequestType.SEARCH)
+
+
+class OnlyPartsWithPhotosTests(TestCase):
+    """Comme pour les véhicules : une pièce sans photo n'est affichée nulle part sur le site."""
+
+    def setUp(self):
+        self.with_photo = make_part(reference='P-1', name='Pièce avec photo', is_featured=True)
+        self.without_photo = make_part(reference='P-2', name='Pièce sans photo', photo=False, is_featured=True)
+        PartCompatibility.objects.create(part=self.with_photo, make='Toyota', model='Corolla')
+        PartCompatibility.objects.create(part=self.without_photo, make='Peugeot', model='208')
+
+    def test_queryset(self):
+        self.assertEqual(list(Part.objects.marketplace()), [self.with_photo])
+        PartImage.objects.create(part=self.with_photo, image='parts/second.webp', order=1)
+        self.assertEqual(Part.objects.marketplace().count(), 1)  # plusieurs photos : une seule ligne
+
+    def test_catalogue_home_and_detail_ignore_parts_without_photo(self):
+        catalogue = self.client.get(reverse('parts:search')).content.decode()
+        self.assertIn('Pièce avec photo', catalogue)
+        self.assertNotIn('Pièce sans photo', catalogue)
+        home = self.client.get(reverse('parts:home')).content.decode()
+        self.assertIn('Pièce avec photo', home)
+        self.assertNotIn('Pièce sans photo', home)
+        self.assertEqual(self.client.get(self.with_photo.get_absolute_url()).status_code, 200)
+        self.assertEqual(self.client.get(self.without_photo.get_absolute_url()).status_code, 404)
+
+    def test_vehicle_lists_and_sitemap_only_use_visible_parts(self):
+        models = self.client.get(reverse('parts:models'), {'marque': 'Peugeot'}).content.decode()
+        self.assertNotIn('208', models)
+        home = self.client.get(reverse('parts:home')).content.decode()
+        self.assertNotIn('Peugeot', home)
+        sitemap = self.client.get('/sitemap.xml').content.decode()
+        self.assertIn(self.with_photo.get_absolute_url(), sitemap)
+        self.assertNotIn(self.without_photo.get_absolute_url(), sitemap)
+
+    def test_interest_and_request_links_ignore_parts_without_photo(self):
+        cache.clear()
+        response = self.client.post(reverse('parts:interest', args=[self.without_photo.pk]),
+                                    {'name': 'Jean', 'phone': '0700000000'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(PartRequest.objects.count(), 0)

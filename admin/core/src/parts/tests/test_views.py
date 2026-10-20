@@ -70,7 +70,7 @@ class CatalogTests(PartsBase):
 
     def test_create_part_keeps_unknown_fields_empty(self):
         with override_settings(MEDIA_ROOT=self.media):
-            response = self.client.post(reverse('part_creer'), self.payload(photos=png_upload()))
+            response = self.client.post(reverse('part_creer'), self.payload(photos=[png_upload(f'p{i}.png') for i in range(3)]))
         self.assertRedirects(response, reverse('part_liste'))
         part = PartMirror.objects.using(DB).get(reference='DJP-100')
         self.assertEqual(part.condition, '')
@@ -80,7 +80,7 @@ class CatalogTests(PartsBase):
         self.assertFalse(part.is_featured)
         compat = list(part.compatibilities.using(DB).values_list('make', 'model', 'year_from', 'year_to'))
         self.assertEqual(sorted(compat), [('Peugeot', '', None, None), ('Toyota', 'Corolla', 2014, 2019)])
-        self.assertEqual(part.images.using(DB).count(), 1)
+        self.assertEqual(part.images.using(DB).count(), 3)
 
     def test_duplicate_reference_and_bad_compatibility_are_rejected(self):
         self.make_part(reference='DJP-100')
@@ -94,7 +94,7 @@ class CatalogTests(PartsBase):
     def test_invalid_photo_blocks_save(self):
         bad = SimpleUploadedFile('faux.png', b'pas une image', content_type='image/png')
         with override_settings(MEDIA_ROOT=self.media):
-            response = self.client.post(reverse('part_creer'), self.payload(photos=bad))
+            response = self.client.post(reverse('part_creer'), self.payload(photos=[bad, png_upload('b.png'), png_upload('c.png')]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'pas une image valide')
         self.assertFalse(PartMirror.objects.using(DB).filter(reference='DJP-100').exists())
@@ -242,3 +242,69 @@ class InterestRequestTests(PartsBase):
         self.client.post(url, {'status': 'en_recherche', 'proposed_price': '', 'proposed_lead_time': '', 'internal_note': 'Rappelé.'})
         self.interest.refresh_from_db(using=DB)
         self.assertEqual(self.interest.status, 'en_recherche')
+
+
+class PhotoRulesLikeVehiclesTests(PartsBase):
+    """Mêmes restrictions de photos que pour les annonces de véhicules."""
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.admin)
+
+    def payload(self, nb, **overrides):
+        data = {
+            'reference': 'DJP-200', 'name': 'Disque', 'category': self.category.pk, 'availability': 'a_confirmer',
+            'compatibilities': '', 'is_active': 'on', 'photos': [png_upload(f'p{i}.png') for i in range(nb)],
+        }
+        data.update(overrides)
+        return data
+
+    def post(self, url, data):
+        with override_settings(MEDIA_ROOT=self.media):
+            return self.client.post(url, data)
+
+    def test_creation_needs_at_least_three_photos(self):
+        for nb in (0, 2):
+            response = self.post(reverse('part_creer'), self.payload(nb))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'Ajoutez au moins 3 photos')
+        self.assertFalse(PartMirror.objects.using(DB).filter(reference='DJP-200').exists())
+        response = self.post(reverse('part_creer'), self.payload(3))
+        self.assertRedirects(response, reverse('part_liste'))
+
+    def test_four_photos_maximum_in_total(self):
+        response = self.post(reverse('part_creer'), self.payload(5))
+        self.assertContains(response, 'plus de 4 photos')
+        self.assertFalse(PartMirror.objects.using(DB).filter(reference='DJP-200').exists())
+        part = self.make_part(reference='DJP-201')
+        with override_settings(MEDIA_ROOT=self.media):
+            for i in range(3):
+                PartImageMirror(part=part, image=png_upload(f'k{i}.png'), order=i).save(using=DB)
+        edit = self.payload(2, reference='DJP-201')
+        response = self.post(reverse('part_modifier', args=[part.pk]), edit)
+        self.assertContains(response, 'plus de 4 photos')  # 3 conservées + 2 nouvelles
+        self.assertEqual(part.images.using(DB).count(), 3)
+
+    def test_editing_an_existing_part_does_not_require_new_photos(self):
+        part = self.make_part(reference='DJP-202')
+        edit = self.payload(0, reference='DJP-202', name='Nouveau nom')
+        response = self.post(reverse('part_modifier', args=[part.pk]), edit)
+        self.assertRedirects(response, reverse('part_liste'))
+        part.refresh_from_db(using=DB)
+        self.assertEqual(part.name, 'Nouveau nom')
+
+    def test_list_flags_parts_without_photo_and_filters_them(self):
+        self.make_part(reference='NOPHOTO', name='Sans image')
+        withp = self.make_part(reference='WITHPHOTO', name='Avec image')
+        with override_settings(MEDIA_ROOT=self.media):
+            PartImageMirror(part=withp, image=png_upload('x.png'), order=0).save(using=DB)
+        html = self.client.get(reverse('part_liste')).content.decode()
+        self.assertIn('Sans photo · non affichée', html)
+        self.assertIn('1 photo', html)
+        only = self.client.get(reverse('part_liste'), {'visibilite': 'sans_photo'}).content.decode()
+        self.assertIn('Sans image', only)
+        self.assertNotIn('Avec image', only)
+
+    def test_form_and_import_pages_explain_the_rules(self):
+        self.assertContains(self.client.get(reverse('part_creer')), '3 photos au minimum')
+        self.assertContains(self.client.get(reverse('part_import')), "n'apparaît sur le site qu'une fois ses photos ajoutées")

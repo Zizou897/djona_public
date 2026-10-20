@@ -12,7 +12,7 @@ from django import forms
 
 from app.views import StaffRequisMixin
 
-from .forms import (MAX_PHOTO_BYTES, MAX_PHOTOS, PartCategoryForm, PartForm, PartImportForm,
+from .forms import (MAX_PHOTO_BYTES, MAX_PHOTOS, MIN_PHOTOS, PartCategoryForm, PartForm, PartImportForm,
                     PartRequestFollowUpForm)
 from .importer import COLUMNS, format_compatibilities, import_parts, replace_compatibilities, sample_csv
 from .models import (PartCategoryMirror, PartImageMirror, PartMirror, PartRequestMirror)
@@ -27,7 +27,7 @@ class PartListView(StaffRequisMixin, View):
     template_name = 'parts/part_liste.html'
 
     def get(self, request):
-        qs = PartMirror.objects.using(DB).select_related('category')
+        qs = PartMirror.objects.using(DB).select_related('category').annotate(nb_photos=Count('images'))
         recherche = request.GET.get('q', '').strip()
         if recherche:
             qs = qs.filter(Q(name__icontains=recherche) | Q(reference__icontains=recherche)
@@ -40,6 +40,8 @@ class PartListView(StaffRequisMixin, View):
             qs = qs.filter(is_active=True)
         elif visibilite == 'masquees':
             qs = qs.filter(is_active=False)
+        elif visibilite == 'sans_photo':
+            qs = qs.filter(nb_photos=0)
         page = Paginator(qs.order_by('name'), PAGE_SIZE).get_page(request.GET.get('page'))
         params = request.GET.copy()
         params.pop('page', None)
@@ -52,6 +54,8 @@ class PartListView(StaffRequisMixin, View):
             'visibilite': visibilite,
             'querystring': params.urlencode(),
             'nb_total': PartMirror.objects.using(DB).count(),
+            'nb_sans_photo': PartMirror.objects.using(DB).annotate(n=Count('images')).filter(n=0).count(),
+            'min_photos': MIN_PHOTOS,
         })
 
 
@@ -63,6 +67,7 @@ class PartFormMixin(StaffRequisMixin):
             'form': form, 'part': part, 'erreurs_photos': errors_photos or [],
             'images': list(PartImageMirror.objects.using(DB).filter(part=part)) if part else [],
             'max_photos': MAX_PHOTOS,
+            'min_photos': MIN_PHOTOS,
         })
 
     def clean_photos(self, request, part):
@@ -73,8 +78,10 @@ class PartFormMixin(StaffRequisMixin):
         if part:
             removed = set(request.POST.getlist('supprimer_photos'))
             kept = sum(1 for img in PartImageMirror.objects.using(DB).filter(part=part) if str(img.pk) not in removed)
+        if part is None and len(files) < MIN_PHOTOS:
+            errors.append(f'Ajoutez au moins {MIN_PHOTOS} photos pour publier la pièce.')
         if kept + len(files) > MAX_PHOTOS:
-            errors.append(f'{MAX_PHOTOS} photos maximum par pièce.')
+            errors.append(f'Une pièce ne peut pas avoir plus de {MAX_PHOTOS} photos.')
         image_field = forms.ImageField()
         for upload in files:
             if upload.size > MAX_PHOTO_BYTES:

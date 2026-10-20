@@ -1,6 +1,7 @@
 import re
 
 from django.db import IntegrityError, models, transaction
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -31,6 +32,14 @@ class PartCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class PartQuerySet(models.QuerySet):
+    def marketplace(self):
+        """Pièces affichées sur le site : visibles, de catégorie visible, ET avec au moins
+        une photo (même règle que les véhicules : pas d'annonce sans photo)."""
+        return self.filter(is_active=True, category__is_active=True).filter(
+            Exists(PartImage.objects.filter(part=OuterRef('pk'))))
 
 
 class Part(models.Model):
@@ -67,6 +76,8 @@ class Part(models.Model):
     is_active = models.BooleanField('visible sur le site', default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = PartQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'pièce détachée'

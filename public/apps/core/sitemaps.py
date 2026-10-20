@@ -37,7 +37,7 @@ class PartSitemap(Sitemap):
     priority = 0.6
 
     def items(self):
-        return Part.objects.filter(is_active=True, category__is_active=True)
+        return Part.objects.marketplace()
 
     def location(self, obj):
         return obj.get_absolute_url()

@@ -73,7 +73,7 @@
 
                     <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 md:p-6" style="animation-delay:.14s">
                         <h2 class="flex items-center gap-2 font-headline-md font-semibold text-base text-primary mb-1"><span class="material-symbols-outlined text-[22px]">photo_library</span>Photos</h2>
-                        <p class="text-xs text-on-surface-variant mb-5">{{ max_photos }} photos maximum, 4 Mo chacune (JPG, PNG, WebP).</p>
+                        <p class="text-xs text-on-surface-variant mb-5">{% if not part %}{{ min_photos }} photos au minimum, {% endif %}{{ max_photos }} au maximum, 4 Mo chacune (JPG, PNG, WebP). Une pièce sans photo n'est pas affichée sur le site.</p>
                         {% if images %}
                         <ul class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
                             {% for img in images %}

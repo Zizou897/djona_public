@@ -7,7 +7,10 @@ INPUT_CLASS = (
     'w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest '
     'focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all'
 )
-MAX_PHOTOS = 6
+# Mêmes règles que les annonces de véhicules (moderation/forms.py) : 3 photos au minimum à la
+# création (la pièce est publiée tout de suite), 4 au maximum, 4 Mo chacune.
+MIN_PHOTOS = 3
+MAX_PHOTOS = 4
 MAX_PHOTO_BYTES = 4 * 1024 * 1024
 
 
