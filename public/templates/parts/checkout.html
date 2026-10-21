@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Passer ma commande — Djona Parts{% endblock %}
+{% block styles %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
+    <div class="border-b border-surface-container-highest pb-gutter">
+      <a href="{% url 'parts:cart' %}" class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2 hover:underline"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_back</span>Mon panier</a>
+      <h1 class="font-display-lg text-headline-lg text-on-surface">Passer ma commande</h1>
+    </div>
+  </section>
+
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter mb-section-gap grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-section-gap items-start">
+    <form method="post" action="{% url 'parts:checkout' %}" id="checkout-form" class="bg-surface-container-lowest rounded-lg shadow-signature p-6 sm:p-8 flex flex-col gap-8" novalidate>
+      {% csrf_token %}
+      <p class="font-body-md text-body-md text-on-surface-variant">Les champs marqués d'un <span class="text-error">*</span> sont obligatoires.</p>
+      {% if form.non_field_errors %}<div class="rounded bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+      <fieldset class="flex flex-col gap-6">
+        <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2"><span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">person</span></span>Vos coordonnées</legend>
+        <div class="flex flex-wrap gap-3" role="radiogroup" aria-label="Vous êtes">
+          {% for radio in form.customer_type %}
+          <label class="cursor-pointer"><span class="sr-only">{{ radio.choice_label }}</span>
+            {{ radio.tag }}
+            <span class="inline-flex items-center px-4 py-2.5 rounded border border-outline-variant text-label-md font-label-md text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary">{{ radio.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {% include 'partials/_transport_field.html' with field=form.full_name %}
+          {% include 'partials/_transport_field.html' with field=form.phone %}
+          {% include 'partials/_transport_field.html' with field=form.email %}
+          <div id="company-wrapper" {% if form.customer_type.value != 'entreprise' %}style="display:none"{% endif %}>
+            {% include 'partials/_transport_field.html' with field=form.company_name %}
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="flex flex-col gap-6">
+        <legend class="flex items-center gap-2 font-headline-md text-headline-md text-primary mb-2"><span class="w-8 h-8 shrink-0 rounded bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_shipping</span></span>Réception de la commande</legend>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Mode de réception">
+          {% for radio in form.reception %}
+          <label class="cursor-pointer">
+            <span class="sr-only">{{ radio.choice_label }}</span>
+            {{ radio.tag }}
+            <span class="flex items-center gap-3 p-4 rounded-lg border border-outline-variant text-on-surface-variant peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[24px]" aria-hidden="true">{% if radio.data.value == 'retrait' %}storefront{% else %}local_shipping{% endif %}</span>
+              <span class="font-label-md text-label-md">{% if radio.data.value == 'retrait' %}Retrait{% else %}Livraison{% endif %}</span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <div id="pickup-block" class="rounded-md bg-surface-container-low p-4 font-body-md text-body-md text-on-surface-variant" {% if form.reception.value == 'livraison' %}style="display:none"{% endif %}>
+          {% if parts_settings.pickup_instructions %}{{ parts_settings.pickup_instructions|linebreaksbr }}{% else %}Le lieu et l'horaire de retrait vous sont confirmés par l'équipe Djona.{% endif %}
+        </div>
+
+        <div id="delivery-block" class="flex flex-col gap-6" {% if form.reception.value != 'livraison' %}style="display:none"{% endif %}>
+          {% if zones %}
+          <div class="flex flex-col gap-2">
+            <label for="{{ form.delivery_zone.id_for_label }}" class="font-label-md text-label-md text-on-surface">Zone de livraison <span class="text-error" aria-hidden="true">*</span></label>
+            <div class="relative">
+              <select name="delivery_zone" id="{{ form.delivery_zone.id_for_label }}" class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all appearance-none pr-10">
+                <option value="">Choisissez votre zone</option>
+                {% for zone in zones %}<option value="{{ zone.pk }}" {% if form.delivery_zone.value|stringformat:'s' == zone.pk|stringformat:'s' %}selected{% endif %}>{{ zone.name }}{% if zone.fee is not None %} — {{ zone.fee|intcomma }} FCFA{% else %} — frais à confirmer{% endif %}{% if zone.lead_time %} ({{ zone.lead_time }}){% endif %}</option>{% endfor %}
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50" aria-hidden="true">keyboard_arrow_down</span>
+            </div>
+            {% for error in form.delivery_zone.errors %}<p class="text-sm text-error" role="alert">{{ error }}</p>{% endfor %}
+          </div>
+          {% endif %}
+          {% include 'partials/_transport_field.html' with field=form.delivery_address %}
+        </div>
+
+        {% include 'partials/_transport_field.html' with field=form.instructions %}
+      </fieldset>
+
+      <div class="rounded-md bg-secondary-container/20 border border-secondary-container/50 p-4 flex items-start gap-3">
+        <span class="material-symbols-outlined text-secondary text-[22px] shrink-0" aria-hidden="true">info</span>
+        <p class="font-body-md text-body-md text-on-surface">Envoyer ma commande <strong>ne la confirme pas encore</strong> : l'équipe Djona vérifie la disponibilité, le prix et les frais, puis vous recontacte.{% if parts_settings.payment_terms %} <span class="block mt-2"><strong>Paiement :</strong> {{ parts_settings.payment_terms|linebreaksbr }}</span>{% else %} Les modalités de paiement vous sont précisées lors de la confirmation.{% endif %}</p>
+      </div>
+
+      <button type="submit" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow-lg hover:brightness-110 transition-all"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">send</span>Envoyer ma commande</button>
+    </form>
+
+    <aside class="bg-surface-container-lowest rounded-lg shadow-signature p-6 flex flex-col gap-4 lg:sticky lg:top-24">
+      <h2 class="font-headline-md text-[18px] text-primary">Votre panier</h2>
+      <ul class="flex flex-col gap-3">
+        {% for line in cart.lines %}
+        <li class="flex justify-between gap-3 font-body-md text-body-md"><span class="text-on-surface">{{ line.quantity }} × {{ line.part.name }}</span><span class="font-semibold whitespace-nowrap">{% if line.price_known %}{{ line.line_total|intcomma }} FCFA{% else %}<span class="text-on-surface-variant font-normal">sur demande</span>{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+      <div class="border-t border-outline-variant/40 pt-4 flex justify-between items-baseline gap-4">
+        <span class="font-label-md text-label-md">Sous-total</span>
+        <span class="font-display-lg text-[20px] text-primary whitespace-nowrap">{{ cart.subtotal|intcomma }} FCFA</span>
+      </div>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">{% if cart.unpriced_count %}{{ cart.unpriced_count }} pièce{{ cart.unpriced_count|pluralize }} sur devis non incluse{{ cart.unpriced_count|pluralize }}. {% endif %}Les frais de livraison s'ajoutent selon la zone choisie.</p>
+      <a href="{% url 'parts:cart' %}" class="text-center font-label-md text-label-md text-primary hover:underline">Modifier mon panier</a>
+    </aside>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  // Affiche le bloc utile selon le mode de réception et le type de client (style.display : « flex » l'emporterait sur [hidden]).
+  var form = document.getElementById('checkout-form');
+  if (!form) { return; }
+  function sync() {
+    var reception = form.querySelector('input[name="reception"]:checked');
+    var livraison = reception && reception.value === 'livraison';
+    document.getElementById('delivery-block').style.display = livraison ? '' : 'none';
+    document.getElementById('pickup-block').style.display = livraison ? 'none' : '';
+    var type = form.querySelector('input[name="customer_type"]:checked');
+    document.getElementById('company-wrapper').style.display = type && type.value === 'entreprise' ? '' : 'none';
+  }
+  form.addEventListener('change', sync);
+  sync();
+})();
+</script>
+{% endblock %}

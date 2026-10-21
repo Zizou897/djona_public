@@ -213,3 +213,223 @@ class PartRequest(models.Model):
         last = cls.objects.filter(reference__startswith=prefix).order_by('-reference').values_list('reference', flat=True).first()
         number = int(last.rsplit('-', 1)[1]) + 1 if last else 1
         return f'{prefix}{number:04d}'
+
+
+# ── Panier et commandes (MVP sans API IAS : confirmation manuelle par l'équipe Djona) ──
+
+class PartsSettings(models.Model):
+    """Réglages commerciaux Djona Parts — une seule ligne (pk=1), modifiée depuis le
+    back-office. Aucun taux n'est codé en dur : sans règle configurée, aucune
+    commission n'est calculée."""
+
+    class CommissionType(models.TextChoices):
+        NONE = 'aucune', 'Aucune (non définie)'
+        PERCENT = 'pourcentage', 'Pourcentage du sous-total'
+        FIXED = 'fixe', 'Montant fixe par commande'
+
+    commission_type = models.CharField('règle de commission', max_length=15, choices=CommissionType.choices,
+                                       default=CommissionType.NONE)
+    commission_value = models.DecimalField('valeur', max_digits=10, decimal_places=2, null=True, blank=True)
+    payment_terms = models.TextField('modalités de paiement affichées au client', blank=True)
+    pickup_instructions = models.TextField('lieu et conditions de retrait', blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'réglages Djona Parts'
+        verbose_name_plural = 'réglages Djona Parts'
+
+    def __str__(self):
+        return 'Réglages Djona Parts'
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def commission_for(self, subtotal):
+        """Commission Djona pour un sous-total, ou None si aucune règle n'est configurée."""
+        if not self.commission_value or subtotal <= 0:
+            return None
+        if self.commission_type == self.CommissionType.PERCENT:
+            return int(round(subtotal * float(self.commission_value) / 100))
+        if self.commission_type == self.CommissionType.FIXED:
+            return int(self.commission_value)
+        return None
+
+
+class DeliveryZone(models.Model):
+    """Zone de livraison proposée au client, avec son tarif et son délai (configurables)."""
+
+    name = models.CharField('zone', max_length=100, unique=True)
+    fee = models.PositiveIntegerField('frais de livraison (FCFA)', null=True, blank=True,
+                                      help_text="Vide = frais confirmés par l'équipe Djona.")
+    lead_time = models.CharField('délai estimé', max_length=100, blank=True)
+    order = models.PositiveIntegerField('ordre', default=0)
+    is_active = models.BooleanField('proposée', default=True)
+
+    class Meta:
+        verbose_name = 'zone de livraison'
+        verbose_name_plural = 'zones de livraison'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class PartOrder(models.Model):
+    """Commande de pièces passée depuis le panier. « Soumise » ne veut pas dire
+    « acceptée » : l'équipe Djona vérifie disponibilité, prix et frais, puis confirme."""
+
+    class Status(models.TextChoices):
+        PENDING = 'en_attente', 'En attente de confirmation'
+        CONFIRMED = 'confirmee', 'Confirmée'
+        PREPARING = 'en_preparation', 'En préparation'
+        READY = 'prete_retrait', 'Prête au retrait'
+        SHIPPING = 'en_livraison', 'En livraison'
+        DONE = 'livree_retiree', 'Livrée / retirée'
+        CANCELLED = 'annulee', 'Annulée'
+        FAILED = 'echec', 'Échec de traitement'
+
+    class Reception(models.TextChoices):
+        PICKUP = 'retrait', 'Retrait'
+        DELIVERY = 'livraison', 'Livraison'
+
+    class CustomerType(models.TextChoices):
+        INDIVIDUAL = 'particulier', 'Particulier'
+        COMPANY = 'entreprise', 'Entreprise'
+
+    class PaymentStatus(models.TextChoices):
+        PENDING = 'en_attente', 'En attente'
+        PARTIAL = 'partiel', 'Partiellement payé'
+        PAID = 'paye', 'Payé'
+
+    # Transitions autorisées (une commande annulée ne peut jamais devenir « livrée »).
+    # Depuis « en préparation » : retrait → prête au retrait ; livraison → en livraison.
+    TRANSITIONS = {
+        Status.PENDING: [Status.CONFIRMED, Status.CANCELLED, Status.FAILED],
+        Status.CONFIRMED: [Status.PREPARING, Status.CANCELLED],
+        Status.PREPARING: [Status.READY, Status.SHIPPING, Status.CANCELLED],
+        Status.READY: [Status.DONE, Status.CANCELLED],
+        Status.SHIPPING: [Status.DONE, Status.FAILED],
+        Status.DONE: [],
+        Status.CANCELLED: [],
+        Status.FAILED: [Status.PENDING, Status.CANCELLED],
+    }
+
+    reference = models.CharField('numéro de commande', max_length=20, unique=True, editable=False)
+    customer_type = models.CharField('type de client', max_length=15, choices=CustomerType.choices,
+                                     default=CustomerType.INDIVIDUAL)
+    full_name = models.CharField('nom et prénom', max_length=150)
+    company_name = models.CharField('raison sociale', max_length=150, blank=True)
+    phone = models.CharField('téléphone / WhatsApp', max_length=30)
+    email = models.EmailField('email', blank=True)
+    reception = models.CharField('mode de réception', max_length=10, choices=Reception.choices)
+    delivery_zone = models.ForeignKey(DeliveryZone, verbose_name='zone de livraison', null=True, blank=True,
+                                      on_delete=models.SET_NULL, related_name='orders')
+    zone_name = models.CharField('zone (au moment de la commande)', max_length=100, blank=True)
+    delivery_address = models.CharField('adresse de livraison', max_length=255, blank=True)
+    instructions = models.TextField('instructions', blank=True)
+    status = models.CharField('statut', max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True)
+    subtotal = models.PositiveBigIntegerField('sous-total (FCFA)', default=0)
+    has_unpriced_items = models.BooleanField('contient des pièces sur devis', default=False)
+    delivery_fee = models.PositiveIntegerField('frais de livraison (FCFA)', null=True, blank=True)
+    commission_amount = models.PositiveBigIntegerField('commission Djona (FCFA)', null=True, blank=True)
+    payment_status = models.CharField('paiement', max_length=15, choices=PaymentStatus.choices,
+                                      default=PaymentStatus.PENDING)
+    payment_method = models.CharField('mode de paiement', max_length=60, blank=True)
+    payment_reference = models.CharField('référence de transaction', max_length=100, blank=True)
+    amount_paid = models.PositiveBigIntegerField('montant payé (FCFA)', default=0)
+    internal_note = models.TextField('note interne', blank=True)
+    created_at = models.DateTimeField('date de la commande', auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'commande de pièces'
+        verbose_name_plural = 'commandes de pièces'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.reference
+
+    @property
+    def total(self):
+        """Total estimé (sous-total des pièces chiffrées + frais de livraison connus)."""
+        return self.subtotal + (self.delivery_fee or 0)
+
+    @property
+    def balance(self):
+        return max(self.total - self.amount_paid, 0)
+
+    @property
+    def total_is_final(self):
+        """Faux tant qu'il reste des pièces sur devis ou des frais de livraison à confirmer."""
+        delivery_pending = self.reception == self.Reception.DELIVERY and self.delivery_fee is None
+        return not self.has_unpriced_items and not delivery_pending
+
+    def next_statuses(self):
+        """Statuts atteignables depuis le statut courant, selon le mode de réception."""
+        allowed = list(self.TRANSITIONS.get(self.status, []))
+        if self.status == self.Status.PREPARING:
+            drop = self.Status.SHIPPING if self.reception == self.Reception.PICKUP else self.Status.READY
+            allowed = [s for s in allowed if s != drop]
+        return allowed
+
+    def save(self, *args, **kwargs):
+        if self.reference:
+            return super().save(*args, **kwargs)
+        for attempt in range(5):
+            self.reference = self._next_reference()
+            try:
+                with transaction.atomic():
+                    return super().save(*args, **kwargs)
+            except IntegrityError:
+                if attempt == 4:
+                    raise
+                self.reference = ''
+
+    @classmethod
+    def _next_reference(cls):
+        prefix = f'DJP-CMD-{timezone.localdate().year}-'
+        last = cls.objects.filter(reference__startswith=prefix).order_by('-reference').values_list('reference', flat=True).first()
+        number = int(last.rsplit('-', 1)[1]) + 1 if last else 1
+        return f'{prefix}{number:04d}'
+
+
+class PartOrderLine(models.Model):
+    """Ligne de commande : copie figée de la pièce (nom, référence, prix) à la commande."""
+
+    order = models.ForeignKey(PartOrder, on_delete=models.CASCADE, related_name='lines')
+    part = models.ForeignKey(Part, null=True, blank=True, on_delete=models.SET_NULL, related_name='order_lines')
+    name = models.CharField('désignation', max_length=150)
+    reference = models.CharField('référence', max_length=80)
+    unit_price = models.PositiveIntegerField('prix unitaire (FCFA)', null=True, blank=True)
+    quantity = models.PositiveSmallIntegerField('quantité', default=1)
+
+    class Meta:
+        verbose_name = 'ligne de commande'
+        verbose_name_plural = 'lignes de commande'
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.quantity} × {self.name}'
+
+    @property
+    def line_total(self):
+        return self.unit_price * self.quantity if self.unit_price is not None else None
+
+
+class PartOrderEvent(models.Model):
+    """Journal d'une commande : création, changements de statut, notes."""
+
+    order = models.ForeignKey(PartOrder, on_delete=models.CASCADE, related_name='events')
+    status = models.CharField('statut', max_length=20, blank=True, choices=PartOrder.Status.choices)
+    note = models.CharField('note', max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'événement de commande'
+        verbose_name_plural = 'événements de commande'
+        ordering = ['created_at', 'id']
+
+    def __str__(self):
+        return f'{self.order_id} — {self.status or self.note}'

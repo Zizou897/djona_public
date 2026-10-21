@@ -1,0 +1,116 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Commande {{ commande.reference }} — Back-office Djona{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='pieces_commandes' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-3" style="animation-delay:.05s">
+                <div>
+                    <a class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="{% url 'part_commande_liste' %}"><span class="material-symbols-outlined text-[18px]">arrow_back</span>Commandes de pièces</a>
+                    <span class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Commande</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">{{ commande.reference }}</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Passée le {{ commande.created_at|date:'d/m/Y à H:i' }}</p>
+                </div>
+                <span class="self-start sm:self-auto px-4 py-1.5 rounded-full text-sm font-bold {% if commande.status == 'en_attente' %}bg-secondary-container/25 text-secondary{% elif commande.status == 'livree_retiree' %}bg-green-100 text-green-800{% elif commande.status == 'annulee' or commande.status == 'echec' %}bg-error-container text-on-error-container{% else %}bg-primary/10 text-primary{% endif %}">{{ commande.get_status_display }}</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
+                <div class="flex flex-col gap-6 min-w-0">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.08s">
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-4">Pièces commandées</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead><tr class="text-left text-[11px] uppercase tracking-wider text-on-surface-variant"><th class="pb-2 font-semibold">Désignation</th><th class="pb-2 font-semibold text-right">Qté</th><th class="pb-2 font-semibold text-right">Prix unit.</th><th class="pb-2 font-semibold text-right">Total</th></tr></thead>
+                                <tbody class="divide-y divide-outline-variant/30">
+                                    {% for l in commande.lines.all %}
+                                    <tr><td class="py-2.5 pr-3"><span class="font-semibold text-on-surface">{{ l.name }}</span><span class="block text-xs text-on-surface-variant">Réf. {{ l.reference }}</span></td><td class="py-2.5 text-right">{{ l.quantity }}</td><td class="py-2.5 text-right whitespace-nowrap">{% if l.unit_price is not None %}{{ l.unit_price|floatformat:"0g" }}{% else %}<span class="text-on-surface-variant">sur devis</span>{% endif %}</td><td class="py-2.5 text-right font-semibold whitespace-nowrap">{% if l.line_total is not None %}{{ l.line_total|floatformat:"0g" }}{% else %}—{% endif %}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <dl class="mt-4 pt-4 border-t border-outline-variant/40 flex flex-col gap-1.5 text-sm">
+                            <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Sous-total</dt><dd class="font-semibold">{{ commande.subtotal|floatformat:"0g" }} FCFA</dd></div>
+                            <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Livraison</dt><dd class="font-semibold">{% if commande.delivery_fee is not None %}{{ commande.delivery_fee|floatformat:"0g" }} FCFA{% else %}à confirmer{% endif %}</dd></div>
+                            <div class="flex justify-between gap-4 text-base"><dt class="font-semibold">{% if commande.total_is_final %}Total{% else %}Total estimé{% endif %}</dt><dd class="font-bold text-primary">{{ commande.total|floatformat:"0g" }} FCFA</dd></div>
+                            {% if not commande.total_is_final %}<p class="text-xs text-secondary">Total non définitif : {% if commande.has_unpriced_items %}pièce(s) sur devis{% endif %}{% if commande.reception == 'livraison' and commande.delivery_fee is None %}{% if commande.has_unpriced_items %} · {% endif %}frais de livraison à confirmer{% endif %}.</p>{% endif %}
+                            <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Payé</dt><dd class="font-semibold">{{ commande.amount_paid|floatformat:"0g" }} FCFA <span class="text-xs font-normal text-on-surface-variant">(reste {{ commande.balance|floatformat:"0g" }})</span></dd></div>
+                            <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Commission Djona</dt><dd class="font-semibold">{% if commande.commission_amount is not None %}{{ commande.commission_amount|floatformat:"0g" }} FCFA{% else %}<span class="font-normal text-on-surface-variant">non définie</span>{% endif %}</dd></div>
+                        </dl>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.12s">
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-4">Réception</h2>
+                        <p class="text-sm font-semibold text-on-surface">{% if commande.reception == 'livraison' %}Livraison{% if commande.zone_name %} — {{ commande.zone_name }}{% endif %}{% else %}Retrait{% endif %}</p>
+                        {% if commande.delivery_address %}<p class="text-sm text-on-surface-variant mt-1">{{ commande.delivery_address }}</p>{% endif %}
+                        {% if commande.instructions %}<p class="text-sm text-on-surface leading-relaxed whitespace-pre-line mt-3 pt-3 border-t border-outline-variant/40"><span class="block text-xs font-semibold text-on-surface-variant mb-1">Instructions du client</span>{{ commande.instructions }}</p>{% endif %}
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-6" style="animation-delay:.16s">
+                        <h2 class="font-headline-md font-semibold text-base text-primary mb-4">Journal</h2>
+                        <ol class="flex flex-col gap-3">
+                            {% for e in commande.events.all %}
+                            <li class="flex gap-3 text-sm"><span class="mt-1.5 w-2 h-2 shrink-0 rounded-full {% if forloop.last %}bg-primary{% else %}bg-outline-variant{% endif %}"></span><div><p class="font-semibold text-on-surface">{% if e.status %}{{ e.get_status_display }}{% else %}Note{% endif %}{% if e.note %} <span class="font-normal text-on-surface-variant">— {{ e.note }}</span>{% endif %}</p><p class="text-xs text-on-surface-variant">{{ e.created_at|date:'d/m/Y à H:i' }}</p></div></li>
+                            {% endfor %}
+                        </ol>
+                    </section>
+                </div>
+
+                <aside class="flex flex-col gap-5 lg:sticky lg:top-24">
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.1s">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-3">Client</h2>
+                        <p class="text-sm font-semibold text-on-surface">{{ commande.customer_label }}</p>
+                        <p class="text-xs text-on-surface-variant">{% if commande.customer_type == 'entreprise' %}Entreprise{% else %}Particulier{% endif %}</p>
+                        <ul class="mt-3 flex flex-col gap-2 text-sm">
+                            <li><a class="inline-flex items-center gap-2 text-primary hover:underline" href="tel:{{ commande.phone }}"><span class="material-symbols-outlined text-[18px]">call</span>{{ commande.phone }}</a></li>
+                            {% if commande.email %}<li><a class="inline-flex items-center gap-2 text-primary hover:underline break-all" href="mailto:{{ commande.email }}?subject=Commande%20{{ commande.reference }}"><span class="material-symbols-outlined text-[18px]">mail</span>{{ commande.email }}</a></li>{% endif %}
+                        </ul>
+                    </section>
+
+                    <section class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5" style="animation-delay:.12s">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-3">Faire avancer la commande</h2>
+                        {% if suivants %}
+                        <form class="flex flex-col gap-3" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="statut">
+                            <label class="sr-only" for="note-statut">Note</label>
+                            <input id="note-statut" name="note" maxlength="240" placeholder="Note (facultatif) : appel, motif…" class="w-full px-4 py-2.5 rounded-lg border border-outline-variant text-sm focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none">
+                            <div class="flex flex-col gap-2">
+                                {% for value, label in suivants %}
+                                <button class="w-full inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors {% if value == 'annulee' or value == 'echec' %}border border-error text-error hover:bg-error-container{% else %}bg-primary text-on-primary hover:bg-primary-container{% endif %}" name="statut" type="submit" value="{{ value }}"{% if value == 'annulee' %} onclick="return confirm('Annuler cette commande ?');"{% endif %}>{{ label }}<span class="material-symbols-outlined text-[18px]">{% if value == 'annulee' or value == 'echec' %}block{% else %}arrow_forward{% endif %}</span></button>
+                                {% endfor %}
+                            </div>
+                        </form>
+                        {% else %}
+                        <p class="text-sm text-on-surface-variant">Commande terminée : plus aucun changement de statut possible.</p>
+                        {% endif %}
+                    </section>
+
+                    <form class="reveal bg-surface-container-lowest rounded-2xl shadow-sm p-5 flex flex-col gap-4" method="post" style="animation-delay:.14s">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="suivi">
+                        <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-on-surface-variant">Frais, paiement et note</h2>
+                        {% for field in form %}
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-on-surface" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<p class="text-xs text-on-surface-variant">{{ field.help_text }}</p>{% endif %}
+                            {% for error in field.errors %}<p class="text-xs text-error">{{ error }}</p>{% endfor %}
+                        </div>
+                        {% endfor %}
+                        <button class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:bg-primary-container transition-colors" type="submit"><span class="material-symbols-outlined text-[18px]">save</span>Enregistrer</button>
+                    </form>
+                </aside>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -60,6 +60,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.context_processors.active_partners',
                 'apps.core.context_processors.site_contact',
+                'apps.core.context_processors.parts_cart',
             ],
         },
     },

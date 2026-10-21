@@ -1,0 +1,16 @@
+{% comment %}Détail d'une commande (confirmation et suivi). Attend `order`.{% endcomment %}
+{% load humanize %}
+<div class="flex flex-col gap-5">
+  <ul class="flex flex-col gap-2">
+    {% for line in order.lines.all %}
+    <li class="flex justify-between gap-4 font-body-md text-body-md"><span class="text-on-surface">{{ line.quantity }} × {{ line.name }} <span class="text-on-surface-variant text-label-sm">({{ line.reference }})</span></span><span class="font-semibold whitespace-nowrap">{% if line.line_total is not None %}{{ line.line_total|intcomma }} FCFA{% else %}<span class="font-normal text-on-surface-variant">sur devis</span>{% endif %}</span></li>
+    {% endfor %}
+  </ul>
+  <dl class="flex flex-col gap-2 border-t border-outline-variant/40 pt-4 font-body-md text-body-md">
+    <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Sous-total</dt><dd class="font-semibold whitespace-nowrap">{{ order.subtotal|intcomma }} FCFA</dd></div>
+    <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Livraison</dt><dd class="font-semibold text-right">{% if order.reception == 'retrait' %}Retrait — sans frais{% elif order.delivery_fee is not None %}{{ order.delivery_fee|intcomma }} FCFA{% else %}À confirmer{% endif %}</dd></div>
+    <div class="flex justify-between gap-4 items-baseline"><dt class="font-label-md text-label-md text-on-surface">{% if order.total_is_final %}Total{% else %}Total estimé{% endif %}</dt><dd class="font-display-lg text-[20px] text-primary whitespace-nowrap">{{ order.total|intcomma }} FCFA</dd></div>
+  </dl>
+  {% if not order.total_is_final %}<p class="font-label-sm text-label-sm text-on-surface-variant">Ce total sera confirmé par l'équipe Djona{% if order.has_unpriced_items %} (pièces sur devis){% endif %}{% if order.reception == 'livraison' and order.delivery_fee is None %}{% if order.has_unpriced_items %} et{% endif %} (frais de livraison){% endif %}.</p>{% endif %}
+  <p class="font-label-sm text-label-sm text-on-surface-variant"><span class="font-semibold text-on-surface">{{ order.get_reception_display }}</span>{% if order.reception == 'livraison' %} — {{ order.zone_name }}{% if order.zone_name and order.delivery_address %}, {% endif %}{{ order.delivery_address }}{% endif %}</p>
+</div>

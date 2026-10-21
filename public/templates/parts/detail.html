@@ -147,8 +147,21 @@
               </ul>
             </div>
 
+            {% if part.availability != 'indisponible' %}
+            <form action="{% url 'parts:cart_add' part.pk %}" method="post" class="js-add-to-cart grid grid-cols-[auto_1fr] gap-3" id="add-to-cart-form">
+              {% csrf_token %}
+              <label class="sr-only" for="cart-quantity">Quantité</label>
+              <input id="cart-quantity" name="quantity" type="number" min="1" max="99" value="1" inputmode="numeric" class="w-20 px-3 py-3.5 rounded border border-outline-variant bg-surface-container-lowest text-center font-label-md text-label-md outline-none focus:ring-2 focus:ring-primary">
+              <button type="submit" class="flex items-center justify-center gap-2 bg-secondary text-on-secondary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide shadow hover:brightness-110 transition-all">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">add_shopping_cart</span> Ajouter au panier
+              </button>
+            </form>
+            {% else %}
+            <p class="px-4 py-3 rounded bg-surface-container text-on-surface-variant text-label-md text-center">Cette pièce est indisponible pour le moment.</p>
+            {% endif %}
+
             <div id="detail-cta" class="grid grid-cols-1 gap-3">
-              <button type="button" onclick="ouvrirModalInteret()" class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">
+              <button type="button" onclick="ouvrirModalInteret()" class="flex items-center justify-center gap-2 border border-primary text-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:bg-primary/5 transition-all">
                 <span class="material-symbols-outlined text-[20px]" aria-hidden="true">favorite</span> Je suis intéressé
               </button>
               <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener"
@@ -175,7 +188,7 @@
               </div>
             </div>
             <ol class="flex flex-col gap-2 text-label-md text-on-surface-variant">
-              <li class="flex gap-2"><span class="font-bold text-secondary">1.</span>Vous cliquez sur « Je suis intéressé » et laissez vos coordonnées.</li>
+              <li class="flex gap-2"><span class="font-bold text-secondary">1.</span>Vous ajoutez la pièce à votre panier (ou cliquez sur « Je suis intéressé »).</li>
               <li class="flex gap-2"><span class="font-bold text-secondary">2.</span>Notre équipe vous rappelle pour confirmer disponibilité, prix et délai.</li>
               <li class="flex gap-2"><span class="font-bold text-secondary">3.</span>Vous décidez ensuite : aucun engagement avant votre accord.</li>
             </ol>
@@ -307,7 +320,10 @@
     </div>
     <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{% if part.price %}{{ part.price|intcomma }} FCFA{% else %}Prix sur demande{% endif %}</p>
     <div class="ml-auto flex items-center gap-3">
-      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Je suis intéressé</button>
+      {% if part.availability != 'indisponible' %}
+      <form action="{% url 'parts:cart_add' part.pk %}" method="post" class="js-add-to-cart">{% csrf_token %}<input type="hidden" name="quantity" value="1"><button type="submit" class="px-6 py-3 rounded bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all">Ajouter au panier</button></form>
+      {% endif %}
+      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded border border-primary text-primary font-label-md text-label-md uppercase tracking-wide hover:bg-primary/5 transition-all">Je suis intéressé</button>
       <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 rounded bg-[#25D366] text-white font-label-md text-label-md uppercase tracking-wide hover:brightness-95 transition-all">
         <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
       </a>
@@ -324,7 +340,11 @@
   <a href="{{ site_contact.whatsapp_url }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="w-12 h-12 shrink-0 rounded bg-[#25D366] text-white flex items-center justify-center" aria-label="Écrire sur WhatsApp">
     <span class="material-symbols-outlined" aria-hidden="true">chat</span>
   </a>
+  {% if part.availability != 'indisponible' %}
+  <form action="{% url 'parts:cart_add' part.pk %}" method="post" class="js-add-to-cart shrink-0">{% csrf_token %}<input type="hidden" name="quantity" value="1"><button type="submit" class="px-5 py-3.5 rounded bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wide">Ajouter au panier</button></form>
+  {% else %}
   <button type="button" onclick="ouvrirModalInteret()" class="shrink-0 px-5 py-3.5 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide">Je suis intéressé</button>
+  {% endif %}
 </div>
 
 {# ══ Visionneuse photos ══ #}
@@ -385,4 +405,5 @@
 <script src="{% static 'js/vehicle-gallery.js' %}" defer></script>
 <script src="{% static 'js/vehicle-detail.js' %}" defer></script>
 <script src="{% static 'js/interest-form.js' %}" defer></script>
+<script src="{% static 'js/part-cart.js' %}" defer></script>
 {% endblock %}

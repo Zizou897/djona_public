@@ -1,0 +1,78 @@
+{% comment %}Contenu du panier — swap HTMX (quantités, retrait) ou rendu direct. Attend `cart`.{% endcomment %}
+{% load humanize %}
+<div id="cart-content">
+  {# Pastille du menu mise à jour avec le fragment #}
+  <span data-cart-count hx-swap-oob="true" id="cart-badge" class="{% if not cart.count %}hidden{% endif %} absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-secondary text-on-secondary text-[10px] font-bold flex items-center justify-center">{{ cart.count }}</span>
+
+  {% if cart.is_empty %}
+  <div class="bg-surface-container-lowest rounded-lg shadow-signature px-6 py-16 text-center flex flex-col items-center gap-4">
+    <span class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center"><span class="material-symbols-outlined text-[32px]" aria-hidden="true">shopping_cart</span></span>
+    <h2 class="font-headline-md text-headline-md text-on-surface">Votre panier est vide</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Parcourez le catalogue et ajoutez les pièces dont vous avez besoin.</p>
+    <a href="{% url 'parts:search' %}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>Voir les pièces</a>
+  </div>
+  {% else %}
+  <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-section-gap items-start">
+    <ul class="flex flex-col gap-4" aria-label="Articles du panier">
+      {% for line in cart.lines %}
+      {% with part=line.part image=line.part.images.all.0 %}
+      <li class="bg-surface-container-lowest rounded-lg shadow-signature p-4 flex gap-4">
+        <a href="{{ part.get_absolute_url }}" class="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-md overflow-hidden bg-surface-container flex items-center justify-center">
+          {% if image %}<img src="{{ image.image.url }}" alt="{{ part.name }}" loading="lazy" class="w-full h-full object-cover">{% else %}<span class="material-symbols-outlined text-[36px] text-outline" aria-hidden="true">{{ part.category.icon }}</span>{% endif %}
+        </a>
+        <div class="flex-1 min-w-0 flex flex-col gap-2">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <a href="{{ part.get_absolute_url }}" class="font-headline-md text-[15px] leading-snug text-on-surface hover:text-primary transition-colors block">{{ part.name }}</a>
+              <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">{% if part.brand %}{{ part.brand }} · {% endif %}Réf. {{ part.manufacturer_reference|default:part.reference }}</p>
+              {% if part.availability == 'a_confirmer' %}<p class="font-label-sm text-[11px] text-secondary mt-1">Disponibilité à confirmer par l'équipe</p>{% endif %}
+            </div>
+            <form hx-post="{% url 'parts:cart_remove' part.pk %}" hx-target="#cart-content" hx-swap="outerHTML" action="{% url 'parts:cart_remove' part.pk %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="p-1.5 rounded-full text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" aria-label="Retirer {{ part.name }} du panier"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">delete</span></button>
+            </form>
+          </div>
+          <div class="mt-auto flex flex-wrap items-center justify-between gap-3">
+            <form hx-post="{% url 'parts:cart_update' part.pk %}" hx-target="#cart-content" hx-swap="outerHTML" action="{% url 'parts:cart_update' part.pk %}" method="post" class="inline-flex items-center rounded border border-outline-variant overflow-hidden">
+              {% csrf_token %}
+              <button type="submit" name="quantity" value="{{ line.quantity|add:'-1' }}" class="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" aria-label="Diminuer la quantité"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">remove</span></button>
+              <span class="w-10 text-center font-label-md text-label-md" aria-live="polite">{{ line.quantity }}</span>
+              <button type="submit" name="quantity" value="{{ line.quantity|add:'1' }}" class="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" aria-label="Augmenter la quantité"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span></button>
+            </form>
+            <div class="text-right">
+              {% if line.price_known %}
+              <p class="font-display-lg text-[16px] text-primary whitespace-nowrap">{{ line.line_total|intcomma }} <span class="text-[11px] font-label-md">FCFA</span></p>
+              {% if line.quantity > 1 %}<p class="font-label-sm text-[11px] text-on-surface-variant">{{ line.unit_price|intcomma }} FCFA l'unité</p>{% endif %}
+              {% else %}
+              <p class="font-label-md text-label-md text-on-surface-variant">Prix sur demande</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endwith %}
+      {% endfor %}
+    </ul>
+
+    <aside class="bg-surface-container-lowest rounded-lg shadow-signature p-6 flex flex-col gap-4 lg:sticky lg:top-24">
+      <h2 class="font-headline-md text-[18px] text-primary">Récapitulatif</h2>
+      <dl class="flex flex-col gap-2 font-body-md text-body-md">
+        <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Articles</dt><dd class="font-semibold">{{ cart.count }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Sous-total</dt><dd class="font-semibold whitespace-nowrap">{{ cart.subtotal|intcomma }} FCFA</dd></div>
+        {% if cart.unpriced_count %}<div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Pièces sur devis</dt><dd class="font-semibold">{{ cart.unpriced_count }}</dd></div>{% endif %}
+        <div class="flex justify-between gap-4"><dt class="text-on-surface-variant">Livraison</dt><dd class="font-semibold text-right">Selon la zone,<br>à l'étape suivante</dd></div>
+      </dl>
+      <div class="border-t border-outline-variant/40 pt-4 flex justify-between items-baseline gap-4">
+        <span class="font-label-md text-label-md text-on-surface">Total estimé</span>
+        <span class="font-display-lg text-[22px] text-primary whitespace-nowrap">{{ cart.subtotal|intcomma }} <span class="text-[12px] font-label-md">FCFA</span></span>
+      </div>
+      {% if cart.unpriced_count %}<p class="font-label-sm text-label-sm text-on-surface-variant">Ce total n'inclut pas les pièces sur devis : leur prix vous sera communiqué avant toute confirmation.</p>{% endif %}
+      <a href="{% url 'parts:checkout' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide shadow hover:brightness-110 transition-all">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">shopping_bag</span>Commander
+      </a>
+      <p class="flex items-start gap-2 font-label-sm text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-[18px] shrink-0" aria-hidden="true">verified_user</span>Aucun paiement à cette étape. L'équipe Djona vérifie la disponibilité et confirme votre commande.</p>
+      <a href="{% url 'parts:search' %}" class="text-center font-label-md text-label-md text-primary hover:underline">Continuer mes achats</a>
+    </aside>
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Suivre ma commande — Djona Parts{% endblock %}
+{% block styles %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop pt-base">
+    <div class="border-b border-surface-container-highest pb-gutter">
+      <a href="{% url 'parts:home' %}" class="font-label-sm text-label-sm text-primary uppercase tracking-[0.2em] mb-2 hover:underline inline-block">Djona Parts</a>
+      <h1 class="font-display-lg text-headline-lg text-on-surface">Suivre ma commande</h1>
+    </div>
+  </section>
+
+  <section class="max-w-3xl mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter mb-section-gap flex flex-col gap-gutter">
+    {% if not order %}
+    <form method="post" class="bg-surface-container-lowest rounded-lg shadow-signature p-6 sm:p-8 flex flex-col gap-6" novalidate>
+      {% csrf_token %}
+      <p class="font-body-md text-body-md text-on-surface-variant">Saisissez le numéro reçu à l'envoi de votre commande et le téléphone utilisé.</p>
+      {% if form.non_field_errors %}<div class="rounded bg-error-container text-on-error-container px-4 py-3" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% include 'partials/_transport_field.html' with field=form.reference %}
+        {% include 'partials/_transport_field.html' with field=form.phone %}
+      </div>
+      <button type="submit" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-secondary text-on-secondary rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-110 transition-all"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>Voir ma commande</button>
+    </form>
+    {% else %}
+    <div class="bg-surface-container-lowest rounded-lg shadow-signature p-6 sm:p-8 flex flex-col gap-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div><p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Commande</p><p class="font-headline-lg text-[24px] text-primary">{{ order.reference }}</p></div>
+        <span class="px-4 py-1.5 rounded-full font-label-md text-label-md {% if order.status == 'annulee' or order.status == 'echec' %}bg-error-container text-on-error-container{% elif order.status == 'livree_retiree' %}bg-green-100 text-green-800{% else %}bg-primary/10 text-primary{% endif %}">{{ order.get_status_display }}</span>
+      </div>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Passée le {{ order.created_at|date:"d/m/Y à H:i" }}</p>
+
+      <ol class="relative flex flex-col gap-5 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/60" aria-label="Historique">
+        {% for event in order.events.all %}
+        <li class="relative flex gap-3">
+          <span class="relative z-10 w-6 h-6 shrink-0 rounded-full {% if forloop.last %}bg-primary text-on-primary{% else %}bg-primary/20 text-primary{% endif %} flex items-center justify-center"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">{% if forloop.last %}radio_button_checked{% else %}check{% endif %}</span></span>
+          <div><p class="font-label-md text-label-md text-on-surface">{% if event.status %}{{ event.get_status_display }}{% else %}{{ event.note }}{% endif %}</p><p class="font-label-sm text-label-sm text-on-surface-variant">{{ event.created_at|date:"d/m/Y à H:i" }}{% if event.status and event.note %} — {{ event.note }}{% endif %}</p></div>
+        </li>
+        {% endfor %}
+      </ol>
+      <div class="border-t border-outline-variant/40 pt-5">{% include 'parts/_order_summary.html' %}</div>
+    </div>
+    <a href="{% url 'parts:track' %}" class="text-center font-label-md text-label-md text-primary hover:underline">Rechercher une autre commande</a>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

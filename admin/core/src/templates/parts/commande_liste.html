@@ -1,0 +1,91 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Commandes de pièces — Back-office Djona{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='pieces_commandes' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-6">
+            <div class="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-4" style="animation-delay:.05s">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Djona Parts</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Commandes de pièces</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">Commandes passées depuis le panier. Une commande n'est confirmée qu'après vérification par l'équipe.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors" href="{% url 'part_zone_liste' %}"><span class="material-symbols-outlined text-[18px]">local_shipping</span>Zones de livraison</a>
+                    <a class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant text-on-surface-variant text-sm font-semibold hover:bg-surface-container transition-colors" href="{% url 'part_reglages' %}"><span class="material-symbols-outlined text-[18px]">tune</span>Réglages</a>
+                </div>
+            </div>
+
+            <section aria-label="Filtres" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm" style="animation-delay:.1s">
+                <nav aria-label="Statut" class="flex gap-1 px-3 pt-2 overflow-x-auto border-b border-outline-variant/30">
+                    <a {% if not statut_actif %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if not statut_actif %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?">Toutes <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if not statut_actif %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">{{ nb_total }}</span></a>
+                    {% for s in statuts %}
+                    <a {% if statut_actif == s.value %}aria-current="page" {% endif %}class="shrink-0 inline-flex items-center gap-1.5 px-3 py-3 -mb-px border-b-2 text-sm font-semibold transition-colors {% if statut_actif == s.value %}border-primary text-primary{% else %}border-transparent text-on-surface-variant hover:text-on-surface{% endif %}" href="?statut={{ s.value }}">{{ s.label }} <span class="text-[11px] font-bold px-1.5 py-0.5 rounded-full {% if statut_actif == s.value %}bg-primary text-on-primary{% elif s.value == 'en_attente' and s.count %}bg-secondary-container text-primary{% else %}bg-surface-container{% endif %}">{{ s.count }}</span></a>
+                    {% endfor %}
+                </nav>
+                <form class="p-3 grid grid-cols-1 md:grid-cols-[1fr_170px_190px_auto] gap-3" method="get" role="search">
+                    {% if statut_actif %}<input name="statut" type="hidden" value="{{ statut_actif }}">{% endif %}
+                    <label class="relative block"><span class="sr-only">Rechercher</span>
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">search</span>
+                        <input class="w-full pl-11 pr-4 py-2.5 bg-surface-container-low border border-transparent rounded-lg text-sm focus:outline-none focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" name="q" placeholder="Numéro, client, téléphone, pièce, référence…" type="search" value="{{ recherche }}">
+                    </label>
+                    <select class="px-3 py-2.5 bg-surface-container-low rounded-lg text-sm border border-transparent focus:outline-none focus:border-primary" name="reception" aria-label="Mode de réception">
+                        <option value="">Tous les modes</option>
+                        <option value="retrait" {% if reception_active == 'retrait' %}selected{% endif %}>Retrait</option>
+                        <option value="livraison" {% if reception_active == 'livraison' %}selected{% endif %}>Livraison</option>
+                    </select>
+                    <select class="px-3 py-2.5 bg-surface-container-low rounded-lg text-sm border border-transparent focus:outline-none focus:border-primary" name="paiement" aria-label="Paiement">
+                        <option value="">Tous les paiements</option>
+                        {% for value, label in paiements %}<option value="{{ value }}" {% if paiement_actif == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                    <button class="px-5 py-2.5 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors" type="submit">Filtrer</button>
+                </form>
+            </section>
+
+            <section aria-label="Commandes" class="reveal bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" style="animation-delay:.14s">
+                <ul class="divide-y divide-outline-variant/30">
+                    {% for c in commandes %}
+                    <li>
+                        <a class="px-4 sm:px-6 py-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors {% if c.status == 'en_attente' %}bg-secondary-container/[0.06]{% endif %}" href="{% url 'part_commande_detail' c.pk %}">
+                            <span class="relative w-10 h-10 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[20px]">{% if c.reception == 'livraison' %}local_shipping{% else %}storefront{% endif %}</span>
+                                {% if c.status == 'en_attente' %}<span class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-secondary-container ring-2 ring-surface-container-lowest"></span>{% endif %}
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-baseline justify-between gap-3">
+                                    <p class="text-sm {% if c.status == 'en_attente' %}font-bold{% else %}font-semibold{% endif %} text-on-surface truncate">{{ c.customer_label }} <span class="font-normal text-on-surface-variant">· {{ c.nb_lignes }} ligne{{ c.nb_lignes|pluralize }}</span></p>
+                                    <span class="shrink-0 text-sm font-bold text-primary whitespace-nowrap">{{ c.total|floatformat:"0g" }} FCFA{% if not c.total_is_final %}<span class="text-[11px] font-normal text-on-surface-variant"> est.</span>{% endif %}</span>
+                                </div>
+                                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant">
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold {% if c.status == 'en_attente' %}bg-secondary-container/25 text-secondary{% elif c.status == 'livree_retiree' %}bg-green-100 text-green-800{% elif c.status == 'annulee' or c.status == 'echec' %}bg-error-container text-on-error-container{% else %}bg-primary/10 text-primary{% endif %}">{{ c.get_status_display }}</span>
+                                    <span class="font-semibold">{{ c.reference }}</span>
+                                    <span>{% if c.reception == 'livraison' %}Livraison{% if c.zone_name %} — {{ c.zone_name }}{% endif %}{% else %}Retrait{% endif %}</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold {% if c.payment_status == 'paye' %}bg-green-100 text-green-800{% else %}bg-surface-container{% endif %}">{{ c.get_payment_status_display }}</span>
+                                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">call</span>{{ c.phone }}</span>
+                                    <span>{{ c.created_at|date:'d/m/Y H:i' }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="py-14 px-6 text-center flex flex-col items-center gap-3">
+                        <span class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[28px]">shopping_bag</span></span>
+                        <p class="text-sm font-semibold text-on-surface">{% if recherche or statut_actif or reception_active or paiement_actif %}Aucune commande ne correspond à ces filtres.{% else %}Aucune commande de pièces pour le moment.{% endif %}</p>
+                        {% if recherche or statut_actif or reception_active or paiement_actif %}<a class="text-sm font-semibold text-primary hover:underline" href="{% url 'part_commande_liste' %}">Réinitialiser les filtres</a>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
+    </div>
+</div>
+{% endblock %}

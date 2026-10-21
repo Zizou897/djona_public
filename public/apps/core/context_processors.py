@@ -11,3 +11,9 @@ def active_partners(request):
 def site_contact(request):
     """Coordonnées et réseaux sociaux du site (footer, pages de contact)."""
     return {'site_contact': SiteContact.load()}
+
+
+def parts_cart(request):
+    """Nombre d'articles du panier de pièces (pastille du menu)."""
+    from apps.parts import cart
+    return {'parts_cart_count': cart.count(request)}
