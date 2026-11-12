@@ -5,6 +5,8 @@ from django.utils import formats
 from django.urls import reverse
 from django.utils.text import slugify
 
+from . import rental
+
 
 class Convention(models.Model):
     """Base abstraite pour les modèles publiables (cf. AGENTS.md §5)."""
@@ -238,6 +240,9 @@ class Interest(models.Model):
     name = models.CharField('nom', max_length=150)
     phone = models.CharField('téléphone', max_length=20)
     message = models.TextField('message', blank=True)
+    # Demande de location : dates souhaitées (vides pour un achat).
+    rental_start = models.DateField('début de location', null=True, blank=True)
+    rental_end = models.DateField('retour du véhicule', null=True, blank=True)
     created_at = models.DateTimeField('date', auto_now_add=True)
 
     class Meta:
@@ -247,3 +252,18 @@ class Interest(models.Model):
 
     def __str__(self):
         return f'{self.name} — {self.vehicle}'
+
+    @property
+    def rental_days(self):
+        if self.rental_start and self.rental_end:
+            return rental.rental_days(self.rental_start, self.rental_end)
+        return None
+
+    @property
+    def rental_duration_label(self):
+        """« Courte durée — 3 jours », ou chaîne vide si ce n'est pas une demande de location."""
+        days = self.rental_days
+        category = rental.duration_category(days) if days else None
+        if not category:
+            return ''
+        return f"{category['label']} — {days} jour{'s' if days > 1 else ''}"

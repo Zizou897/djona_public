@@ -1,0 +1,27 @@
+{% comment %}
+Contact direct avec le vendeur (Je suis intéressé / WhatsApp / Appeler / Comparer) — option secondaire :
+l'action prioritaire est « Acheter avec Djona » (vente) ou « Louer avec Djona » (location).
+Attend `vehicle`, `whatsapp_message`. Pour une location, « Je suis intéressé » est omis : la demande
+passe par « Louer avec Djona », qui exige les dates.
+{% endcomment %}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  {% if not vehicle.is_rental %}
+  <button type="button" onclick="ouvrirModalInteret()" class="flex items-center justify-center gap-2 py-3.5 rounded font-label-md text-label-md uppercase tracking-wide transition-all border border-primary text-primary hover:bg-primary/5 {% if not vehicle.seller.phone %}sm:col-span-2{% endif %}">
+    Je suis intéressé
+  </button>
+  {% endif %}
+  {% if vehicle.seller.phone %}
+  <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-105 transition-all {% if vehicle.is_rental %}sm:col-span-2{% endif %}">
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
+  </a>
+  {% endif %}
+</div>
+
+<div class="flex flex-wrap items-center justify-between gap-3 text-label-sm">
+  {% if vehicle.seller.phone %}
+  <a href="tel:+225{{ vehicle.seller.phone }}" class="inline-flex items-center gap-1.5 font-label-md text-primary hover:underline">
+    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span> Appeler le vendeur
+  </a>
+  {% endif %}
+  {% include 'partials/_compare_button.html' with in_compare=vehicle.in_compare %}
+</div>

@@ -1,6 +1,8 @@
 function ouvrirModalInteret() {
   var modal = document.getElementById('modal-interet');
   if (!modal) return;
+  // Location : window.rentalGate (rental-dates.js) exige des dates valides avant d'ouvrir la demande.
+  if (typeof window.rentalGate === 'function' && !window.rentalGate()) return;
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }

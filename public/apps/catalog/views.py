@@ -5,12 +5,14 @@ from django.db.models import F, FloatField
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.core.views import AVANTAGES_ITEMS, FAQ_ITEMS, _client_ip
 
 from .forms import InterestForm
 from .models import Favorite, Seller, Vehicle
+from .rental import RENTAL_CATEGORIES
 
 PAGE_SIZE = 9
 MAX_COMPARE = 3
@@ -151,6 +153,7 @@ def vehicle_list(request):
         'compare_ids': compare_ids,
         'compare_count': len(compare_ids),
         'max_compare': MAX_COMPARE,
+        'avantages': AVANTAGES_ITEMS[:3],  # bandeau « Acheter avec Djona »
     }
 
     if request.htmx:
@@ -193,7 +196,9 @@ def vehicle_detail(request, slug):
         'compare_ids': compare_ids,
         'compare_count': len(compare_ids),
         'max_compare': MAX_COMPARE,
-        'interest_form': InterestForm(),
+        'interest_form': InterestForm(vehicle=vehicle),
+        'rental_categories': RENTAL_CATEGORIES,
+        'today': timezone.localdate().isoformat(),
         'whatsapp_message': whatsapp_message,
         'avantages': AVANTAGES_ITEMS[:5],
         'faq_items': FAQ_ITEMS,
@@ -221,14 +226,23 @@ def express_interest(request, slug):
         return redirect(vehicle.get_absolute_url())
     cache.set(cache_key, attempts + 1, INTEREST_RATE_WINDOW)
 
-    form = InterestForm(request.POST)
+    form = InterestForm(request.POST, vehicle=vehicle)
     if form.is_valid():
         interest = form.save(commit=False)
         interest.vehicle = vehicle
         interest.save()
-        status, message = 'success', 'Merci ! Le vendeur a reçu vos coordonnées et va vous recontacter rapidement.'
+        if vehicle.is_rental:
+            status, message = 'success', ('Merci ! Votre demande de location a bien été reçue. '
+                                          'Le vendeur confirme la disponibilité et vous recontacte rapidement.')
+        else:
+            status, message = 'success', 'Merci ! Le vendeur a reçu vos coordonnées et va vous recontacter rapidement.'
     else:
-        status, message = 'error', 'Merci de renseigner votre nom et un numéro de téléphone valide.'
+        status = 'error'
+        date_errors = form.non_field_errors() or form.errors.get('rental_start') or form.errors.get('rental_end')
+        if vehicle.is_rental and date_errors:
+            message = date_errors[0]
+        else:
+            message = 'Merci de renseigner votre nom et un numéro de téléphone valide.'
 
     if is_ajax:
         return JsonResponse({'status': status, 'message': message})

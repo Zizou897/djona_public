@@ -78,7 +78,7 @@
       <nav class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant mb-5 overflow-hidden" aria-label="Fil d'ariane">
         <a href="{% url 'core:home' %}" class="hover:text-primary transition-colors shrink-0">Accueil</a>
         <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">chevron_right</span>
-        <a href="{% url 'catalog:list' %}" class="hover:text-primary transition-colors shrink-0">Acheter</a>
+        <a href="{% url 'catalog:list' %}" class="hover:text-primary transition-colors shrink-0">Acheter et louer</a>
         <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">chevron_right</span>
         <span class="text-on-surface truncate">{{ vehicle.brand }} {{ vehicle.model_name }} {{ vehicle.year|stringformat:"d" }}</span>
       </nav>
@@ -183,50 +183,89 @@
               </ul>
             </div>
 
-            <div id="detail-cta" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button type="button" onclick="ouvrirModalInteret()" class="flex items-center justify-center gap-2 bg-primary text-on-primary py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all {% if not vehicle.seller.phone %}sm:col-span-2{% endif %}">
-                Je suis intéressé
-              </button>
-              {% if vehicle.seller.phone %}
-              <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3.5 rounded font-label-md text-label-md uppercase tracking-wide hover:brightness-105 transition-all">
-                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
-              </a>
-              {% endif %}
-            </div>
-
-            <div class="flex flex-wrap items-center justify-between gap-3 text-label-sm">
-              {% if vehicle.seller.phone %}
-              <a href="tel:+225{{ vehicle.seller.phone }}" class="inline-flex items-center gap-1.5 font-label-md text-primary hover:underline">
-                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span> Appeler le vendeur
-              </a>
-              {% endif %}
-              {% include 'partials/_compare_button.html' with in_compare=vehicle.in_compare %}
-            </div>
           </div>
 
-          <div class="rounded-lg border-2 border-secondary/30 bg-secondary/[0.06] p-5 flex flex-col gap-3">
+          {% if vehicle.is_rental %}
+          {# ══ Action prioritaire : Louer avec Djona (dates → durée courte / moyenne / longue) ══ #}
+          <div id="rental-card" class="rounded-lg border-2 border-secondary bg-secondary/[0.07] p-5 sm:p-6 flex flex-col gap-4 shadow-signature">
             <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+              <span class="w-11 h-11 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">key</span>
+              </span>
+              <div>
+                <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Location</span>
+                <h2 class="font-headline-md text-[20px] text-on-background leading-tight">Louer avec Djona</h2>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col gap-1.5">
+                <label for="rental-start" class="font-label-md text-label-sm text-on-surface">Date de début</label>
+                <input id="rental-start" type="date" min="{{ today }}" class="w-full px-3 py-2.5 rounded bg-white border border-outline-variant/60 font-body-md text-label-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="rental-end" class="font-label-md text-label-sm text-on-surface">Date de retour</label>
+                <input id="rental-end" type="date" min="{{ today }}" class="w-full px-3 py-2.5 rounded bg-white border border-outline-variant/60 font-body-md text-label-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+              </div>
+            </div>
+
+            <div id="rental-summary" class="items-center justify-between gap-3 rounded bg-white p-3" style="display:none" aria-live="polite">
+              <div>
+                <p class="text-label-sm text-on-surface-variant">Durée de la location</p>
+                <p id="rental-days" class="font-headline-md text-[18px] leading-tight text-primary"></p>
+              </div>
+              <span id="rental-badge" class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-wide text-center"></span>
+            </div>
+            <p id="rental-error" class="text-label-sm text-error" role="alert" style="display:none"></p>
+
+            <ul id="rental-categories" class="flex flex-col gap-1.5" data-on="bg-secondary text-on-secondary font-semibold" data-off="bg-white text-on-surface-variant">
+              {% for category in rental_categories %}
+              <li data-category="{{ category.key }}" class="flex items-center justify-between gap-3 rounded px-3 py-2 text-label-sm bg-white text-on-surface-variant transition-colors"><span>{{ category.label }}</span><span>{{ category.range }}</span></li>
+              {% endfor %}
+            </ul>
+            {{ rental_categories|json_script:"rental-categories-data" }}
+
+            <div id="detail-cta" class="flex flex-col gap-3">
+              <button type="button" onclick="ouvrirModalInteret()" class="group w-full bg-secondary text-on-secondary py-4 rounded font-label-md text-label-md uppercase tracking-wide shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                Louer avec Djona
+                <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+              </button>
+              <p class="text-center text-label-sm text-on-surface-variant">Le vendeur confirme la disponibilité et le tarif.</p>
+            </div>
+          </div>
+          {% else %}
+          {# ══ Action prioritaire : Acheter avec Djona ══ #}
+          <div class="rounded-lg border-2 border-secondary bg-secondary/[0.07] p-5 sm:p-6 flex flex-col gap-4 shadow-signature">
+            <div class="flex items-center gap-3">
+              <span class="w-11 h-11 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">star</span>
               </span>
               <div>
-                <h2 class="font-headline-md text-[17px] text-on-background leading-tight">Acheter avec Djona</h2>
                 <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Recommandé</span>
+                <h2 class="font-headline-md text-[20px] text-on-background leading-tight">Acheter avec Djona</h2>
               </div>
             </div>
-            <p class="text-label-sm text-on-surface-variant">Bénéficiez de :</p>
-            <ul class="grid grid-cols-1 gap-1.5 text-label-sm text-on-surface">
+            <ul class="grid grid-cols-1 gap-2 text-label-md text-on-surface">
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">check</span>Accompagnement personnalisé</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">check</span>Vérification du véhicule</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">check</span>Aide à la négociation</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">check</span>Transaction plus sécurisée</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">check</span>Avantages exclusifs après achat</li>
             </ul>
-            <button type="button" onclick="ouvrirModalInteret()" class="group mt-1 w-full bg-secondary text-on-secondary py-3.5 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2">
-              Je veux acheter avec Djona
-              <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
-            </button>
-            <a href="{% url 'core:avantages' %}" class="text-center font-label-md text-label-sm text-primary hover:underline">En savoir plus sur nos avantages</a>
+            <div id="detail-cta" class="flex flex-col gap-3">
+              <button type="button" onclick="ouvrirModalInteret()" class="group w-full bg-secondary text-on-secondary py-4 rounded font-label-md text-label-md uppercase tracking-wide shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                Acheter avec Djona
+                <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+              </button>
+              <a href="{% url 'core:avantages' %}" class="text-center font-label-md text-label-sm text-primary hover:underline">En savoir plus sur nos avantages</a>
+            </div>
+          </div>
+          {% endif %}
+
+          {# Contact direct : option secondaire #}
+          <div class="rounded-lg bg-primary/[0.06] p-5 flex flex-col gap-4">
+            <p class="font-label-md text-label-md text-on-surface-variant">Ou échangez directement avec le vendeur</p>
+            {% include 'partials/_detail_contact.html' %}
           </div>
 
           <div class="flex items-start gap-3 px-1">
@@ -427,7 +466,11 @@
     </div>
     <p class="font-display-lg text-[22px] text-primary whitespace-nowrap">{{ vehicle.price_label }}</p>
     <div class="ml-auto flex items-center gap-3">
-      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wide hover:brightness-125 transition-all">Je suis intéressé</button>
+      {% if vehicle.is_rental %}
+      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wide shadow-md hover:brightness-110 transition-all">Louer avec Djona</button>
+      {% else %}
+      <button type="button" onclick="ouvrirModalInteret()" class="px-6 py-3 rounded bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wide shadow-md hover:brightness-110 transition-all">Acheter avec Djona</button>
+      {% endif %}
       {% if vehicle.seller.phone %}
       <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 rounded bg-[#25D366] text-white font-label-md text-label-md uppercase tracking-wide hover:brightness-105 transition-all">
         <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chat</span> WhatsApp
@@ -443,12 +486,11 @@
     <p class="font-label-sm text-label-sm text-on-surface-variant truncate">{{ vehicle.brand }} {{ vehicle.model_name }}</p>
     <p class="font-headline-md text-[17px] text-primary whitespace-nowrap">{{ vehicle.price_label }}</p>
   </div>
-  {% if vehicle.seller.phone %}
-  <a href="https://wa.me/225{{ vehicle.seller.phone }}?text={{ whatsapp_message|urlencode }}" target="_blank" rel="noopener" class="w-12 h-12 shrink-0 rounded bg-[#25D366] text-white flex items-center justify-center" aria-label="Contacter sur WhatsApp">
-    <span class="material-symbols-outlined" aria-hidden="true">chat</span>
-  </a>
+  {% if vehicle.is_rental %}
+  <button type="button" onclick="ouvrirModalInteret()" class="shrink-0 h-12 px-5 rounded bg-secondary text-on-secondary font-label-md text-label-md shadow-md">Louer avec Djona</button>
+  {% else %}
+  <button type="button" onclick="ouvrirModalInteret()" class="shrink-0 h-12 px-5 rounded bg-secondary text-on-secondary font-label-md text-label-md shadow-md">Acheter avec Djona</button>
   {% endif %}
-  <button type="button" onclick="ouvrirModalInteret()" class="shrink-0 h-12 px-5 rounded bg-primary text-on-primary font-label-md text-label-md">Je suis intéressé</button>
 </div>
 
 {# ══ Visionneuse photos ══ #}
@@ -486,11 +528,19 @@
       <span class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
         <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">favorite</span>
       </span>
-      <h3 class="font-headline-md text-[18px] text-on-surface">Je suis intéressé</h3>
+      <h3 class="font-headline-md text-[18px] text-on-surface">{% if vehicle.is_rental %}Demande de location{% else %}Je suis intéressé{% endif %}</h3>
       <p class="font-body-md text-label-sm text-on-surface-variant">Laissez vos coordonnées, le vendeur de « {{ vehicle.brand }} {{ vehicle.model_name }} » vous recontacte rapidement.</p>
     </div>
     <form action="{% url 'catalog:express_interest' vehicle.slug %}" class="flex flex-col gap-3" id="interest-form" method="post">
       {% csrf_token %}
+      {% if vehicle.is_rental %}
+      <input type="hidden" name="rental_start" id="interest-rental-start">
+      <input type="hidden" name="rental_end" id="interest-rental-end">
+      <div class="flex items-center justify-between gap-3 rounded bg-secondary/10 px-4 py-3" aria-live="polite">
+        <p id="interest-rental-recap" class="font-label-md text-label-sm text-on-surface"></p>
+        <span id="interest-rental-badge" class="shrink-0 px-2.5 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-[11px] uppercase tracking-wide"></span>
+      </div>
+      {% endif %}
       <input class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="name" placeholder="Votre nom" required type="text">
       <input class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="phone" placeholder="Votre téléphone" required type="tel">
       <textarea class="w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none" name="message" placeholder="Message (optionnel)" rows="2"></textarea>
@@ -504,6 +554,7 @@
 {% block scripts %}
 <script src="{% static 'js/vehicle-gallery.js' %}" defer></script>
 <script src="{% static 'js/vehicle-detail.js' %}" defer></script>
+{% if vehicle.is_rental %}<script src="{% static 'js/rental-dates.js' %}" defer></script>{% endif %}
 <script src="{% static 'js/interest-form.js' %}" defer></script>
 <script src="{% static 'js/faq.js' %}" defer></script>
 {% endblock %}

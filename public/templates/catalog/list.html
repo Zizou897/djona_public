@@ -65,6 +65,30 @@
     </div>
   </section>
 
+  {# Acheter avec Djona : offre prioritaire du volet achat (masquée pour la location) #}
+  <section id="buy-with-djona" class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter" style="{% if listing_type == 'location' %}display:none{% endif %}">
+    <div class="rounded-lg bg-primary text-on-primary p-5 sm:p-6 lg:px-8 flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-10 shadow-signature">
+      <div class="flex items-center gap-4 lg:w-72 shrink-0">
+        <span class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">star</span>
+        </span>
+        <div>
+          <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary-container">Recommandé</span>
+          <h2 class="font-headline-md text-[20px] leading-tight">Acheter avec Djona</h2>
+        </div>
+      </div>
+      <ul class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 text-label-md text-on-primary/90">
+        {% for item in avantages %}
+        <li class="flex items-start gap-2"><span class="material-symbols-outlined text-secondary-container text-[18px] mt-0.5 shrink-0" aria-hidden="true">check_circle</span>{{ item.title }}</li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'core:avantages' %}" class="group inline-flex items-center justify-center gap-2 bg-secondary text-on-secondary px-6 py-3 rounded font-label-md text-label-md shadow-md hover:brightness-110 transition-all shrink-0">
+        Découvrir les avantages
+        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+      </a>
+    </div>
+  </section>
+
   {# Contenu principal #}
   <section class="max-w-page mx-auto w-full px-container-margin-mobile lg:px-container-margin-desktop mt-gutter flex flex-col lg:flex-row gap-section-gap">
 

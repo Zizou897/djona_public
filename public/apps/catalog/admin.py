@@ -25,6 +25,10 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(Interest)
 class InterestAdmin(admin.ModelAdmin):
-    list_display = ['name', 'phone', 'vehicle', 'created_at']
+    list_display = ['name', 'phone', 'vehicle', 'rental_start', 'rental_end', 'rental_duration_label', 'created_at']
     list_filter = ['created_at']
     search_fields = ['name', 'phone', 'vehicle__brand', 'vehicle__model_name']
+
+    @admin.display(description='durée de location')
+    def rental_duration_label(self, obj):
+        return obj.rental_duration_label or '—'

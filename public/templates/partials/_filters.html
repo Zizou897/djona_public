@@ -108,6 +108,9 @@ selected_transmissions, selected_conditions, selected_city, price_min, price_max
     // style.display (et non l'attribut hidden) : « flex » l'emporterait sur [hidden].
     document.getElementById('rent-period-block').style.display = location ? '' : 'none';
     document.getElementById('budget-block').style.display = location ? 'none' : '';
+    // « Acheter avec Djona » ne concerne que l'achat.
+    var buyBanner = document.getElementById('buy-with-djona');
+    if (buyBanner) { buyBanner.style.display = location ? 'none' : ''; }
   });
 })();
 </script>

@@ -165,3 +165,121 @@ class SyncRentalTests(TestCase):
         self.run_sync(self.annonce(prix_jour=45000, prix_mois=None, caution=None))
         vehicle = Vehicle.objects.get(source_annonce_id=77)
         self.assertEqual((vehicle.rent_price_day, vehicle.rent_price_month, vehicle.deposit), (45000, None, None))
+
+
+class RentalDurationTests(TestCase):
+    """Courte / moyenne / longue durée : seuils uniques (apps/catalog/rental.py)."""
+
+    def test_category_boundaries(self):
+        from .rental import duration_category
+
+        cases = {1: 'courte', 7: 'courte', 8: 'moyenne', 29: 'moyenne', 30: 'longue', 400: 'longue'}
+        for days, key in cases.items():
+            self.assertEqual(duration_category(days)['key'], key, days)
+        self.assertIsNone(duration_category(0))
+        self.assertIsNone(duration_category(-3))
+
+    def test_days_exclude_the_return_day(self):
+        from datetime import date
+
+        from .rental import rental_days
+
+        self.assertEqual(rental_days(date(2026, 12, 1), date(2026, 12, 4)), 3)
+        self.assertEqual(rental_days(date(2026, 12, 1), date(2026, 12, 1)), 0)
+
+    def test_categories_are_contiguous(self):
+        from .rental import RENTAL_CATEGORIES
+
+        for previous, current in zip(RENTAL_CATEGORIES, RENTAL_CATEGORIES[1:]):
+            self.assertEqual(previous['max_days'] + 1, current['min_days'])
+        self.assertIsNone(RENTAL_CATEGORIES[-1]['max_days'])
+
+
+class RentalRequestTests(RentalBase):
+    def setUp(self):
+        super().setUp()
+        from django.core.cache import cache
+
+        cache.clear()  # la demande d'intérêt est limitée par IP
+        self.today = timezone.localdate()
+
+    def post(self, vehicle, **data):
+        payload = {'name': 'Kouadio', 'phone': '0700000000'}
+        payload.update(data)
+        response = self.client.post(reverse('catalog:express_interest', args=[vehicle.slug]), payload,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        return response.json()
+
+    def day(self, offset):
+        return (self.today + timezone.timedelta(days=offset)).isoformat()
+
+    def test_rental_request_stores_dates_and_duration(self):
+        from .models import Interest
+
+        result = self.post(self.rent_day, rental_start=self.day(2), rental_end=self.day(5))
+        self.assertEqual(result['status'], 'success')
+        self.assertIn('location', result['message'])
+        interest = Interest.objects.get()
+        self.assertEqual(interest.rental_days, 3)
+        self.assertEqual(interest.rental_duration_label, 'Courte durée — 3 jours')
+
+    def test_duration_label_for_each_category(self):
+        from .models import Interest
+
+        for end, expected in ((8, 'Courte durée — 7 jours'), (10, 'Moyenne durée — 9 jours'), (32, 'Longue durée — 31 jours')):
+            Interest.objects.all().delete()
+            self.post(self.rent_all, rental_start=self.day(1), rental_end=self.day(end))
+            self.assertEqual(Interest.objects.get().rental_duration_label, expected)
+
+    def test_rental_requires_valid_dates(self):
+        from .models import Interest
+
+        bad = [
+            {},                                                                       # aucune date
+            {'rental_start': self.day(2)},                                            # retour manquant
+            {'rental_start': self.day(-1), 'rental_end': self.day(3)},                # début dans le passé
+            {'rental_start': self.day(3), 'rental_end': self.day(3)},                 # retour le jour du début
+            {'rental_start': self.day(5), 'rental_end': self.day(2)},                 # retour avant le début
+            {'rental_start': 'pas-une-date', 'rental_end': self.day(3)},              # format invalide
+        ]
+        for data in bad:
+            result = self.post(self.rent_day, **data)
+            self.assertEqual(result['status'], 'error', data)
+        self.assertEqual(Interest.objects.count(), 0)
+
+    def test_error_message_names_the_date_problem(self):
+        result = self.post(self.rent_day, rental_start=self.day(5), rental_end=self.day(2))
+        self.assertIn('postérieure', result['message'])
+        result = self.post(self.rent_day, rental_start=self.day(-1), rental_end=self.day(2))
+        self.assertIn('passé', result['message'])
+
+    def test_sale_ignores_any_dates(self):
+        from .models import Interest
+
+        result = self.post(self.sale, rental_start=self.day(2), rental_end=self.day(5))
+        self.assertEqual(result['status'], 'success')
+        interest = Interest.objects.get()
+        self.assertIsNone(interest.rental_start)
+        self.assertEqual(interest.rental_duration_label, '')
+
+    def test_missing_contact_still_reports_contact_error(self):
+        result = self.post(self.rent_day, name='', rental_start=self.day(2), rental_end=self.day(5))
+        self.assertEqual(result['status'], 'error')
+        self.assertIn('nom', result['message'])
+
+
+class RentalDetailPageTests(RentalBase):
+    def test_rental_page_offers_dates_and_the_three_categories(self):
+        html = self.client.get(self.rent_all.get_absolute_url()).content.decode()
+        for expected in ('Louer avec Djona', 'id="rental-start"', 'id="rental-end"', 'Courte durée', 'Moyenne durée',
+                         'Longue durée', '1 à 7 jours', '30 jours et plus', 'rental-dates.js', 'id="interest-rental-start"'):
+            self.assertIn(expected, html)
+        self.assertNotIn('Acheter avec Djona', html)
+        self.assertNotIn('Je suis intéressé', html)  # la demande passe par « Louer avec Djona » (dates requises)
+
+    def test_sale_page_has_no_rental_widgets(self):
+        html = self.client.get(self.sale.get_absolute_url()).content.decode()
+        for absent in ('rental-card', 'rental-start', 'rental-dates.js', 'Louer avec Djona', 'interest-rental-start'):
+            self.assertNotIn(absent, html)
+        self.assertIn('Acheter avec Djona', html)
+        self.assertIn('Je suis intéressé', html)
