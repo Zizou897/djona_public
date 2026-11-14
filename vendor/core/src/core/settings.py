@@ -141,13 +141,32 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email
+# E-mail — SMTP Brevo (relais smtp-relay.brevo.com), expéditeur sur le domaine djona.tech.
+# EMAIL_HOST_USER = identifiant SMTP Brevo (ce n'est PAS l'adresse expéditrice) ; EMAIL_HOST_PASSWORD = clé SMTP Brevo.
+# DEFAULT_FROM_EMAIL doit être un expéditeur validé dans Brevo (domaine djona.tech authentifié).
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='')
+EMAIL_HOST = config('EMAIL_HOST', default='') or 'smtp-relay.brevo.com'
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)  # sans délai, un SMTP lent bloquerait un worker
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='') or 'Djona <noreply@djona.tech>'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+# Envoi par l'API Brevo (HTTPS, sans SMTP) : prioritaire sur le SMTP dès que BREVO_API_KEY est défini.
+# L'expéditeur reste soumis à validation dans Brevo ; l'IP du serveur doit être autorisée (Sécurité > Adresses IP autorisées).
+BREVO_API_KEY = config('BREVO_API_KEY', default='')
+if BREVO_API_KEY:
+    EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
+    ANYMAIL = {'BREVO_API_KEY': BREVO_API_KEY, 'REQUESTS_TIMEOUT': (5, 15)}
+if DEBUG and not (EMAIL_HOST_USER or BREVO_API_KEY):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # développement : e-mails affichés dans la console
+
+# Mot de passe oublié : validité du lien (secondes) et domaine utilisé dans les e-mails.
+# PASSWORD_RESET_DOMAIN (ex. vendor.djona.tech) évite que le lien soit construit à partir de l'en-tête
+# Host de la requête ; à défaut, l'hôte de la requête est utilisé (développement).
+PASSWORD_RESET_TIMEOUT = 60 * 60
+PASSWORD_RESET_DOMAIN = config('PASSWORD_RESET_DOMAIN', default='')
 
 # Celery
 CELERY_BROKER_URL = config('REDIS_URL', default='redis://127.0.0.1:6379')

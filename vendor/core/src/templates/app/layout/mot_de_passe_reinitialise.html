@@ -1,0 +1,17 @@
+{% extends 'app/layout/_auth_carte.html' %}
+
+{% block title %}Mot de passe modifié — Djona Vendeur{% endblock %}
+
+{% block carte %}
+<div class="flex flex-col items-center text-center gap-3">
+    <span class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+        <span class="material-symbols-outlined text-green-700 text-[28px]">check_circle</span>
+    </span>
+    <h1 class="font-headline-lg text-headline-lg text-primary">Mot de passe modifié</h1>
+    <p class="text-on-surface-variant text-body-md">Votre nouveau mot de passe est enregistré. Vous pouvez maintenant vous connecter.</p>
+</div>
+<a class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-2 group" href="{% url 'connexion_vendeur' %}">
+    Se connecter
+    <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+</a>
+{% endblock %}

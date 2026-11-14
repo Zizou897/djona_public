@@ -117,3 +117,22 @@ TRANSPORT_NOTIFY_EMAILS = [e.strip() for e in _config('TRANSPORT_NOTIFY_EMAILS',
 # Destinataires des notifications email de nouveau message de contact. Vide = pas d'email.
 PARTS_NOTIFY_EMAILS = [e.strip() for e in _config('PARTS_NOTIFY_EMAILS', default='').split(',') if e.strip()]
 CONTACT_NOTIFY_EMAILS = [e.strip() for e in _config('CONTACT_NOTIFY_EMAILS', default='').split(',') if e.strip()]
+
+# E-mail — SMTP Brevo (relais smtp-relay.brevo.com), expéditeur sur le domaine djona.tech.
+# EMAIL_HOST_USER = identifiant SMTP Brevo (ce n'est PAS l'adresse expéditrice) ; EMAIL_HOST_PASSWORD = clé SMTP Brevo.
+# DEFAULT_FROM_EMAIL doit être un expéditeur validé dans Brevo (domaine djona.tech authentifié).
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = _config('EMAIL_HOST', default='') or 'smtp-relay.brevo.com'
+EMAIL_HOST_USER = _config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = _config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_PORT = _config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = _config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_TIMEOUT = _config('EMAIL_TIMEOUT', default=10, cast=int)  # sans délai, un SMTP lent bloquerait un worker
+DEFAULT_FROM_EMAIL = _config('DEFAULT_FROM_EMAIL', default='') or 'Djona <noreply@djona.tech>'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+# Envoi par l'API Brevo (HTTPS, sans SMTP) : prioritaire sur le SMTP dès que BREVO_API_KEY est défini.
+# L'expéditeur reste soumis à validation dans Brevo ; l'IP du serveur doit être autorisée (Sécurité > Adresses IP autorisées).
+BREVO_API_KEY = _config('BREVO_API_KEY', default='')
+if BREVO_API_KEY:
+    EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
+    ANYMAIL = {'BREVO_API_KEY': BREVO_API_KEY, 'REQUESTS_TIMEOUT': (5, 15)}

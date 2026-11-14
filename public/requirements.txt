@@ -4,3 +4,4 @@ gunicorn==23.0.0
 mysqlclient==2.2.7
 pillow==10.4.0
 python-decouple==3.8
+django-anymail==13.1

@@ -1,0 +1,80 @@
+{% extends 'app/layout/_auth_carte.html' %}
+
+{% block title %}Nouveau mot de passe — Djona Vendeur{% endblock %}
+
+{% block carte %}
+{% if validlink %}
+<div class="flex flex-col items-center text-center gap-3">
+    <span class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-[28px]">key</span>
+    </span>
+    <h1 class="font-headline-lg text-headline-lg text-primary">Nouveau mot de passe</h1>
+    <p class="text-on-surface-variant text-body-md">Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.</p>
+</div>
+
+<form class="flex flex-col gap-5" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="flex items-start gap-2.5 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-label-md font-medium" role="alert">
+        <span class="material-symbols-outlined text-[18px] shrink-0">error</span>
+        <span>{{ form.non_field_errors.0 }}</span>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-col gap-1.5">
+        <label class="font-label-md text-label-md text-on-surface" for="id_new_password1">Nouveau mot de passe</label>
+        <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px] pointer-events-none">lock</span>
+            <input autocomplete="new-password" autofocus class="w-full pl-11 pr-11 py-3.5 rounded-lg border {% if form.new_password1.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_new_password1" name="new_password1" placeholder="••••••••" required type="password">
+            <button aria-label="Afficher le mot de passe" class="absolute right-3.5 text-outline hover:text-on-surface-variant" data-toggle-password type="button">
+                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+            </button>
+        </div>
+        {% for error in form.new_password1.errors %}<p class="text-error text-label-sm" role="alert">{{ error }}</p>{% endfor %}
+        <div class="text-label-sm text-on-surface-variant [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-0.5">{{ form.new_password1.help_text|safe }}</div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+        <label class="font-label-md text-label-md text-on-surface" for="id_new_password2">Confirmer le mot de passe</label>
+        <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px] pointer-events-none">lock</span>
+            <input autocomplete="new-password" class="w-full pl-11 pr-4 py-3.5 rounded-lg border {% if form.new_password2.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_new_password2" name="new_password2" placeholder="••••••••" required type="password">
+        </div>
+        {% for error in form.new_password2.errors %}<p class="text-error text-label-sm" role="alert">{{ error }}</p>{% endfor %}
+    </div>
+
+    <button class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-2 group" type="submit">
+        Enregistrer le mot de passe
+        <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">check</span>
+    </button>
+</form>
+{% else %}
+<div class="flex flex-col items-center text-center gap-3">
+    <span class="w-14 h-14 rounded-full bg-error-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-error text-[28px]">link_off</span>
+    </span>
+    <h1 class="font-headline-lg text-headline-lg text-primary">Lien invalide ou expiré</h1>
+    <p class="text-on-surface-variant text-body-md">Ce lien de réinitialisation n'est plus valable : il a peut-être déjà été utilisé ou a expiré. Demandez-en un nouveau.</p>
+</div>
+<a class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:bg-primary-container transition-all text-center" href="{% url 'mot_de_passe_oublie' %}">Demander un nouveau lien</a>
+<a class="inline-flex items-center justify-center gap-1 text-label-md font-semibold text-primary hover:underline" href="{% url 'connexion_vendeur' %}">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Retour à la connexion
+</a>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('[data-toggle-password]').forEach(function (bouton) {
+        bouton.addEventListener('click', function () {
+            var input = document.getElementById('id_new_password1');
+            var icone = bouton.querySelector('.material-symbols-outlined');
+            var masque = input.type === 'password';
+            input.type = masque ? 'text' : 'password';
+            icone.textContent = masque ? 'visibility' : 'visibility_off';
+            bouton.setAttribute('aria-label', masque ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'app/layout/_auth_carte.html' %}
+
+{% block title %}Mot de passe oublié — Djona Vendeur{% endblock %}
+
+{% block carte %}
+<div class="flex flex-col items-center text-center gap-3">
+    <span class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-[28px]">lock_reset</span>
+    </span>
+    <h1 class="font-headline-lg text-headline-lg text-primary">Mot de passe oublié ?</h1>
+    <p class="text-on-surface-variant text-body-md">Saisissez l'adresse email de votre compte. Nous vous enverrons un lien pour choisir un nouveau mot de passe.</p>
+</div>
+
+<form class="flex flex-col gap-5" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="flex items-start gap-2.5 px-4 py-3 rounded-lg bg-error-container text-on-error-container text-label-md font-medium" role="alert">
+        <span class="material-symbols-outlined text-[18px] shrink-0">error</span>
+        <span>{{ form.non_field_errors.0 }}</span>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-col gap-1.5">
+        <label class="font-label-md text-label-md text-on-surface" for="id_email">Adresse email</label>
+        <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px] pointer-events-none">mail</span>
+            <input autocomplete="email" autofocus class="w-full pl-11 pr-4 py-3.5 rounded-lg border {% if form.email.errors %}border-error{% else %}border-outline-variant{% endif %} bg-surface-container focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" id="id_email" name="email" placeholder="nom@exemple.com" required type="email" value="{{ form.email.value|default:'' }}">
+        </div>
+        {% if form.email.errors %}<p class="text-error text-label-sm" role="alert">{{ form.email.errors.0 }}</p>{% endif %}
+    </div>
+
+    <button class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-2 group" type="submit">
+        Envoyer le lien
+        <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+    </button>
+</form>
+
+<a class="inline-flex items-center justify-center gap-1 text-label-md font-semibold text-primary hover:underline" href="{% url 'connexion_vendeur' %}">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Retour à la connexion
+</a>
+{% endblock %}

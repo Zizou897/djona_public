@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
+from django.core.exceptions import ValidationError
 
 from .models import DemandePassagePro, Profil, Utilisateur, telephone_validator
 
@@ -82,6 +83,37 @@ class ConnexionForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = forms.EmailInput()
         self.fields['username'].label = 'Adresse email'
+
+
+class MotDePasseOublieForm(PasswordResetForm):
+    """Demande de lien de réinitialisation par e-mail.
+
+    Django n'écrit qu'aux comptes actifs ayant un mot de passe utilisable, et journalise (sans lever)
+    un échec d'envoi : la réponse reste la même, que le compte existe ou non."""
+
+    email = forms.EmailField(
+        label='Adresse email', max_length=254,
+        error_messages={'invalid': 'Saisissez une adresse email valide.', 'required': 'Saisissez votre adresse email.'},
+        widget=forms.EmailInput(attrs={'autocomplete': 'email'}),
+    )
+
+
+class NouveauMotDePasseForm(SetPasswordForm):
+    """Choix du nouveau mot de passe. Les règles de robustesse s'affichent sous le champ du mot de passe
+    (Django les rattache par défaut au champ de confirmation) ; seule la différence entre les deux saisies
+    est signalée sous la confirmation."""
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1:
+            try:
+                password_validation.validate_password(password1, self.user)
+            except ValidationError as error:
+                self.add_error('new_password1', error)
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(self.error_messages['password_mismatch'], code='password_mismatch')
+        return password2
 
 
 class UtilisateurInfoForm(forms.Form):

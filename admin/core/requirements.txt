@@ -10,3 +10,4 @@ pillow==12.3.0
 sweetify
 django-after-response
 celery[redis]
+django-anymail==13.1

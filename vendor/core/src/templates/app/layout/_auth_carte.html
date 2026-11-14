@@ -1,0 +1,26 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+{% comment %}
+Mise en page « carte centrée » des pages de récupération de mot de passe.
+Les pages fille remplissent le bloc `carte`.
+{% endcomment %}
+
+{% block styles %}{% include 'app/includes/styles_auth.html' %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center px-5 py-10 bg-background font-body-md text-on-surface">
+    <a aria-label="Djona Group — retour à la connexion" class="mb-8 hover:opacity-90 transition-opacity" href="{% url 'connexion_vendeur' %}">
+        <img alt="Djona Group" width="40" height="40" class="sm:hidden h-14 w-14 rounded-md object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
+        <img alt="Djona Group" width="644" height="240" class="hidden sm:block h-14 w-auto object-contain" src="{% static 'app/assets/img/djona-group-logo.png' %}">
+    </a>
+
+    <main class="reveal w-full max-w-md bg-surface-container-lowest rounded-xl shadow-[0_4px_24px_rgba(0,59,90,0.08)] border border-outline-variant/40 p-6 sm:p-8 flex flex-col gap-6">
+        {% block carte %}{% endblock %}
+    </main>
+
+    <p class="mt-6 flex items-center justify-center gap-1.5 text-label-sm text-on-surface-variant">
+        <span class="material-symbols-outlined text-secondary text-[16px]">verified_user</span>
+        Espace vendeur Djona
+    </p>
+</div>
+{% endblock %}

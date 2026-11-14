@@ -1,0 +1,26 @@
+{% extends 'app/layout/_auth_carte.html' %}
+
+{% block title %}Vérifiez votre boîte mail — Djona Vendeur{% endblock %}
+
+{% block carte %}
+<div class="flex flex-col items-center text-center gap-3">
+    <span class="w-14 h-14 rounded-full bg-secondary-container/30 flex items-center justify-center">
+        <span class="material-symbols-outlined text-secondary text-[28px]">mark_email_read</span>
+    </span>
+    <h1 class="font-headline-lg text-headline-lg text-primary">Vérifiez votre boîte mail</h1>
+    <p class="text-on-surface-variant text-body-md">Si un compte existe pour cette adresse, un email contenant un lien de réinitialisation vient d'être envoyé. Ce lien est valable {{ validite }}.</p>
+</div>
+
+<ul class="flex flex-col gap-2.5 text-label-md text-on-surface-variant">
+    <li class="flex items-start gap-2.5"><span class="material-symbols-outlined text-primary text-[18px] shrink-0">folder_special</span>Pensez à regarder dans vos courriers indésirables.</li>
+    <li class="flex items-start gap-2.5"><span class="material-symbols-outlined text-primary text-[18px] shrink-0">schedule</span>L'email peut mettre quelques minutes à arriver.</li>
+</ul>
+
+<div class="flex flex-col gap-3">
+    <a class="w-full py-3.5 border border-primary text-primary font-label-md text-label-md rounded-lg hover:bg-primary/5 transition-colors text-center" href="{% url 'mot_de_passe_oublie' %}">Renvoyer un email</a>
+    <a class="inline-flex items-center justify-center gap-1 text-label-md font-semibold text-primary hover:underline" href="{% url 'connexion_vendeur' %}">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Retour à la connexion
+    </a>
+</div>
+{% endblock %}

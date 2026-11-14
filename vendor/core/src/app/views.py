@@ -1,19 +1,32 @@
+import hashlib
+import logging
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import (
+    LoginView, PasswordResetCompleteView, PasswordResetConfirmView, PasswordResetDoneView, PasswordResetView,
+)
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Count, Sum
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, TemplateView
 
 from annonces.forms import MIN_PHOTOS
 from annonces.models import Annonce
-from .forms import ConnexionForm, DemandePassageProForm, InscriptionForm, ProfilForm, UtilisateurInfoForm
+from .forms import (
+    ConnexionForm, DemandePassageProForm, InscriptionForm, MotDePasseOublieForm, NouveauMotDePasseForm, ProfilForm,
+    UtilisateurInfoForm,
+)
 from .models import DemandePassagePro, Profil, Utilisateur
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -47,6 +60,95 @@ class ConnexionView(LoginView):
     template_name = 'app/layout/connexion.html'
     authentication_form = ConnexionForm
     redirect_authenticated_user = True
+
+
+# ── Mot de passe oublié ───────────────────────────────────────────────────────
+# Limites par fenêtre d'une heure : 3 demandes par adresse e-mail (protège la boîte d'une personne
+# visée par du « mail bombing »), 30 par IP. Au-delà, la réponse reste identique mais rien n'est envoyé.
+RESET_EMAIL_LIMIT = 3
+RESET_IP_LIMIT = 30
+RESET_WINDOW = 60 * 60
+
+
+def _client_ip(request):
+    return request.META.get('HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR', '')
+
+
+def _validite_lien():
+    """Durée de validité du lien, lisible (« 1 heure », « 30 minutes »), d'après PASSWORD_RESET_TIMEOUT."""
+    minutes = max(settings.PASSWORD_RESET_TIMEOUT // 60, 1)
+    if minutes % 60 == 0:
+        heures = minutes // 60
+        return f"{heures} heure{'s' if heures > 1 else ''}"
+    return f'{minutes} minutes'
+
+
+def _within_limit(key, limit, window=RESET_WINDOW):
+    """Compte un appel pour `key` ; False si `limit` est dépassée dans la fenêtre."""
+    if cache.add(key, 1, window):
+        return limit >= 1
+    try:
+        return cache.incr(key) <= limit
+    except ValueError:  # clé expirée entre add() et incr()
+        cache.set(key, 1, window)
+        return limit >= 1
+
+
+class MotDePasseOublieView(PasswordResetView):
+    template_name = 'app/layout/mot_de_passe_oublie.html'
+    form_class = MotDePasseOublieForm
+    success_url = reverse_lazy('mot_de_passe_oublie_envoye')
+    email_template_name = 'app/emails/reinitialisation_mdp.txt'
+    html_email_template_name = 'app/emails/reinitialisation_mdp.html'
+    subject_template_name = 'app/emails/reinitialisation_mdp_sujet.txt'
+
+    @property
+    def extra_email_context(self):
+        return {'validite': _validite_lien()}
+
+    def _is_limited(self, email):
+        email_key = 'pwreset:email:' + hashlib.sha256(email.encode()).hexdigest()
+        limited = not _within_limit(email_key, RESET_EMAIL_LIMIT)
+        ip = _client_ip(self.request)
+        if ip and ip not in ('127.0.0.1', '::1'):  # derrière un proxy sans X-Real-IP : pas de compteur partagé
+            limited = not _within_limit('pwreset:ip:' + ip, RESET_IP_LIMIT) or limited
+        return limited
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email'].strip().lower()
+        if self._is_limited(email):
+            logger.warning('Mot de passe oublié : trop de demandes (limite atteinte)')
+        else:
+            form.save(
+                use_https=self.request.is_secure() or not settings.DEBUG,
+                token_generator=self.token_generator,
+                from_email=self.from_email,
+                email_template_name=self.email_template_name,
+                subject_template_name=self.subject_template_name,
+                request=self.request,
+                html_email_template_name=self.html_email_template_name,
+                extra_email_context=self.extra_email_context,
+                domain_override=settings.PASSWORD_RESET_DOMAIN or None,
+            )
+        # Même réponse dans tous les cas : on ne révèle pas si l'adresse correspond à un compte.
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class MotDePasseOublieEnvoyeView(PasswordResetDoneView):
+    template_name = 'app/layout/mot_de_passe_oublie_envoye.html'
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(validite=_validite_lien(), **kwargs)
+
+
+class NouveauMotDePasseView(PasswordResetConfirmView):
+    template_name = 'app/layout/mot_de_passe_nouveau.html'
+    form_class = NouveauMotDePasseForm
+    success_url = reverse_lazy('mot_de_passe_reinitialise')
+
+
+class MotDePasseReinitialiseView(PasswordResetCompleteView):
+    template_name = 'app/layout/mot_de_passe_reinitialise.html'
 
 
 class TableauDeBordVendeurView(LoginRequiredMixin, TemplateView):

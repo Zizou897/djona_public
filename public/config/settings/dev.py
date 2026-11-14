@@ -3,6 +3,8 @@ from decouple import config
 from .base import *  # noqa: F401,F403
 
 DEBUG = config('DEBUG', default=True, cast=bool)
+if not (EMAIL_HOST_USER or BREVO_API_KEY):  # noqa: F405 — développement sans identifiants Brevo : e-mails affichés dans la console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 DATABASES = {

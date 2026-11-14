@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def send_customize_email(subject: str, receivers: list, template: str, context: dict) -> bool:
     try:
         html_message = render_to_string(template, context)
-        send_mail(subject, '', settings.EMAIL_HOST_USER, receivers, html_message=html_message)
+        send_mail(subject, '', settings.DEFAULT_FROM_EMAIL, receivers, html_message=html_message)
         return True
     except Exception as e:
         logger.error(f"Email error: {e}")
