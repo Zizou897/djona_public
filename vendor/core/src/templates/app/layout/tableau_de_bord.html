@@ -14,9 +14,9 @@
     <!-- Compte en attente ou suspendu : pas de navigation, page d'état -->
     <header class="w-full border-b border-outline-variant/30 bg-surface-container-lowest">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <img alt="" width="40" height="40" class="h-9 w-9 rounded-sm object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
-                <img alt="Djona Group" width="644" height="240" class="h-6 w-auto object-contain translate-y-1" src="{% static 'app/assets/img/djona-group-logo.png' %}">
+            <div class="flex items-center">
+                <img alt="Djona Group" width="40" height="40" class="sm:hidden h-10 w-10 rounded-md object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
+                <img alt="Djona Group" width="644" height="240" class="hidden sm:block h-11 w-auto object-contain" src="{% static 'app/assets/img/djona-group-logo.png' %}">
             </div>
             <form action="{% url 'deconnexion_vendeur' %}" method="post">
                 {% csrf_token %}

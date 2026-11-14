@@ -11,8 +11,7 @@ Paramètre : page_active = dashboard | annonces | creer | prospects | equipe | p
 <header class="lg:hidden sticky top-0 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur">
     <div class="px-5 h-16 flex items-center justify-between">
         <a class="flex items-center gap-2" href="{% if ev.est_pro %}{% url 'espace_pro_dashboard' %}{% else %}{% url 'tableau_de_bord_vendeur' %}{% endif %}">
-            <img alt="" width="40" height="40" class="h-8 w-8 rounded-sm object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
-            <img alt="Djona Group" width="644" height="240" class="h-5 w-auto object-contain translate-y-0.5" src="{% static 'app/assets/img/djona-group-logo.png' %}">
+            <img alt="Djona Group" width="40" height="40" class="h-10 w-10 rounded-md object-cover" src="{% static 'app/assets/img/djona-logo.png' %}">
         </a>
         <div class="flex items-center gap-1">
             <a aria-label="Paramètres" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors {% if page_active == 'parametres' %}text-primary{% else %}text-on-surface-variant{% endif %}" href="{% url 'profil_vendeur' %}">
@@ -31,9 +30,8 @@ Paramètre : page_active = dashboard | annonces | creer | prospects | equipe | p
 <!-- Barre latérale desktop -->
 <aside class="hidden lg:flex fixed left-0 top-0 h-full w-64 flex-col gap-1 p-4 bg-primary text-on-primary z-50">
     <div class="flex flex-col gap-2 px-2 pt-2 pb-6 mb-2 border-b border-on-primary/10">
-        <div class="flex items-center gap-2.5">
-            <img alt="" width="40" height="40" class="h-9 w-9 rounded-sm object-cover ring-1 ring-white/20" src="{% static 'app/assets/img/djona-logo.png' %}">
-            <img alt="Djona Group" width="721" height="240" class="h-6 w-auto object-contain translate-y-1" src="{% static 'app/assets/img/djona-group-logo-white.png' %}">
+        <div class="flex items-center">
+            <img alt="Djona Group" width="721" height="240" class="h-12 w-auto object-contain" src="{% static 'app/assets/img/djona-group-logo-white.png' %}">
         </div>
         <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary-container">{% if ev.est_pro %}Espace professionnel{% else %}Espace vendeur{% endif %}</span>
     </div>
