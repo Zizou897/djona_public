@@ -3,7 +3,7 @@
 Navigation du back-office. À inclure en premier enfant du conteneur racine ;
 la colonne de contenu doit porter `lg:pl-64 lg:pt-16`.
 Paramètre : page_active = dashboard | annonces | vendeurs | demandes_pro | messages | transport | pieces_demandes | pieces_commandes | pieces | pieces_categories | pieces_import | pieces_zones | pieces_reglages
-            | partenaires | coordonnees | newsletter | profil
+            | partenaires | coordonnees | newsletter | temps_reel | profil
 Les compteurs « à traiter » (data-compteur) sont chargés après l'affichage via `compteurs_admin`.
 {% endcomment %}
 <style>@media (max-width: 1023px) { body { padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px)); } }</style>
@@ -29,6 +29,9 @@ Les compteurs « à traiter » (data-compteur) sont chargés après l'affichage 
         <div class="flex flex-col gap-0.5">
             <a {% if page_active == 'dashboard' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'dashboard' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'dashboard_admin' %}">
                 <span class="material-symbols-outlined text-[20px]">dashboard</span>Tableau de bord
+            </a>
+            <a {% if page_active == 'temps_reel' %}aria-current="page" {% endif %}class="{{ lien }} {% if page_active == 'temps_reel' %}{{ actif }}{% else %}{{ inactif }}{% endif %}" href="{% url 'live_dashboard' %}">
+                <span class="material-symbols-outlined text-[20px]">sensors</span>Temps réel
             </a>
         </div>
 

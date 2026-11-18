@@ -58,6 +58,7 @@ LOCAL_APPS = [
     'transport',
     'contactmessages',
     'parts',
+    'analytics_live',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -282,6 +283,23 @@ CELERY_TASK_SERIALIZER = 'json'
 PUBLIC_SYNC_PYTHON = config('PUBLIC_SYNC_PYTHON', default='')
 PUBLIC_SYNC_MANAGE_PY = config('PUBLIC_SYNC_MANAGE_PY', default='')
 PUBLIC_SYNC_SETTINGS = config('PUBLIC_SYNC_SETTINGS', default='config.settings.prod')
+
+# Alertes du suivi en temps réel (analytics_live, commande `check_alerts` lancée chaque minute).
+# Rien n'est envoyé tant qu'aucun canal n'est configuré. Seuils réglables sans toucher au code.
+ALERT_EMAILS = [e.strip() for e in config('ALERT_EMAILS', default='').split(',') if e.strip()]
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+ALERT_COOLDOWN_MINUTES = config('ALERT_COOLDOWN_MINUTES', default=60, cast=int)   # délai entre deux rappels d'un même incident
+ALERT_5XX_MIN_COUNT = config('ALERT_5XX_MIN_COUNT', default=10, cast=int)         # erreurs 5xx en 5 minutes
+ALERT_SLOW_P95_MS = config('ALERT_SLOW_P95_MS', default=3000, cast=int)           # p95 du temps de réponse sur 10 minutes
+ALERT_MIN_REQUESTS = config('ALERT_MIN_REQUESTS', default=20, cast=int)           # volume minimal pour juger la lenteur
+ALERT_TRAFFIC_DROP_PCT = config('ALERT_TRAFFIC_DROP_PCT', default=80, cast=int)   # baisse des pages vues (15 min vs heure précédente)
+ALERT_TRAFFIC_MIN_BASELINE = config('ALERT_TRAFFIC_MIN_BASELINE', default=20, cast=int)  # en dessous, trop peu de trafic pour juger
+ALERT_HEALTH_FAILURES = config('ALERT_HEALTH_FAILURES', default=2, cast=int)      # pings ratés consécutifs avant alerte
+# Pings de santé : « site=url » séparés par des virgules, ex. public=https://djona.tech/,vendor=https://vendeur.djona.tech/
+ALERT_HEALTH_URLS = dict(
+    pair.split('=', 1) for pair in config('ALERT_HEALTH_URLS', default='').replace(' ', '').split(',') if '=' in pair
+)
 
 # Jazzmin
 JAZZMIN_SETTINGS = {

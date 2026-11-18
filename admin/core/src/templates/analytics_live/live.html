@@ -1,0 +1,143 @@
+{% extends 'app/base/base.html' %}
+{% load static %}
+
+{% block title %}Temps réel — Back-office Djona{% endblock %}
+
+{% block styles %}
+{% include 'app/includes/styles_admin.html' %}
+<style>
+    @keyframes live-pulse { 0% { box-shadow: 0 0 0 0 rgba(26,127,55,.45); } 70% { box-shadow: 0 0 0 8px rgba(26,127,55,0); } 100% { box-shadow: 0 0 0 0 rgba(26,127,55,0); } }
+    .live-dot { animation: live-pulse 2s infinite; }
+    @keyframes feed-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+    .feed-new { animation: feed-in .35s ease-out; }
+    @media (prefers-reduced-motion: reduce) { .live-dot, .feed-new { animation: none; } }
+    .bar { transition: height .3s ease; }
+    .bar-col:hover .bar, .bar-col:focus-visible .bar { background-color: #1a5276; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+    {% include 'app/includes/navigation_admin.html' with page_active='temps_reel' %}
+
+    <div class="flex-1 flex flex-col min-w-0 lg:pl-64 lg:pt-16">
+        <main class="flex-1 max-w-6xl w-full mx-auto px-5 md:px-8 py-8 lg:py-10 flex flex-col gap-8" data-live data-site="{{ site }}" data-url-stats="{% url 'live_stats' %}" data-url-events="{% url 'live_events' %}">
+
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">Suivi du site</span>
+                    <h1 class="font-headline-lg font-bold text-2xl md:text-[28px] text-primary mt-1">Temps réel</h1>
+                    <p class="text-sm text-on-surface-variant mt-1 flex items-center gap-2">
+                        <span aria-hidden="true" class="live-dot inline-block w-2 h-2 rounded-full bg-[#1a7f37]" data-live-dot></span>
+                        <span data-live-status>Connexion…</span>
+                    </p>
+                </div>
+                <div class="inline-flex rounded-lg bg-surface-container p-1 self-start" role="tablist" aria-label="Site suivi">
+                    {% for s in sites %}
+                    <a {% if s.key == site %}aria-current="page" {% endif %}class="px-4 py-2 rounded-lg text-sm transition-colors {% if s.key == site %}bg-surface-container-lowest font-bold text-primary shadow-sm{% else %}font-medium text-on-surface-variant hover:text-on-surface{% endif %}" href="?site={{ s.key }}">{{ s.label }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="hidden rounded-xl bg-error-container text-on-error-container px-4 py-3 text-sm flex items-start gap-3" data-live-unavailable role="alert">
+                <span class="material-symbols-outlined text-[20px]">error</span>
+                <span>Les statistiques de ce site sont indisponibles : la base du site est injoignable, ou le suivi n'est pas encore activé sur ce site (migration et clé <code>ANALYTICS_SITE_KEY</code>).</span>
+            </div>
+
+            <!-- Indicateurs -->
+            <section aria-label="Indicateurs" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+                <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-[#1a7f37]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#1a7f37] text-[22px]">sensors</span></span>
+                    <div><p class="text-2xl font-bold leading-none" data-kpi="online">—</p><p class="text-xs text-on-surface-variant mt-1.5">Visiteurs en ligne</p></div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">visibility</span></span>
+                    <div><p class="text-2xl font-bold leading-none" data-kpi="pageviews_today">—</p><p class="text-xs text-on-surface-variant mt-1.5">Pages vues aujourd'hui · <span data-kpi="visitors_today">—</span> visiteurs</p></div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-secondary-container/20 flex items-center justify-center"><span class="material-symbols-outlined text-secondary text-[22px]">bolt</span></span>
+                    <div><p class="text-2xl font-bold leading-none" data-kpi="actions_today">—</p><p class="text-xs text-on-surface-variant mt-1.5">Actions aujourd'hui</p></div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3" data-health-card>
+                    <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center" data-health-icon-wrap><span class="material-symbols-outlined text-primary text-[22px]" data-health-icon>check_circle</span></span>
+                    <div><p class="text-2xl font-bold leading-none"><span data-kpi="errors_5xx">—</span> <span class="text-sm font-semibold" data-kpi="rate_5xx"></span></p><p class="text-xs text-on-surface-variant mt-1.5">Erreurs serveur (15 min)</p></div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3 col-span-2 md:col-span-1">
+                    <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[22px]">speed</span></span>
+                    <div><p class="text-2xl font-bold leading-none"><span data-kpi="avg_ms">—</span><span class="text-sm font-semibold"> ms</span></p><p class="text-xs text-on-surface-variant mt-1.5">Temps moyen · p95 <span data-kpi="p95_ms">—</span> ms</p></div>
+                </div>
+            </section>
+
+            <!-- Pages vues par minute -->
+            <section aria-labelledby="titre-graphe" class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+                <div class="flex items-baseline justify-between gap-3">
+                    <h2 class="text-sm font-semibold" id="titre-graphe">Pages vues par minute</h2>
+                    <span class="text-xs text-on-surface-variant">30 dernières minutes</span>
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex flex-col justify-between text-[11px] text-on-surface-variant text-right w-8 pb-5" aria-hidden="true">
+                        <span data-axis="max">0</span><span data-axis="mid">0</span><span>0</span>
+                    </div>
+                    <div class="relative flex-1 min-w-0">
+                        <div class="absolute inset-x-0 top-0 bottom-5 flex flex-col justify-between pointer-events-none" aria-hidden="true">
+                            <div class="border-t border-outline-variant/40"></div><div class="border-t border-outline-variant/40"></div><div class="border-t border-outline-variant"></div>
+                        </div>
+                        <div class="relative flex items-end gap-[2px] h-40 pb-5" data-chart role="img" aria-label="Pages vues par minute sur les 30 dernières minutes"></div>
+                        <div class="hidden absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-on-surface text-surface-container-lowest text-xs px-2.5 py-1.5 shadow-lg whitespace-nowrap pointer-events-none" data-tooltip></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[11px] text-on-surface-variant pl-11" aria-hidden="true"><span data-chart-start></span><span data-chart-end></span></div>
+                <details class="text-sm">
+                    <summary class="cursor-pointer text-on-surface-variant hover:text-on-surface">Voir en tableau</summary>
+                    <div class="mt-3 max-h-56 overflow-auto"><table class="w-full text-left text-sm"><thead class="text-xs text-on-surface-variant"><tr><th class="py-1 pr-4 font-medium">Minute</th><th class="py-1 font-medium">Pages vues</th></tr></thead><tbody data-chart-table></tbody></table></div>
+                </details>
+            </section>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Flux en direct -->
+                <section aria-labelledby="titre-flux" class="lg:col-span-2 bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                    <h2 class="text-sm font-semibold" id="titre-flux">Flux en direct</h2>
+                    <p class="text-sm text-on-surface-variant" data-feed-empty>Aucun événement pour l'instant.</p>
+                    <ul class="flex flex-col divide-y divide-outline-variant/30 max-h-[28rem] overflow-y-auto" data-feed></ul>
+                </section>
+
+                <div class="flex flex-col gap-6">
+                    <section aria-labelledby="titre-actions" class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                        <h2 class="text-sm font-semibold" id="titre-actions">Actions du jour</h2>
+                        <ul class="flex flex-col gap-2.5" data-list="actions"></ul>
+                    </section>
+                    <section aria-labelledby="titre-erreurs" class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                        <h2 class="text-sm font-semibold" id="titre-erreurs">Erreurs (15 min)</h2>
+                        <dl class="grid grid-cols-2 gap-3 text-sm">
+                            <div><dt class="text-xs text-on-surface-variant">4xx (client)</dt><dd class="font-bold text-lg"><span data-kpi="errors_4xx">—</span> <span class="text-xs font-semibold text-on-surface-variant" data-kpi="rate_4xx"></span></dd></div>
+                            <div><dt class="text-xs text-on-surface-variant">5xx (serveur)</dt><dd class="font-bold text-lg"><span data-kpi="errors_5xx_b">—</span> <span class="text-xs font-semibold text-on-surface-variant" data-kpi="rate_5xx_b"></span></dd></div>
+                            <div class="col-span-2"><dt class="text-xs text-on-surface-variant">Requêtes mesurées</dt><dd class="font-bold text-lg" data-kpi="requests">—</dd></div>
+                        </dl>
+                    </section>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <section aria-labelledby="titre-pages" class="md:col-span-2 bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                    <h2 class="text-sm font-semibold" id="titre-pages">Pages les plus vues aujourd'hui</h2>
+                    <ul class="flex flex-col gap-2.5" data-list="top_pages"></ul>
+                </section>
+                <div class="flex flex-col gap-6">
+                    <section aria-labelledby="titre-appareils" class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                        <h2 class="text-sm font-semibold" id="titre-appareils">Appareils</h2>
+                        <ul class="flex flex-col gap-2.5" data-list="devices"></ul>
+                    </section>
+                    <section aria-labelledby="titre-pays" class="hidden bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3" data-countries-card>
+                        <h2 class="text-sm font-semibold" id="titre-pays">Pays</h2>
+                        <ul class="flex flex-col gap-2.5" data-list="countries"></ul>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'app/assets/js/temps_reel.js' %}"></script>
+{% endblock %}
