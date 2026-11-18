@@ -1,0 +1,71 @@
+{% extends 'emails/_layout.html' %}
+{% comment %}
+Notification interne (équipe Djona) : nouvelle demande, commande, message.
+Contexte : eyebrow, title, reference, rows [(libellé, valeur)], lines [{name, reference, quantity, unit_price, total}],
+totals [(libellé, valeur)], message, cta_label, cta_url.
+{% endcomment %}
+
+{% block preheader %}{{ title }}{% if reference %} {{ reference }}{% endif %}{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 6px 0;font-size:12px;line-height:16px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#b84e08;">{{ eyebrow }}</p>
+<h1 style="margin:0 0 14px 0;font-size:24px;line-height:30px;color:#0c4b70;">{{ title }}</h1>
+{% if reference %}
+<p style="margin:0 0 24px 0;"><span style="display:inline-block;background:#e6f0f6;color:#0c4b70;font-size:14px;font-weight:bold;letter-spacing:0.4px;padding:6px 12px;border-radius:6px;">{{ reference }}</span></p>
+{% endif %}
+
+{% if rows %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;background:#f4f6f7;border-radius:8px;">
+  {% for label, value in rows %}
+  <tr>
+    <td valign="top" width="34%" style="padding:10px 0 10px 16px;{% if not forloop.last %}border-bottom:1px solid #e3e7ea;{% endif %}font-size:14px;line-height:21px;color:#5b636a;">{{ label }}</td>
+    <td valign="top" style="padding:10px 16px 10px 8px;{% if not forloop.last %}border-bottom:1px solid #e3e7ea;{% endif %}font-size:15px;line-height:21px;font-weight:bold;color:#191c1c;">{{ value }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if lines %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px 0;">
+  <tr>
+    <td style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;">Pièce</td>
+    <td align="center" style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;" width="48">Qté</td>
+    <td align="right" style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;" width="120">Prix</td>
+  </tr>
+  {% for line in lines %}
+  <tr>
+    <td valign="top" style="padding:12px 8px 12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;line-height:21px;color:#191c1c;"><strong>{{ line.name }}</strong><br><span style="font-size:13px;color:#5b636a;">Réf. {{ line.reference }}</span></td>
+    <td valign="top" align="center" style="padding:12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;color:#191c1c;">{{ line.quantity }}</td>
+    <td valign="top" align="right" style="padding:12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;color:#191c1c;white-space:nowrap;">{% if line.unit_price is not None %}{{ line.unit_price }} FCFA{% else %}<span style="color:#5b636a;">Sur demande</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if totals %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
+  {% for label, value in totals %}
+  <tr>
+    <td align="right" style="padding:6px 12px 0 0;font-size:14px;color:#5b636a;">{{ label }}</td>
+    <td align="right" width="150" style="padding:6px 0 0 0;font-size:16px;font-weight:bold;color:#0c4b70;white-space:nowrap;">{{ value }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if message %}
+<p style="margin:0 0 6px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;">{{ message_label|default:"Message" }}</p>
+<div style="margin:0 0 24px 0;padding:14px 16px;background:#f4f6f7;border-radius:8px;font-size:15px;line-height:23px;color:#191c1c;">{{ message|linebreaksbr }}</div>
+{% endif %}
+
+{% if cta_url %}
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 0 0;">
+  <tr>
+    <td style="background:#b84e08;border-radius:8px;"><a href="{{ cta_url }}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">{{ cta_label }}</a></td>
+  </tr>
+</table>
+{% endif %}
+{% endblock %}
+
+{% block footer %}Notification automatique de la marketplace Djona.<br>
+<a href="{{ site_url }}/" style="color:#0c4b70;text-decoration:underline;">djona.tech</a>{% endblock %}

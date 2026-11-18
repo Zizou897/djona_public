@@ -1,15 +1,18 @@
 from django.conf import settings
 from django.contrib import messages
 from django.core.cache import cache
-from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import formats
 from django.views.decorators.http import require_POST
 
 from apps.core.views import _client_ip
 
 from . import cart as cart_service
 from .forms import PartOrderForm, PartTrackingForm
+from apps.core.emails import admin_url, send_branded_email
+
 from .models import DeliveryZone, Part, PartOrder, PartsSettings
 
 NL = chr(10)
@@ -84,6 +87,10 @@ def _notify_order(order):
                     + (f' — {line.unit_price} FCFA' if line.unit_price is not None else ' — prix sur demande')
                     for line in order.lines.all())
     recipients = getattr(settings, 'PARTS_NOTIFY_EMAILS', [])
+    lines_ctx = [
+        {'name': line.name, 'reference': line.reference, 'quantity': line.quantity, 'unit_price': line.unit_price}
+        for line in order.lines.all()
+    ]
     try:
         if recipients:
             body = NL.join([
@@ -96,7 +103,25 @@ def _notify_order(order):
                 f'Sous-total : {order.subtotal} FCFA' + (' (+ pièces sur devis)' if order.has_unpriced_items else ''),
                 f'Instructions : {order.instructions or "—"}',
             ])
-            send_mail(f'Nouvelle commande de pièces {order.reference}', body, None, recipients, fail_silently=True)
+            reception = order.get_reception_display()
+            if order.reception == PartOrder.Reception.DELIVERY:
+                reception += f' — {order.zone_name}, {order.delivery_address}'
+            send_branded_email(
+                f'Nouvelle commande de pièces {order.reference}', body, 'emails/notification.html',
+                {
+                    'eyebrow': 'Djona Parts', 'title': 'Nouvelle commande de pièces', 'reference': order.reference,
+                    'rows': [
+                        ('Client', order.full_name + (f' ({order.company_name})' if order.company_name else '')),
+                        ('Téléphone', order.phone), ('Email', order.email or '—'), ('Réception', reception),
+                    ],
+                    'lines': lines_ctx,
+                    'totals': [('Sous-total' + (' (+ pièces sur devis)' if order.has_unpriced_items else ''),
+                                f"{formats.number_format(order.subtotal, force_grouping=True)} FCFA")],
+                    'message_label': 'Instructions du client', 'message': order.instructions,
+                    'cta_label': 'Ouvrir la commande', 'cta_url': admin_url(f'/pieces/commandes/{order.pk}/'),
+                },
+                recipients,
+            )
         if order.email:
             body = NL.join([
                 f'Bonjour {order.full_name},', '',
@@ -105,7 +130,14 @@ def _notify_order(order):
                 '', lines, '', 'Vous pouvez suivre votre commande avec son numéro et votre téléphone sur djona.tech/pieces-detachees/suivi/.',
                 '', 'Djona Parts',
             ])
-            send_mail(f'Votre commande {order.reference} — Djona Parts', body, None, [order.email], fail_silently=True)
+            send_branded_email(
+                f'Votre commande {order.reference} — Djona Parts', body, 'emails/order_confirmation.html',
+                {
+                    'order': order, 'lines': lines_ctx, 'parts_settings': PartsSettings.load(),
+                    'track_url': settings.SITE_URL + reverse('parts:track'),
+                },
+                [order.email],
+            )
     except Exception:
         pass
 

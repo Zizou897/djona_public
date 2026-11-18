@@ -114,6 +114,10 @@ from decouple import config as _config  # noqa: E402
 
 TRANSPORT_NOTIFY_EMAILS = [e.strip() for e in _config('TRANSPORT_NOTIFY_EMAILS', default='').split(',') if e.strip()]
 
+# URLs absolues utilisées dans les e-mails (logo, boutons) — le front et le back-office.
+SITE_URL = _config('SITE_URL', default='https://djona.tech').rstrip('/')
+ADMIN_SITE_URL = _config('ADMIN_SITE_URL', default='https://admin.djona.tech').rstrip('/')
+
 # Destinataires des notifications email de nouveau message de contact. Vide = pas d'email.
 PARTS_NOTIFY_EMAILS = [e.strip() for e in _config('PARTS_NOTIFY_EMAILS', default='').split(',') if e.strip()]
 CONTACT_NOTIFY_EMAILS = [e.strip() for e in _config('CONTACT_NOTIFY_EMAILS', default='').split(',') if e.strip()]

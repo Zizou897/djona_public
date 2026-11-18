@@ -1,0 +1,40 @@
+{% load static %}{% comment %}
+Cadre commun des e-mails Djona (public). HTML « e-mail » : tableaux, styles en ligne, 600 px max,
+sans dépendance à une police web. Les gabarits fille remplissent `preheader` et `content`.
+{% endcomment %}<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#eef1f3;font-family:Helvetica,Arial,sans-serif;color:#191c1c;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">{% block preheader %}{% endblock %}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f3;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+          <tr>
+            <td style="background:#0c4b70;padding:24px 32px;border-radius:12px 12px 0 0;border-bottom:4px solid #ec6f1d;">
+              <a href="{{ site_url }}/" style="text-decoration:none;"><img src="{{ site_url }}{% static 'img/djona-group-logo-white.png' %}" width="150" alt="Djona Group" style="display:block;border:0;height:auto;color:#ffffff;font-size:18px;font-weight:bold;"></a>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#ffffff;padding:32px;border-radius:0 0 12px 12px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;color:#191c1c;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:20px 32px 8px 32px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#5b636a;">
+              {% block footer %}Djona — la marketplace automobile de confiance en Côte d'Ivoire.<br>
+              <a href="{{ site_url }}/" style="color:#0c4b70;text-decoration:underline;">djona.tech</a>{% endblock %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

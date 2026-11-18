@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.core.cache import cache
-from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q, Value
 from django.db.models.functions import Concat, Replace, Upper
@@ -11,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from apps.catalog.models import Vehicle
+from apps.core.emails import admin_url, send_branded_email
 from apps.core.views import _client_ip
 
 from .forms import PartInterestForm, PartRequestForm
@@ -214,8 +214,21 @@ def _notify_part_request(part_request):
         '',
         f'Message : {part_request.description or "—"}',
     ])
+    vehicle = ' '.join(str(v) for v in (part_request.make, part_request.model, part_request.year) if v) or 'Non précisé'
+    if part_request.engine:
+        vehicle += f' — {part_request.engine}'
+    part = part_request.part_name + (f' (réf. {part_request.part_reference})' if part_request.part_reference else '')
     try:
-        send_mail(f'{title} {part_request.reference}', body, None, recipients, fail_silently=True)
+        send_branded_email(
+            f'{title} {part_request.reference}', body, 'emails/notification.html',
+            {
+                'eyebrow': 'Djona Parts', 'title': title, 'reference': part_request.reference,
+                'rows': [('Client', part_request.full_name), ('Téléphone', part_request.phone), ('Véhicule', vehicle), ('Pièce', part)],
+                'message': part_request.description,
+                'cta_label': 'Ouvrir dans le back-office', 'cta_url': admin_url(f'/pieces/demandes/{part_request.pk}/'),
+            },
+            recipients,
+        )
     except Exception:
         pass
 

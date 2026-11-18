@@ -3,12 +3,13 @@ from datetime import date
 from django.contrib import messages
 from django.core.cache import cache
 from django.conf import settings
-from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.catalog.models import Vehicle
+
+from .emails import admin_url, send_branded_email
 
 from .forms import ContactMessageForm, NewsletterForm, QuestionForm, TransportRequestForm
 from .models import ContactMessage, NewsletterSubscriber, SiteContact, TransportRequest
@@ -239,9 +240,19 @@ def _notify_contact_message(contact_message):
         contact_message.message,
     ])
     try:
-        send_mail(
+        send_branded_email(
             f'Contact Djona : {contact_message.get_subject_display()} — {contact_message.full_name or "Visiteur"}',
-            body, None, recipients, fail_silently=True,
+            body, 'emails/notification.html',
+            {
+                'eyebrow': 'Contact', 'title': 'Nouveau message de contact',
+                'rows': [
+                    ('Sujet', contact_message.get_subject_display()), ('Nom', contact_message.full_name or 'Visiteur'),
+                    ('Téléphone', contact_message.phone), ('Email', contact_message.email or '—'),
+                ],
+                'message': contact_message.message,
+                'cta_label': 'Ouvrir dans le back-office', 'cta_url': admin_url(f'/messages/{contact_message.pk}/'),
+            },
+            recipients,
         )
     except Exception:
         pass
@@ -387,9 +398,21 @@ def _notify_transport_request(transport_request):
         f'Message : {transport_request.message or "—"}',
     ])
     try:
-        send_mail(
-            f'Nouvelle demande de transport {transport_request.reference}',
-            body, None, recipients, fail_silently=True,
+        send_branded_email(
+            f'Nouvelle demande de transport {transport_request.reference}', body, 'emails/notification.html',
+            {
+                'eyebrow': 'Transport & Logistique', 'title': 'Nouvelle demande de transport',
+                'reference': transport_request.reference,
+                'rows': [
+                    ('Demandeur', who), ('Téléphone', transport_request.phone), ('Email', transport_request.email or '—'),
+                    ('Véhicule', f'{transport_request.quantity} x {transport_request.vehicle_type}'),
+                    ('Chargement', f'{transport_request.loading_place} le {transport_request.loading_date:%d/%m/%Y}'),
+                    ('Livraison', transport_request.delivery_place),
+                ],
+                'message': transport_request.message,
+                'cta_label': 'Ouvrir dans le back-office', 'cta_url': admin_url('/transport/'),
+            },
+            recipients,
         )
     except Exception:
         pass

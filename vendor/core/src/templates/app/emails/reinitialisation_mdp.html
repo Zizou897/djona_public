@@ -1,36 +1,51 @@
 {% load static %}<!DOCTYPE html>
 <html lang="fr">
-<body style="margin:0;padding:0;background:#f8f9f9;font-family:Arial,Helvetica,sans-serif;color:#191c1c;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9f9;padding:32px 16px;">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>Réinitialisation de votre mot de passe Djona</title>
+</head>
+<body style="margin:0;padding:0;background:#eef1f3;font-family:Helvetica,Arial,sans-serif;color:#191c1c;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Choisissez un nouveau mot de passe pour votre compte vendeur Djona. Ce lien est valable {{ validite }}.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f3;">
     <tr>
-      <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border:1px solid #dfe3e6;border-radius:12px;">
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
           <tr>
-            <td style="padding:28px 28px 8px 28px;">
-              <img src="{{ protocol }}://{{ domain }}{% static 'app/assets/img/djona-group-logo.png' %}" alt="Djona Group" width="120" style="display:block;height:auto;border:0;">
+            <td style="background:#0c4b70;padding:24px 32px;border-radius:12px 12px 0 0;border-bottom:4px solid #ec6f1d;">
+              <img src="{{ protocol }}://{{ domain }}{% static 'app/assets/img/djona-group-logo-white.png' %}" width="150" alt="Djona Group" style="display:block;border:0;height:auto;color:#ffffff;font-size:18px;font-weight:bold;">
             </td>
           </tr>
           <tr>
-            <td style="padding:12px 28px 0 28px;">
-              <h1 style="margin:0 0 12px 0;font-size:20px;line-height:26px;color:#003b5a;">Réinitialisation de votre mot de passe</h1>
-              <p style="margin:0 0 12px 0;font-size:14px;line-height:21px;">Bonjour {{ user.prenom }},</p>
-              <p style="margin:0 0 20px 0;font-size:14px;line-height:21px;">Vous avez demandé à réinitialiser le mot de passe de votre compte vendeur Djona (<strong>{{ email }}</strong>). Cliquez sur le bouton ci-dessous pour en choisir un nouveau. Ce lien est valable {{ validite }}.</p>
+            <td style="background:#ffffff;padding:32px;border-radius:0 0 12px 12px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;color:#191c1c;">
+              <p style="margin:0 0 6px 0;font-size:12px;line-height:16px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#b84e08;">Espace vendeur</p>
+              <h1 style="margin:0 0 20px 0;font-size:24px;line-height:30px;color:#0c4b70;">Réinitialisation de votre mot de passe</h1>
+              <p style="margin:0 0 12px 0;">Bonjour {{ user.prenom }},</p>
+              <p style="margin:0 0 24px 0;">Vous avez demandé à réinitialiser le mot de passe de votre compte vendeur Djona (<strong>{{ email }}</strong>). Cliquez sur le bouton ci-dessous pour en choisir un nouveau.</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
+                <tr>
+                  <td style="background:#b84e08;border-radius:8px;"><a href="{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">Choisir un nouveau mot de passe</a></td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;background:#f4f6f7;border-radius:8px;">
+                <tr>
+                  <td style="padding:12px 16px;font-size:14px;line-height:21px;color:#191c1c;">Ce lien est valable <strong>{{ validite }}</strong> et ne peut être utilisé qu'<strong>une seule fois</strong>.</td>
+                </tr>
+              </table>
+              <p style="margin:0 0 6px 0;font-size:13px;line-height:19px;color:#5b636a;">Le bouton ne fonctionne pas ? Copiez ce lien dans votre navigateur :</p>
+              <p style="margin:0 0 24px 0;font-size:13px;line-height:19px;word-break:break-all;"><a href="{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}" style="color:#0c4b70;">{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}</a></p>
+              <p style="margin:0;font-size:14px;line-height:21px;color:#5b636a;">Si vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message : votre mot de passe actuel reste inchangé.</p>
             </td>
           </tr>
           <tr>
-            <td align="center" style="padding:0 28px 24px 28px;">
-              <a href="{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}" style="display:inline-block;background:#003b5a;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;padding:14px 28px;border-radius:8px;">Choisir un nouveau mot de passe</a>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:0 28px 8px 28px;">
-              <p style="margin:0 0 8px 0;font-size:13px;line-height:19px;color:#41474e;">Le bouton ne fonctionne pas ? Copiez ce lien dans votre navigateur :</p>
-              <p style="margin:0 0 20px 0;font-size:13px;line-height:19px;word-break:break-all;"><a href="{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}" style="color:#003b5a;">{{ protocol }}://{{ domain }}{% url 'mot_de_passe_reinitialisation' uidb64=uid token=token %}</a></p>
-              <p style="margin:0 0 28px 0;font-size:13px;line-height:19px;color:#41474e;">Si vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message : votre mot de passe actuel reste inchangé.</p>
+            <td align="center" style="padding:20px 32px 8px 32px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:#5b636a;">
+              Djona — l'équipe vendeurs<br>
+              <a href="https://djona.tech/" style="color:#0c4b70;text-decoration:underline;">djona.tech</a>
             </td>
           </tr>
         </table>
-        <p style="margin:16px 0 0 0;font-size:12px;color:#72787f;">Djona — l'équipe vendeurs</p>
       </td>
     </tr>
   </table>

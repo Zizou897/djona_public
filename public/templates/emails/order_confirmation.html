@@ -1,0 +1,68 @@
+{% extends 'emails/_layout.html' %}
+{% comment %}
+Accusé de réception envoyé au client après sa commande de pièces. Contexte : order, lines, track_url,
+parts_settings (conditions de retrait / paiement saisies par l'équipe, affichées seulement si renseignées).
+Aucune promesse n'est faite : la commande n'est pas confirmée tant que l'équipe n'a pas vérifié disponibilité, prix et frais.
+{% endcomment %}
+
+{% block preheader %}Nous avons bien reçu votre commande {{ order.reference }}.{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 6px 0;font-size:12px;line-height:16px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#b84e08;">Djona Parts</p>
+<h1 style="margin:0 0 14px 0;font-size:24px;line-height:30px;color:#0c4b70;">Nous avons bien reçu votre commande</h1>
+<p style="margin:0 0 24px 0;"><span style="display:inline-block;background:#e6f0f6;color:#0c4b70;font-size:14px;font-weight:bold;letter-spacing:0.4px;padding:6px 12px;border-radius:6px;">{{ order.reference }}</span></p>
+
+<p style="margin:0 0 12px 0;">Bonjour {{ order.full_name }},</p>
+<p style="margin:0 0 24px 0;">Merci pour votre commande sur Djona Parts. Elle <strong>n'est pas encore confirmée</strong> : notre équipe vérifie la disponibilité, le prix et les frais, puis vous recontacte.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px 0;">
+  <tr>
+    <td style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;">Votre commande</td>
+    <td align="center" width="48" style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;">Qté</td>
+    <td align="right" width="120" style="padding:0 0 8px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;border-bottom:2px solid #0c4b70;">Prix</td>
+  </tr>
+  {% for line in lines %}
+  <tr>
+    <td valign="top" style="padding:12px 8px 12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;line-height:21px;color:#191c1c;"><strong>{{ line.name }}</strong><br><span style="font-size:13px;color:#5b636a;">Réf. {{ line.reference }}</span></td>
+    <td valign="top" align="center" style="padding:12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;color:#191c1c;">{{ line.quantity }}</td>
+    <td valign="top" align="right" style="padding:12px 0;border-bottom:1px solid #e3e7ea;font-size:15px;color:#191c1c;white-space:nowrap;">{% if line.unit_price is not None %}{{ line.unit_price }} FCFA{% else %}<span style="color:#5b636a;">Sur demande</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
+  <tr>
+    <td align="right" style="padding:6px 12px 0 0;font-size:14px;color:#5b636a;">Sous-total{% if order.has_unpriced_items %} (hors pièces sur devis){% endif %}</td>
+    <td align="right" width="150" style="padding:6px 0 0 0;font-size:16px;font-weight:bold;color:#0c4b70;white-space:nowrap;">{{ order.subtotal }} FCFA</td>
+  </tr>
+  {% if order.reception != 'retrait' %}
+  <tr>
+    <td align="right" style="padding:6px 12px 0 0;font-size:14px;color:#5b636a;">Frais de livraison</td>
+    <td align="right" width="150" style="padding:6px 0 0 0;font-size:15px;color:#191c1c;white-space:nowrap;">{% if order.delivery_fee is not None %}{{ order.delivery_fee }} FCFA{% else %}À confirmer{% endif %}</td>
+  </tr>
+  {% endif %}
+</table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;background:#f4f6f7;border-radius:8px;">
+  <tr>
+    <td valign="top" width="34%" style="padding:12px 0 12px 16px;font-size:14px;line-height:21px;color:#5b636a;">Réception</td>
+    <td valign="top" style="padding:12px 16px 12px 8px;font-size:15px;line-height:21px;font-weight:bold;color:#191c1c;">{{ order.get_reception_display }}{% if order.reception == 'livraison' %}<br><span style="font-weight:normal;">{{ order.zone_name }}{% if order.delivery_address %} — {{ order.delivery_address }}{% endif %}</span>{% endif %}</td>
+  </tr>
+</table>
+
+{% if parts_settings.pickup_instructions and order.reception == 'retrait' %}
+<p style="margin:0 0 6px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;">Lieu et conditions de retrait</p>
+<div style="margin:0 0 24px 0;padding:14px 16px;background:#f4f6f7;border-radius:8px;">{{ parts_settings.pickup_instructions|linebreaksbr }}</div>
+{% endif %}
+{% if parts_settings.payment_terms %}
+<p style="margin:0 0 6px 0;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#5b636a;">Modalités de paiement</p>
+<div style="margin:0 0 24px 0;padding:14px 16px;background:#f4f6f7;border-radius:8px;">{{ parts_settings.payment_terms|linebreaksbr }}</div>
+{% endif %}
+
+<p style="margin:0 0 16px 0;">Vous pouvez suivre votre commande avec son numéro et votre numéro de téléphone.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 8px 0;">
+  <tr>
+    <td style="background:#b84e08;border-radius:8px;"><a href="{{ track_url }}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">Suivre ma commande</a></td>
+  </tr>
+</table>
+{% endblock %}
