@@ -54,11 +54,13 @@ LOCAL_APPS = [
     'app',
     'annonces',
     'pro',
+    'analytics',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    'analytics.middleware.AnalyticsMiddleware',  # premier : mesure toute la pile (inactif sans ANALYTICS_SITE_KEY)
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -83,6 +85,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'app.context_processors.espace_vendeur',
+                'analytics.context_processors.analytics',
             ],
         },
     },
@@ -205,6 +208,15 @@ CELERY_TASK_SERIALIZER = 'json'
 PUBLIC_SYNC_PYTHON = config('PUBLIC_SYNC_PYTHON', default='')
 PUBLIC_SYNC_MANAGE_PY = config('PUBLIC_SYNC_MANAGE_PY', default='')
 PUBLIC_SYNC_SETTINGS = config('PUBLIC_SYNC_SETTINGS', default='config.settings.prod')
+
+# Suivi du trafic en temps réel (app `analytics`), affiché dans le back-office. « Fermé par défaut » : sans clé de site,
+# ni le middleware, ni le script, ni le point de collecte ne sont actifs. Générer une clé :
+#   python -c "import secrets; print(secrets.token_urlsafe(24))"
+ANALYTICS_SITE_KEY = config('ANALYTICS_SITE_KEY', default='')
+ANALYTICS_SITE_NAME = 'vendor'
+ANALYTICS_RETENTION_DAYS = config('ANALYTICS_RETENTION_DAYS', default=90, cast=int)
+# True : écriture par lot dans un fil d'arrière-plan (production). False : écriture immédiate (tests).
+ANALYTICS_ASYNC = True
 
 # Jazzmin
 JAZZMIN_SETTINGS = {

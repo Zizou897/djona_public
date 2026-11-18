@@ -17,6 +17,7 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
     </style>
     {% block styles %}{% endblock %}
+    {% if analytics_site_key %}<script src="{% static 'app/assets/js/analytics.js' %}" data-site-key="{{ analytics_site_key }}" data-endpoint="{% url 'analytics:collect' %}" defer></script>{% endif %}
 </head>
 <body>
     {% if messages %}
