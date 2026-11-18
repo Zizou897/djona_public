@@ -1,0 +1,8 @@
+[Unit]
+Description=Djona - verification des alertes du suivi en temps reel
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/var/www/project/djona_public/admin/core/src
+ExecStart=/var/www/project/djona_public/admin/core/venv/bin/python manage.py check_alerts

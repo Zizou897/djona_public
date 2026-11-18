@@ -1,0 +1,9 @@
+[Unit]
+Description=Djona - agregation et purge des evenements de suivi (public et vendor)
+
+[Service]
+Type=oneshot
+User=www-data
+# Chaque projet possede sa propre table d'evenements : on purge les deux.
+ExecStart=/var/www/project/djona_public/public/venv/bin/python /var/www/project/djona_public/public/manage.py purge_events --settings=config.settings.prod
+ExecStart=/var/www/project/djona_public/vendor/core/venv/bin/python /var/www/project/djona_public/vendor/core/src/manage.py purge_events
