@@ -30,11 +30,13 @@ LOCAL_APPS = [
     'apps.catalog',
     'apps.vendor_sync',
     'apps.parts',
+    'apps.analytics',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    'apps.analytics.middleware.AnalyticsMiddleware',  # premier : mesure toute la pile (inactif sans ANALYTICS_SITE_KEY)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,6 +63,7 @@ TEMPLATES = [
                 'apps.core.context_processors.active_partners',
                 'apps.core.context_processors.site_contact',
                 'apps.core.context_processors.parts_cart',
+                'apps.analytics.context_processors.analytics',
             ],
         },
     },
@@ -140,3 +143,12 @@ BREVO_API_KEY = _config('BREVO_API_KEY', default='')
 if BREVO_API_KEY:
     EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
     ANYMAIL = {'BREVO_API_KEY': BREVO_API_KEY, 'REQUESTS_TIMEOUT': (5, 15)}
+
+# Suivi du trafic en temps réel (apps.analytics), affiché dans le back-office. « Fermé par défaut » : sans clé de site,
+# ni le middleware, ni le script, ni le point de collecte ne sont actifs. Générer une clé :
+#   python -c "import secrets; print(secrets.token_urlsafe(24))"
+ANALYTICS_SITE_KEY = _config('ANALYTICS_SITE_KEY', default='')
+ANALYTICS_SITE_NAME = 'public'
+ANALYTICS_RETENTION_DAYS = _config('ANALYTICS_RETENTION_DAYS', default=90, cast=int)
+# True : écriture par lot dans un fil d'arrière-plan (production). False : écriture immédiate (tests).
+ANALYTICS_ASYNC = True

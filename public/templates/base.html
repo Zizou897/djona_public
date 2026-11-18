@@ -35,6 +35,7 @@
   <script src="{% static 'js/mobile-nav.js' %}" defer></script>
   <script src="{% static 'js/reveal.js' %}" defer></script>
   <script src="{% static 'js/newsletter.js' %}" defer></script>
+  {% if analytics_site_key %}<script src="{% static 'js/analytics.js' %}" data-site-key="{{ analytics_site_key }}" data-endpoint="{% url 'analytics:collect' %}" defer></script>{% endif %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",

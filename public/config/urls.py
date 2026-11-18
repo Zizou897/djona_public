@@ -24,6 +24,7 @@ urlpatterns = [
     path('favoris/', catalog_views.vehicle_favorites, name='favorites_direct'),
     path('vehicules/', include('apps.catalog.urls')),
     path('pieces-detachees/', include('apps.parts.urls')),
+    path('analytics/', include('apps.analytics.urls')),
 ]
 
 if settings.DEBUG:
