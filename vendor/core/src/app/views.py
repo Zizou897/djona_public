@@ -9,7 +9,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     LoginView, PasswordResetCompleteView, PasswordResetConfirmView, PasswordResetDoneView, PasswordResetView,
 )
-from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect
@@ -20,6 +19,7 @@ from django.views.generic import CreateView, TemplateView
 
 from annonces.forms import MIN_PHOTOS
 from annonces.models import Annonce
+from . import throttle
 from .forms import (
     ConnexionForm, DemandePassageProForm, InscriptionForm, MotDePasseOublieForm, NouveauMotDePasseForm, ProfilForm,
     UtilisateurInfoForm,
@@ -45,8 +45,18 @@ class InscriptionView(CreateView):
             return redirect('tableau_de_bord_vendeur')
         return super().dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        # Évite la création de comptes en masse depuis une même IP (spam, e-mails de bienvenue détournés).
+        if throttle.nombre(f'signup:ip:{throttle.client_ip(request)}') >= throttle.SIGNUP_LIMIT_PER_IP:
+            self.object = None
+            form = self.get_form()
+            form.add_error(None, 'Trop de comptes créés depuis cette connexion. Réessayez dans une heure.')
+            return self.form_invalid(form)
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
         response = super().form_valid(form)
+        throttle.compter(f'signup:ip:{throttle.client_ip(self.request)}', throttle.SIGNUP_WINDOW)
         self.object.backend = 'django.contrib.auth.backends.ModelBackend'
         login(self.request, self.object)
         messages.success(self.request, f'Bienvenue sur Djona, {self.object.prenom} !')
@@ -71,7 +81,7 @@ RESET_WINDOW = 60 * 60
 
 
 def _client_ip(request):
-    return request.META.get('HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR', '')
+    return throttle.client_ip(request)
 
 
 def _validite_lien():
@@ -85,13 +95,7 @@ def _validite_lien():
 
 def _within_limit(key, limit, window=RESET_WINDOW):
     """Compte un appel pour `key` ; False si `limit` est dépassée dans la fenêtre."""
-    if cache.add(key, 1, window):
-        return limit >= 1
-    try:
-        return cache.incr(key) <= limit
-    except ValueError:  # clé expirée entre add() et incr()
-        cache.set(key, 1, window)
-        return limit >= 1
+    return throttle.compter(key, window) <= limit
 
 
 class MotDePasseOublieView(PasswordResetView):

@@ -1,9 +1,11 @@
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.core.exceptions import ValidationError
 
 from .models import DemandePassagePro, Profil, Utilisateur, telephone_validator
+from .throttle import LoginThrottleMixin
 
 
 class InscriptionForm(forms.ModelForm):
@@ -72,7 +74,7 @@ class InscriptionForm(forms.ModelForm):
         return user
 
 
-class ConnexionForm(AuthenticationForm):
+class ConnexionForm(LoginThrottleMixin, AuthenticationForm):
     error_messages = {
         **AuthenticationForm.error_messages,
         'invalid_login': 'Email ou mot de passe incorrect.',
@@ -83,6 +85,10 @@ class ConnexionForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = forms.EmailInput()
         self.fields['username'].label = 'Adresse email'
+
+
+class AdminConnexionForm(LoginThrottleMixin, AdminAuthenticationForm):
+    """Connexion de l'interface /admin/ de Django, soumise à la même limitation que l'espace vendeur."""
 
 
 class MotDePasseOublieForm(PasswordResetForm):

@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView
 
-from .forms import ProfilForm, UtilisateurInfoForm
+from .forms import ConnexionAdminForm, ProfilForm, UtilisateurInfoForm
 from .models import Profil
 from moderation.models import AnnonceMirror, CompteVendeur, DemandePassageProMirror
 
@@ -22,6 +22,7 @@ def home(request):
 
 class AdminLoginView(LoginView):
     template_name = 'app/layout/connexion_admin.html'
+    authentication_form = ConnexionAdminForm
 
     @property
     def redirect_authenticated_user(self):

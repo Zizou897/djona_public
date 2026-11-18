@@ -3,6 +3,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from app.forms import AdminConnexionForm
+
+admin.site.login_form = AdminConnexionForm
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),

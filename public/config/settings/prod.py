@@ -1,8 +1,14 @@
 from decouple import config
+from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F401,F403
 
 DEBUG = False
+
+# Valeurs publiques (placeholder de .env.example, valeur par défaut de base.py) : refusées en production,
+# sinon les sessions et les liens signés seraient falsifiables.
+if SECRET_KEY in {'', 'change-me-in-production', 'your-secret-key-here'}:  # noqa: F405
+    raise ImproperlyConfigured("SECRET_KEY manquante ou factice : définissez une clé secrète unique dans .env.")
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
 DATABASES = {

@@ -1,5 +1,8 @@
+import sys
 from pathlib import Path
+
 from decouple import Config, RepositoryEmpty, RepositoryEnv
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,9 +17,20 @@ if _env_file.is_file():
 else:
     config = Config(RepositoryEmpty())
 
-SECRET_KEY = config('SECRET_KEY', default='change-me-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+# Réglages « fermés par défaut » : sans .env, le projet ne doit pas démarrer en mode debug,
+# avec une clé publique ni accepter n'importe quel nom d'hôte. En développement, DEBUG=True est
+# posé explicitement dans .env (voir .env.example).
+SECRET_KEY = config('SECRET_KEY', default='')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='localhost,127.0.0.1,[::1]').split(',') if h.strip()]
+
+# Valeurs connues et publiques (placeholder de .env.example, ancienne valeur par défaut) : refusées hors debug,
+# sinon les sessions et les liens de réinitialisation de mot de passe seraient falsifiables.
+_CLES_PUBLIQUES = {'', 'change-me-in-production', 'your-secret-key-here'}
+if not DEBUG and SECRET_KEY in _CLES_PUBLIQUES:
+    raise ImproperlyConfigured("SECRET_KEY manquante ou factice : définissez une clé secrète unique dans .env (DEBUG=False).")
+if DEBUG and not SECRET_KEY:
+    SECRET_KEY = 'dev-only-insecure-key'
 
 DJANGO_APPS = [
     'jazzmin',
@@ -225,6 +239,15 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Cache fichiers, partagé entre les workers gunicorn (LocMemCache est propre à chaque processus : la limitation
+# des tentatives de connexion y serait multipliée par le nombre de workers et perdue à chaque redémarrage).
+# Le dossier doit appartenir à l'utilisateur de gunicorn : voir deploy/deploy_*.sh. Pendant les tests, cache
+# en mémoire pour ne pas garder de compteurs d'une exécution à l'autre.
+if 'test' in sys.argv[1:2]:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
+else:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache', 'LOCATION': BASE_DIR / 'cache_framework'}}
+
 # E-mail — SMTP Brevo (relais smtp-relay.brevo.com), expéditeur sur le domaine djona.tech.
 # EMAIL_HOST_USER = identifiant SMTP Brevo (ce n'est PAS l'adresse expéditrice) ; EMAIL_HOST_PASSWORD = clé SMTP Brevo.
 # DEFAULT_FROM_EMAIL doit être un expéditeur validé dans Brevo (domaine djona.tech authentifié).
@@ -271,9 +294,14 @@ JAZZMIN_UI_TWEAKS = {'theme': 'cyborg'}
 
 # Sécurité production
 if not DEBUG:
+    # nginx termine le TLS et transmet en HTTP : sans cet en-tête, Django croirait chaque requête non sécurisée
+    # (redirection HTTPS en boucle, cookies « Secure » jamais envoyés, HSTS jamais émis).
+    # nginx doit poser `proxy_set_header X-Forwarded-Proto $scheme;` (comme pour le site public).
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)  # 1 an ; 0 pour désactiver

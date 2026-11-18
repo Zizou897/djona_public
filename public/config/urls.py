@@ -4,7 +4,10 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
+from apps.core.forms import AdminConnexionForm
 from apps.core.sitemaps import PartSitemap, StaticViewSitemap, VehicleSitemap
+
+admin.site.login_form = AdminConnexionForm
 
 sitemaps = {
     'static': StaticViewSitemap,

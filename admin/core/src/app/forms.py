@@ -1,6 +1,17 @@
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Profil
+from .throttle import LoginThrottleMixin
+
+
+class ConnexionAdminForm(LoginThrottleMixin, AuthenticationForm):
+    """Connexion du back-office : nombre de tentatives limité (brute-force)."""
+
+
+class DjangoAdminConnexionForm(LoginThrottleMixin, AdminAuthenticationForm):
+    """Même limitation pour l'interface /admin/ de Django."""
 
 
 class UtilisateurInfoForm(forms.Form):

@@ -35,6 +35,12 @@ mkdir -p "$PUBLIC_PARTS" media_cdn
 chown www-data:www-data "$PUBLIC_PARTS"
 ln -sfn "$PUBLIC_PARTS" media_cdn/parts
 
+# Le cache fichiers (limitation des tentatives de connexion) doit appartenir à l'utilisateur de
+# gunicorn : créé par root, il est inutilisable par le service (la limitation serait alors ignorée).
+echo "==> [admin] droits du cache fichiers"
+mkdir -p cache_framework
+chown -R www-data:www-data cache_framework
+
 restart_and_check "$SERVICE" "$URL" 200 302
 
 echo "==> [admin] déploiement réussi"

@@ -1,7 +1,14 @@
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.utils import timezone
 
+from .throttle import LoginThrottleMixin
+
 from .models import ContactMessage, TransportRequest, TransportVehicleType
+
+class AdminConnexionForm(LoginThrottleMixin, AdminAuthenticationForm):
+    """Connexion de l'interface /admin/ de Django : nombre de tentatives limité (brute-force)."""
+
 
 INPUT_CLASS = 'w-full px-4 py-3 rounded bg-surface-container border border-outline-variant/40 text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all'
 

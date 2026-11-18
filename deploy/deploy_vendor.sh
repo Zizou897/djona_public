@@ -27,6 +27,12 @@ python manage.py migrate --noinput
 echo "==> [vendor] collecte des statiques"
 python manage.py collectstatic --noinput
 
+# Le cache fichiers (limitation des tentatives de connexion) doit appartenir à l'utilisateur de
+# gunicorn : créé par root, il est inutilisable par le service (la limitation serait alors ignorée).
+echo "==> [vendor] droits du cache fichiers"
+mkdir -p cache_framework
+chown -R www-data:www-data cache_framework
+
 # / redirige vers /connexion/ pour un visiteur non authentifié — c'est le
 # comportement normal, pas une panne.
 restart_and_check "$SERVICE" "$URL" 200 302

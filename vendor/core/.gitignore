@@ -12,6 +12,7 @@ db.sqlite3
 *.db
 static_cdn/
 media_cdn/
+cache_framework/
 dist/
 build/
 *.egg-info/
